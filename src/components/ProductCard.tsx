@@ -29,6 +29,12 @@ function ProductCard({ product }: { product: Product }) {
         // TODO: API call to update vote on the backend
     };
 
+    const handleVoteKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.stopPropagation();
+        }
+    };
+
     return (
         <div
             onClick={handleCardClick}
@@ -53,9 +59,10 @@ function ProductCard({ product }: { product: Product }) {
                     <div className="flex gap-2 h-10 text-transparent">
                         <button
                             className={`p-2 rounded-full hover:bg-gray-200 duration-200 ${
-                                vote === "like" ? "text-blue-500" : ""
+                                vote === "like" ? "text-blue-400" : ""
                             }`}
                             onClick={(e) => handleVoteClick(e, "like")}
+                            onKeyDown={handleVoteKeyDown}
                             aria-label="Product is relevant"
                         >
                             <svg
@@ -71,9 +78,10 @@ function ProductCard({ product }: { product: Product }) {
                         </button>
                         <button
                             className={`p-2 rounded-full hover:bg-gray-200 duration-200 ${
-                                vote === "dislike" ? "text-red-500" : ""
+                                vote === "dislike" ? "text-red-400" : ""
                             }`}
                             onClick={(e) => handleVoteClick(e, "dislike")}
+                            onKeyDown={handleVoteKeyDown}
                             aria-label="Product is not relevant"
                         >
                             <svg

@@ -9,13 +9,13 @@ function HomePage() {
     };
 
     return (
-        <div className="w-screen h-screen flex flex-col items-center justify-center h-screen bg-gray-100">
+        <div className="w-screen h-screen p-2 flex flex-col items-center justify-center h-screen bg-gray-100">
             <h1 className="text-5xl font-bold mb-12 text-gray-800 text-shadow-md">
-                <span className="text-blue-500">Smart </span>
+                <span className="text-indigo-500">Smart </span>
                 <span className="text-gray-800">Search</span>
             </h1>
 
-            <SearchBar className="w-150" onSearchSuccess={handleSearchSuccess} />
+            <SearchBar className="w-full max-w-150 mb-12" onSearchSuccess={handleSearchSuccess} />
         </div>
     );
 }

@@ -36,9 +36,9 @@ function ProductPage() {
         }
 
         return (
-            <div className="flex flex-col sm:flex-row gap-4 mx-auto">
+            <div className="flex flex-col sm:flex-row shadow-lg rounded-lg overflow-hidden bg-gray-50 sm:gap-4 mx-auto">
                 {/* Image Section */}
-                <div className="aspect-square sm:w-1/2 bg-gray-200 rounded-lg overflow-hidden">
+                <div className="aspect-square sm:w-1/2 bg-gray-200">
                     {product.imageUrl ? (
                         <img src={product.imageUrl} alt={product.title} className="w-full object-cover" />
                     ) : (
@@ -49,7 +49,7 @@ function ProductPage() {
                 </div>
 
                 {/* Details Section */}
-                <div className="flex gap-4 sm:w-1/2 rounded-r-lg bg-gray-100 sm:pl-4 flex flex-col">
+                <div className="flex gap-4 sm:w-1/2 p-4 flex flex-col">
                     <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
                     <p className="text-gray-600 text-lg">{product.description}</p>
                     <p className="text-2xl text-gray-700">{product.price ? `${product.price}` : "Not available"}</p>
@@ -60,14 +60,14 @@ function ProductPage() {
 
     return (
         <div className="min-h-screen max-w-6xl mx-auto bg-gray-100 py-6 px-2">
-            <header className="mb-8 flex flex-col sm:flex-row items-center justify-between">
+            <header className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <button
                     onClick={() => {
                         navigate("/");
                     }}
-                    className="mb-4 sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
+                    className="mb-4 flex gap-2 sm:gap-0 sm:flex-col sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
                 >
-                    <span className="text-blue-500">Smart </span>
+                    <span className="text-indigo-500">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </button>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />
