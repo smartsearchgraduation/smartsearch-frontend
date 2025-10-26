@@ -27,7 +27,7 @@ export async function searchRequest(input: SearchRequestInput): Promise<SearchRe
 
     // Mock api call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    //throw new Error("An unknown network error occurred.");
+    // throw new Error("An unknown network error occurred.");
     return { searchId: query };
 
     try {
