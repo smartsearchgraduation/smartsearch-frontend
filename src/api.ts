@@ -56,40 +56,44 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 export const fetchSearchResults = async (searchId: string) => {
     // Mock api call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const mockData: Product[] = [
-        {
-            id: "1",
-            name: "Product 1",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 1",
-            price: currencyFormatter.format(10.99),
-            title: "Title 1",
-        },
-        {
-            id: "2",
-            name: "Product 2",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 2",
-            price: currencyFormatter.format(20.97),
-            title: "Title 2",
-        },
-        {
-            id: "3",
-            name: "Product 3",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 3",
-            price: currencyFormatter.format(30.5),
-            title: "Title 3",
-        },
-        {
-            id: "4",
-            name: "Product 4",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 4",
-            price: currencyFormatter.format(40.99),
-            title: "Title 4",
-        },
-    ];
+    const mockData: { products: Product[]; correctedText: string; rawText: string } = {
+        products: [
+            {
+                id: "1",
+                name: "Product 1",
+                imageUrl: "https://placehold.co/400",
+                description: "Description 1",
+                price: currencyFormatter.format(10.99),
+                title: "Title 1",
+            },
+            {
+                id: "2",
+                name: "Product 2",
+                imageUrl: "https://placehold.co/400",
+                description: "Description 2",
+                price: currencyFormatter.format(20.97),
+                title: "Title 2",
+            },
+            {
+                id: "3",
+                name: "Product 3",
+                imageUrl: "https://placehold.co/400",
+                description: "Description 3",
+                price: currencyFormatter.format(30.5),
+                title: "Title 3",
+            },
+            {
+                id: "4",
+                name: "Product 4",
+                imageUrl: "https://placehold.co/400",
+                description: "Description 4",
+                price: currencyFormatter.format(40.99),
+                title: "Title 4",
+            },
+        ],
+        correctedText: searchId.includes("raw") ? "" : "corrected text",
+        rawText: "raw text",
+    };
     return mockData;
 
     const response = await fetch(`/api/search-results/${searchId}`);
@@ -98,8 +102,14 @@ export const fetchSearchResults = async (searchId: string) => {
         throw new Error("Failed to get results.");
     }
 
-    const data: { products: Product[] } = await response.json();
-    return data.products;
+    const data: { products: Product[]; correctedText: string; rawText: string } = await response.json();
+    return data;
+};
+
+export const getRawTextResults = async (searchId: string) => {
+    // Mock api call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return "raw text " + searchId;
 };
 
 export const fetchProductById = async (productId: string): Promise<Product> => {
