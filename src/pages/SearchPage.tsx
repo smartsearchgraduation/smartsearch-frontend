@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchSearchResults, type Product } from "../api";
+import { fetchSearchResults, getRawTextResults, type Product } from "../api";
 import ProductCard from "../components/ProductCard";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "../components/SearchBar";
@@ -34,13 +34,13 @@ function SearchPage() {
             );
         }
 
-        if (!results || results.length === 0) {
+        if (!results || results.products.length === 0) {
             return <div className="text-center text-gray-500">No products found.</div>;
         }
 
         return (
             <div className="grid sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))] grid-cols-2 gap-2 sm:gap-4">
-                {results.map((product: Product) => (
+                {results.products.map((product: Product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
             </div>
@@ -49,7 +49,7 @@ function SearchPage() {
 
     return (
         <div className="min-h-screen max-w-6xl mx-auto bg-gray-100 py-6 px-2">
-            <header className="mb-8 flex flex-col sm:flex-row items-center justify-between">
+            <header className="mb-6 flex flex-col sm:flex-row items-center justify-between">
                 <button
                     onClick={() => {
                         navigate("/");
@@ -61,6 +61,23 @@ function SearchPage() {
                 </button>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />
             </header>
+            {results && results.correctedText && (
+                <>
+                    <p className="text-gray-700 mb-1">
+                        Showing results for: <span className="font-bold text-blue-500">{results.correctedText}</span>
+                    </p>
+                    <p className="text-gray-600 text-sm mb-4">
+                        Search instead for:{" "}
+                        <button
+                            disabled // Disabled for now will enable later
+                            onClick={async () => handleSearchSuccess(await getRawTextResults(searchId || ""))}
+                            className="text-blue-500 hover:underline cursor-pointer"
+                        >
+                            {results.rawText}
+                        </button>
+                    </p>
+                </>
+            )}
             <div>{renderContent()}</div>
         </div>
     );
