@@ -67,7 +67,7 @@ function ProductPage() {
                     }}
                     className="mb-4 flex gap-2 sm:gap-0 sm:flex-col sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
                 >
-                    <span className="text-indigo-500">Smart </span>
+                    <span className="text-emerald-600">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </button>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />

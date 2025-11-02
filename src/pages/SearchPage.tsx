@@ -56,7 +56,7 @@ function SearchPage() {
                     }}
                     className="mb-4 flex gap-2 sm:gap-0 sm:flex-col sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
                 >
-                    <span className="text-indigo-500">Smart </span>
+                    <span className="text-emerald-600">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </button>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />
@@ -64,14 +64,14 @@ function SearchPage() {
             {results && results.correctedText && (
                 <>
                     <p className="text-gray-700 mb-1">
-                        Showing results for: <span className="font-bold text-indigo-500">{results.correctedText}</span>
+                        Showing results for: <span className="font-bold text-emerald-600">{results.correctedText}</span>
                     </p>
                     <p className="text-gray-600 text-sm mb-4">
                         Search instead for:{" "}
                         <button
                             disabled // Disabled for now will enable later
                             onClick={async () => handleSearchSuccess(await getRawTextResults(searchId || ""))}
-                            className="text-indigo-500 hover:underline cursor-pointer"
+                            className="text-emerald-600 hover:underline cursor-pointer"
                         >
                             {results.rawText}
                         </button>

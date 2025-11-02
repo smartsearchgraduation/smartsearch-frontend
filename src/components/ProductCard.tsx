@@ -41,7 +41,7 @@ function ProductCard({ product }: { product: Product }) {
             onKeyDown={handleCardKeyDown}
             role="link"
             tabIndex={0}
-            className="rounded-lg shadow-md overflow-hidden bg-gray-200 focus:outline-2 hover:shadow-xl cursor-pointer transition-shadow duration-200"
+            className="ring-2 ring-gray-200 rounded-lg shadow-md overflow-hidden bg-gray-200 focus:outline-2 hover:shadow-xl cursor-pointer transition-shadow duration-200"
         >
             {product.imageUrl ? (
                 <div className="aspect-square w-full rounded-t-lg">
