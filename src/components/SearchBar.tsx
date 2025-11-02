@@ -122,8 +122,8 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             return;
         }
 
-        if (query.trim() === "" && !imageFile) {
-            setError("Please enter a search query or add an image.");
+        if (query.trim() === "") {
+            setError("Please enter a search query.");
             return;
         }
 
@@ -176,8 +176,8 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
     return (
         <form
             className={
-                "flex flex-col relative bg-white border border-gray-200 rounded-[1.5rem] shadow-lg duration-200 " +
-                `${error ? "ring-2 ring-red-400" : "focus-within:ring-2 focus-within:ring-indigo-500"} ` +
+                "flex flex-col relative bg-white ring-2 ring-gray-200 rounded-[1.5rem] shadow-lg duration-200 " +
+                `${error ? "ring-red-400" : "focus-within:ring-emerald-600"} ` +
                 props.className
             }
             onDragOver={handleDragOver}
@@ -194,6 +194,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     className="flex-grow text-lg border-none focus:outline-none focus:ring-0 bg-transparent 
                                  text-gray-900 placeholder:text-gray-500 resize-none overflow-y-auto max-h-28"
                     placeholder="Search using natural language"
+                    autoFocus
                     value={query}
                     onChange={handleQueryChange}
                     onKeyDown={handleKeyDown}
@@ -263,9 +264,9 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     id="submit"
                     name="submit"
                     type="submit"
-                    disabled={isLoading || (query.trim() === "" && !imageFile)}
-                    className="w-10 h-10 p-2 mt-auto rounded-full bg-indigo-500 text-white hover:bg-indigo-600 duration-200 cursor-pointer 
-                                flex-shrink-0 shadow-md disabled:opacity-80 disabled:cursor-not-allowed disabled:hover:bg-indigo-500"
+                    disabled={isLoading || query.trim() === ""}
+                    className="w-10 h-10 p-2 mt-auto rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
+                                flex-shrink-0 shadow-md disabled:hover:bg-emerald-600 disabled:cursor-not-allowed"
                     aria-label="Submit search"
                 >
                     {isLoading ? (
@@ -297,7 +298,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             {/* --- Drag and Drop Overlay --- */}
             <div
                 className="absolute inset-0 rounded-[1.5rem] flex items-center justify-center text-white 
-                            font-bold bg-indigo-500/80 transition-opacity duration-200"
+                            font-bold bg-emerald-600/80 transition-opacity duration-200"
                 style={{
                     opacity: isDragging ? 1 : 0,
                     pointerEvents: isDragging ? "auto" : "none",

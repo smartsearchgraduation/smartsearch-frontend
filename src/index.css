@@ -2,7 +2,6 @@
 
 @layer base {
     html {
-        scrollbar-gutter: stable both-edges;
         @apply bg-gray-100;
     }
 }
