@@ -260,7 +260,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         </svg>
                     </button>
                 )}
-                <div>
+                <div className="mt-auto">
                     {/* --- Character Count/Limit --- */}
                     <span className={"text-sm text-gray-500 mr-2 " + (query.length > charLimit ? "text-red-500" : "")}>
                         {textAreaRef.current?.value.length || 0}/{charLimit}
@@ -271,8 +271,8 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         name="submit"
                         type="submit"
                         disabled={isLoading || query.trim() === "" || query.length > charLimit}
-                        className="w-10 h-10 p-2 mt-auto rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
-                                flex-shrink-0 shadow-md disabled:opacity-50 disabled:bg-emerald-700 disabled:hover:bg-emerald-700 disabled:cursor-not-allowed"
+                        className="w-10 h-10 p-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
+                                shadow-md disabled:opacity-50 disabled:bg-emerald-700 disabled:hover:bg-emerald-700 disabled:cursor-not-allowed"
                         aria-label="Submit search"
                     >
                         {isLoading ? (
