@@ -20,6 +20,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const charLimit = 300;
 
     const processFile = (file: File | null | undefined) => {
         if (file && file.type.startsWith("image/")) {
@@ -259,40 +260,51 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         </svg>
                     </button>
                 )}
-                {/* --- Submit Button --- */}
-                <button
-                    id="submit"
-                    name="submit"
-                    type="submit"
-                    disabled={isLoading || query.trim() === ""}
-                    className="w-10 h-10 p-2 mt-auto rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
-                                flex-shrink-0 shadow-md disabled:hover:bg-emerald-600 disabled:cursor-not-allowed"
-                    aria-label="Submit search"
-                >
-                    {isLoading ? (
-                        <svg className="animate-spin" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M 300 80 A 220 220 0 1 1 80 300"
-                                fill="transparent"
-                                stroke="currentColor"
-                                strokeWidth="60"
-                                strokeLinecap="round"
-                            />
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke="currentColor" strokeWidth="60" strokeLinecap="round" d="M 400 400 520 520" />
-                            <circle
-                                cx="240"
-                                cy="240"
-                                r="180"
-                                fill="transparent"
-                                stroke="currentColor"
-                                strokeWidth="60"
-                            />
-                        </svg>
-                    )}
-                </button>
+                <div>
+                    {/* --- Character Count/Limit --- */}
+                    <span className={"text-sm text-gray-500 mr-2 " + (query.length > charLimit ? "text-red-500" : "")}>
+                        {textAreaRef.current?.value.length || 0}/{charLimit}
+                    </span>
+                    {/* --- Submit Button --- */}
+                    <button
+                        id="submit"
+                        name="submit"
+                        type="submit"
+                        disabled={isLoading || query.trim() === "" || query.length > charLimit}
+                        className="w-10 h-10 p-2 mt-auto rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
+                                flex-shrink-0 shadow-md disabled:opacity-50 disabled:bg-emerald-700 disabled:hover:bg-emerald-700 disabled:cursor-not-allowed"
+                        aria-label="Submit search"
+                    >
+                        {isLoading ? (
+                            <svg className="animate-spin" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M 300 80 A 220 220 0 1 1 80 300"
+                                    fill="transparent"
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                    strokeLinecap="round"
+                                    d="M 400 400 520 520"
+                                />
+                                <circle
+                                    cx="240"
+                                    cy="240"
+                                    r="180"
+                                    fill="transparent"
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                />
+                            </svg>
+                        )}
+                    </button>
+                </div>
             </div>
 
             {/* --- Drag and Drop Overlay --- */}
