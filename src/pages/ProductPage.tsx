@@ -36,7 +36,7 @@ function ProductPage() {
         }
 
         return (
-            <div className="flex flex-col sm:flex-row shadow-lg rounded-lg overflow-hidden bg-gray-50 sm:gap-4 mx-auto">
+            <div className="flex flex-col sm:flex-row ring-2 ring-gray-200 shadow-lg rounded-lg overflow-hidden bg-gray-50 sm:gap-4 mx-auto">
                 {/* Image Section */}
                 <div className="aspect-square sm:w-1/2 bg-gray-200">
                     {product.imageUrl ? (
