@@ -1,69 +1,61 @@
-import { useState, type MouseEvent, type KeyboardEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, type MouseEvent } from "react";
+import { Link } from "react-router-dom";
 import { type Product } from "../api";
 
 function ProductCard({ product }: { product: Product }) {
     const [vote, setVote] = useState<"like" | "dislike" | null>(null);
-    const navigate = useNavigate();
-
-    const handleCardClick = () => {
-        navigate(`/product/${product.id}`);
-    };
-
-    const handleCardKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-        // Allow navigation with Enter or Spacebar
-        if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault(); // Stop spacebar from scrolling
-            handleCardClick();
-        }
-    };
 
     const handleVoteClick = (e: MouseEvent<HTMLButtonElement>, voteType: "like" | "dislike") => {
         e.stopPropagation();
+        e.preventDefault();
+
         setVote((currentVote) => {
             if (currentVote === voteType) {
                 return null;
             }
             return voteType;
         });
-        // TODO: API call to update vote on the backend
-    };
-
-    const handleVoteKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
-        if (e.key === "Enter" || e.key === " ") {
-            e.stopPropagation();
-        }
     };
 
     return (
         <div
-            onClick={handleCardClick}
-            onKeyDown={handleCardKeyDown}
-            role="link"
-            tabIndex={0}
-            className="ring-2 ring-gray-200 rounded-lg shadow-md overflow-hidden bg-gray-200 focus:outline-2 hover:shadow-xl cursor-pointer transition-shadow duration-200"
+            className="ring-2 ring-gray-200 rounded-lg shadow-md overflow-hidden bg-gray-200 focus-within:outline-2 
+                       hover:shadow-xl transition-shadow duration-200 relative group"
         >
             {product.imageUrl ? (
                 <div className="aspect-square w-full rounded-t-lg">
                     <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain" />
                 </div>
             ) : (
-                <div className="aspect-square w-full rounded-t-lg flex items-center justify-center">
+                <div
+                    role="img"
+                    aria-label={product.name}
+                    className="aspect-square w-full rounded-t-lg flex items-center justify-center"
+                >
                     <p className="text-gray-700">No image available</p>
                 </div>
             )}
+
             <div className="flex flex-col p-4 bg-gray-100">
-                <h3 className="font-bold sm:text-lg mr-auto max-w-full truncate">{product.title}</h3>
+                <h3 className="font-bold sm:text-lg mr-auto max-w-full truncate">
+                    <Link
+                        to={`/product/${product.id}`}
+                        className="text-gray-900 after:content-[''] after:absolute after:inset-0 after:z-10"
+                    >
+                        {product.title}
+                    </Link>
+                </h3>
+
                 <div className="flex items-center justify-between">
                     <p className="text-gray-700">{product.price || "Not available"}</p>
-                    <div className="flex gap-2 h-10 text-transparent">
+                    <div className="flex gap-2 h-10 text-transparent relative z-20">
                         <button
                             className={`p-2 rounded-full hover:bg-gray-200 duration-200 ${
                                 vote === "like" ? "text-blue-400" : ""
                             }`}
                             onClick={(e) => handleVoteClick(e, "like")}
-                            onKeyDown={handleVoteKeyDown}
                             aria-label="Product is relevant"
+                            aria-pressed={vote === "like"}
                         >
                             <svg
                                 className="h-full"
@@ -81,8 +73,8 @@ function ProductCard({ product }: { product: Product }) {
                                 vote === "dislike" ? "text-red-400" : ""
                             }`}
                             onClick={(e) => handleVoteClick(e, "dislike")}
-                            onKeyDown={handleVoteKeyDown}
                             aria-label="Product is not relevant"
+                            aria-pressed={vote === "dislike"}
                         >
                             <svg
                                 className="h-full"
