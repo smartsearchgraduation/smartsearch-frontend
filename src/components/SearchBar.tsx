@@ -176,6 +176,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     return (
         <form
+            role="search"
             className={
                 "flex flex-col relative bg-white ring-2 ring-gray-200 rounded-[1.5rem] shadow-lg duration-200 " +
                 `${error ? "ring-red-400" : "focus-within:ring-emerald-600"} ` +
@@ -190,6 +191,9 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     ref={textAreaRef}
                     id="searchbar"
                     name="searchbar"
+                    aria-label="Search using natural language"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "search-error" : undefined}
                     rows={1}
                     disabled={isLoading}
                     className="flex-grow text-lg border-none focus:outline-none focus:ring-0 bg-transparent 
@@ -202,13 +206,25 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     onPaste={handlePaste}
                 />
             </div>
-
             {/* Hidden file input */}
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
-
+            <input
+                type="file"
+                aria-label="Add image"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+            />
+            {/* Visually-hidden announcements for screen readers */}
+            <div className="visually-hidden" role="status" aria-live="polite">
+                {isDragging ? "Drop image here to upload" : ""}
+            </div>
             {/* --- Error Message --- */}
-            {error && <p className="text-sm text-red-500 px-4 pb-2">{error}</p>}
-
+            {error && (
+                <p id="search-error" role="alert" className="text-sm text-red-500 px-4 pb-2">
+                    {error}
+                </p>
+            )}
             {/* --- Bottom Row --- */}
             <div className="flex justify-between items-center px-2 pt-1 pb-2">
                 {/* --- Image Preview --- */}
@@ -217,7 +233,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         <div className="relative">
                             <img
                                 src={previewUrl}
-                                alt="Search preview"
+                                alt={imageFile ? `Preview of ${imageFile.name}` : ""}
                                 className="max-w-xs max-h-24 rounded-[1rem] shadow-md pointer-events-none"
                             />
                             <button
@@ -262,7 +278,11 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                 )}
                 <div className="mt-auto">
                     {/* --- Character Count/Limit --- */}
-                    <span className={"text-sm text-gray-500 mr-2 " + (query.length > charLimit ? "text-red-500" : "")}>
+                    <span
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className={"text-sm text-gray-500 mr-2 " + (query.length > charLimit ? "text-red-500" : "")}
+                    >
                         {textAreaRef.current?.value.length || 0}/{charLimit}
                     </span>
                     {/* --- Submit Button --- */}
@@ -306,7 +326,6 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     </button>
                 </div>
             </div>
-
             {/* --- Drag and Drop Overlay --- */}
             <div
                 className="absolute inset-0 rounded-[1.5rem] flex items-center justify-center text-white 
