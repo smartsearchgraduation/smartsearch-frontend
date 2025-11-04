@@ -10,7 +10,7 @@ import {
 } from "react";
 import { searchRequest } from "../api";
 
-function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void }) {
+function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void; autofocus?: boolean }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>("");
@@ -20,6 +20,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const charLimit = 300;
 
     const processFile = (file: File | null | undefined) => {
         if (file && file.type.startsWith("image/")) {
@@ -122,8 +123,8 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             return;
         }
 
-        if (query.trim() === "" && !imageFile) {
-            setError("Please enter a search query or add an image.");
+        if (query.trim() === "") {
+            setError("Please enter a search query.");
             return;
         }
 
@@ -175,9 +176,10 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     return (
         <form
+            role="search"
             className={
-                "flex flex-col relative bg-white border border-gray-200 rounded-[1.5rem] shadow-lg duration-200 " +
-                `${error ? "ring-2 ring-red-400" : "focus-within:ring-2 focus-within:ring-indigo-500"} ` +
+                "flex flex-col relative bg-white ring-2 ring-gray-200 rounded-[1.5rem] shadow-lg duration-200 " +
+                `${error ? "ring-red-400" : "focus-within:ring-emerald-600"} ` +
                 props.className
             }
             onDragOver={handleDragOver}
@@ -189,24 +191,40 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     ref={textAreaRef}
                     id="searchbar"
                     name="searchbar"
+                    aria-label="Search using natural language"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "search-error" : undefined}
                     rows={1}
                     disabled={isLoading}
                     className="flex-grow text-lg border-none focus:outline-none focus:ring-0 bg-transparent 
                                  text-gray-900 placeholder:text-gray-500 resize-none overflow-y-auto max-h-28"
                     placeholder="Search using natural language"
+                    autoFocus={props.autofocus || false}
                     value={query}
                     onChange={handleQueryChange}
                     onKeyDown={handleKeyDown}
                     onPaste={handlePaste}
                 />
             </div>
-
             {/* Hidden file input */}
-            <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
-
+            <input
+                type="file"
+                aria-label="Add image"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+            />
+            {/* Visually-hidden announcements for screen readers */}
+            <div className="visually-hidden" role="status" aria-live="polite">
+                {isDragging ? "Drop image here to upload" : ""}
+            </div>
             {/* --- Error Message --- */}
-            {error && <p className="text-sm text-red-500 px-4 pb-2">{error}</p>}
-
+            {error && (
+                <p id="search-error" role="alert" className="text-sm text-red-500 px-4 pb-2">
+                    {error}
+                </p>
+            )}
             {/* --- Bottom Row --- */}
             <div className="flex justify-between items-center px-2 pt-1 pb-2">
                 {/* --- Image Preview --- */}
@@ -215,7 +233,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         <div className="relative">
                             <img
                                 src={previewUrl}
-                                alt="Search preview"
+                                alt={imageFile ? `Preview of ${imageFile.name}` : ""}
                                 className="max-w-xs max-h-24 rounded-[1rem] shadow-md pointer-events-none"
                             />
                             <button
@@ -258,46 +276,60 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                         </svg>
                     </button>
                 )}
-                {/* --- Submit Button --- */}
-                <button
-                    id="submit"
-                    name="submit"
-                    type="submit"
-                    disabled={isLoading || (query.trim() === "" && !imageFile)}
-                    className="w-10 h-10 p-2 mt-auto rounded-full bg-indigo-500 text-white hover:bg-indigo-600 duration-200 cursor-pointer 
-                                flex-shrink-0 shadow-md disabled:opacity-80 disabled:cursor-not-allowed disabled:hover:bg-indigo-500"
-                    aria-label="Submit search"
-                >
-                    {isLoading ? (
-                        <svg className="animate-spin" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M 300 80 A 220 220 0 1 1 80 300"
-                                fill="transparent"
-                                stroke="currentColor"
-                                strokeWidth="60"
-                                strokeLinecap="round"
-                            />
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke="currentColor" strokeWidth="60" strokeLinecap="round" d="M 400 400 520 520" />
-                            <circle
-                                cx="240"
-                                cy="240"
-                                r="180"
-                                fill="transparent"
-                                stroke="currentColor"
-                                strokeWidth="60"
-                            />
-                        </svg>
-                    )}
-                </button>
+                <div className="mt-auto">
+                    {/* --- Character Count/Limit --- */}
+                    <span
+                        aria-live="polite"
+                        aria-atomic="true"
+                        className={"text-sm text-gray-500 mr-2 " + (query.length > charLimit ? "text-red-500" : "")}
+                    >
+                        {textAreaRef.current?.value.length || 0}/{charLimit}
+                    </span>
+                    {/* --- Submit Button --- */}
+                    <button
+                        id="submit"
+                        name="submit"
+                        type="submit"
+                        disabled={isLoading || query.trim() === "" || query.length > charLimit}
+                        className="w-10 h-10 p-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 duration-200 cursor-pointer 
+                                shadow-md disabled:opacity-50 disabled:bg-emerald-700 disabled:hover:bg-emerald-700 disabled:cursor-not-allowed"
+                        aria-label="Submit search"
+                    >
+                        {isLoading ? (
+                            <svg className="animate-spin" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M 300 80 A 220 220 0 1 1 80 300"
+                                    fill="transparent"
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                    strokeLinecap="round"
+                                />
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                    strokeLinecap="round"
+                                    d="M 400 400 520 520"
+                                />
+                                <circle
+                                    cx="240"
+                                    cy="240"
+                                    r="180"
+                                    fill="transparent"
+                                    stroke="currentColor"
+                                    strokeWidth="60"
+                                />
+                            </svg>
+                        )}
+                    </button>
+                </div>
             </div>
-
             {/* --- Drag and Drop Overlay --- */}
             <div
                 className="absolute inset-0 rounded-[1.5rem] flex items-center justify-center text-white 
-                            font-bold bg-indigo-500/80 transition-opacity duration-200"
+                            font-bold bg-emerald-600/80 transition-opacity duration-200"
                 style={{
                     opacity: isDragging ? 1 : 0,
                     pointerEvents: isDragging ? "auto" : "none",
