@@ -10,7 +10,7 @@ import {
 } from "react";
 import { searchRequest } from "../api";
 
-function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void }) {
+function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void; autofocus?: boolean }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>("");
@@ -195,7 +195,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
                     className="flex-grow text-lg border-none focus:outline-none focus:ring-0 bg-transparent 
                                  text-gray-900 placeholder:text-gray-500 resize-none overflow-y-auto max-h-28"
                     placeholder="Search using natural language"
-                    autoFocus
+                    autoFocus={props.autofocus || false}
                     value={query}
                     onChange={handleQueryChange}
                     onKeyDown={handleKeyDown}
