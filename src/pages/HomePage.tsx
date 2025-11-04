@@ -15,7 +15,7 @@ function HomePage() {
                 <span className="text-gray-800">Search</span>
             </h1>
 
-            <SearchBar className="w-full max-w-150 mb-12" onSearchSuccess={handleSearchSuccess} />
+            <SearchBar className="w-full max-w-150 mb-12" onSearchSuccess={handleSearchSuccess} autofocus={true} />
         </div>
     );
 }
