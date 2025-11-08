@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "../components/SearchBar";
 import { fetchProductById } from "../api";
+import LoadingWave from "../components/LoadingWave";
 
 function ProductPage() {
     const { productId } = useParams<{ productId: string }>();
@@ -24,11 +25,7 @@ function ProductPage() {
 
     const renderContent = () => {
         if (isLoading) {
-            return (
-                <div role="status" className="text-center text-gray-500">
-                    Loading product details...
-                </div>
-            );
+            return <LoadingWave message="Loading product details" />;
         }
 
         if (isError) {
