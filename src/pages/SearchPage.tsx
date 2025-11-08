@@ -3,6 +3,7 @@ import { fetchSearchResults, getRawTextResults, type Product } from "../api";
 import ProductCard from "../components/ProductCard";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "../components/SearchBar";
+import LoadingWave from "../components/LoadingWave";
 
 function SearchPage() {
     const { searchId } = useParams<{ searchId: string }>();
@@ -25,11 +26,7 @@ function SearchPage() {
 
     const renderContent = () => {
         if (isLoading) {
-            return (
-                <div role="status" className="text-center text-gray-500">
-                    Loading results...
-                </div>
-            );
+            return <LoadingWave message="Loading results" />;
         }
 
         if (isError) {
@@ -88,7 +85,7 @@ function SearchPage() {
                     </p>
                 </main>
             )}
-            <div>{renderContent()}</div>
+            {renderContent()}
         </div>
     );
 }
