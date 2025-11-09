@@ -1,75 +1,89 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🚀 smartsearch-frontend
 
-Currently, two official plugins are available:
+This is the React frontend for the SmartSearch project.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+## 🌐 Live Demo
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+You can view the latest deployed version here:
+**[https://smartsearchgraduation.github.io/smartsearch-frontend/](https://smartsearchgraduation.github.io/smartsearch-frontend/)**
 
-Note: This will impact Vite dev & build performances.
 
-## Expanding the ESLint configuration
+## 🛠️ Built With
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This project is built with modern web technologies, including:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+* **[React](https://reactjs.org/):** A JavaScript library for building user interfaces.
+* **[Vite](https://vitejs.dev/):** A next-generation frontend build tool for extremely fast development.
+* **[Tailwind CSS](https://tailwindcss.com/):** A utility-first CSS framework for rapid UI development.
+* **[TanStack Query](https://tanstack.com/query/latest):** A powerful library for data fetching, caching, and state management.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+
+## 🏁 Getting Started
+
+To get a local copy up and running, follow these steps.
+
+### Prerequisites
+
+You will need [Node.js](https://nodejs.org/) (version 18 or higher is recommended) and npm installed on your machine.
+
+### Installation
+
+1.  **Clone the repo**
+    ```sh
+    git clone https://github.com/smartsearchgraduation/smartsearch-frontend.git
+    ```
+2.  **Navigate to the project directory**
+    ```sh
+    cd smartsearch-frontend
+    ```
+3.  **Install dependencies**
+    ```sh
+    npm install
+    ```
+
+### Running the Development Server
+
+Once the dependencies are installed, you can start the local development server:
+
+```sh
+npm run dev
+```
+This will run the app in development mode. Open [http://localhost:5173](https://www.google.com/search?q=http://localhost:5173) (or the port specified in your terminal) to view it in your browser. The page will reload automatically as you make edits.
+
+
+## 📁 Project Structure
+
+The project follows a standard Vite + React structure, organizing files by feature and type.
+
+```
+smartsearch-frontend/
+├── public/
+│   └── ... (static assets)
+├── src/
+│   ├── components/
+│   │   ├── SearchBar.tsx
+│   │   ├── ProductCard.tsx
+│   │   └── ... (reusable UI components)
+│   ├── pages/
+│   │   ├── HomePage.tsx
+│   │   ├── SearchPage.tsx
+│   │   └── ... (main page views)
+│   ├── App.tsx
+│   ├── index.css
+│   └── main.tsx
+├── .gitignore
+├── index.html
+├── package.json
+└── README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🏗️ Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+-   **Components:** All reusable UI elements (like `SearchBar`, `ProductCard`) are located in `src/components`. These are designed to be simple and reusable across different pages.
+    
+-   **Pages:** Major application views (like `HomePage`, `SearchPage`) are in `src/pages`. These components are responsible for assembling various smaller components to create a full page.
+    
+-   **Data Fetching:** All communication with the backend API is handled by **TanStack Query**. This manages caching, refetching, and loading/error states, keeping the UI components clean.
