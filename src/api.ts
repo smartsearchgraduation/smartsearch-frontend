@@ -17,8 +17,59 @@ export type Product = {
 };
 
 export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
-    const { query, image } = input;
+    if (import.meta.env.MODE === "development") {
+        const { query } = input;
 
+        const dataToSend = {
+            raw_text: query,
+        };
+
+        try {
+            const response = await fetch("http://localhost:5000/api/search", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(dataToSend),
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                const message = errData.message || `Request failed with status ${response.status}`;
+                throw new Error(message);
+            }
+
+            const data: { query_id: { searchId: string }; corrected_text: string; products: any } =
+                await response.json();
+
+            console.log(data);
+
+            const { searchId } = data.query_id;
+            localStorage.setItem("raw_text", query);
+            localStorage.setItem("corrected_text", data.corrected_text);
+            localStorage.setItem(
+                "products",
+                JSON.stringify(
+                    data.products.map((p: any) => {
+                        return {
+                            id: p.product_id,
+                            name: p.name,
+                            imageUrl: "https://placehold.co/400",
+                            description: p.description,
+                            price: currencyFormatter.format(Number(p.price)),
+                            title: p.name,
+                        };
+                    })
+                )
+            );
+
+            return { searchId };
+        } catch (err: any) {
+            throw new Error(err.message || "An unknown network error occurred.");
+        }
+    }
+
+    const { query, image } = input;
     const formData = new FormData();
     formData.append("query", query);
     if (image) {
@@ -54,6 +105,13 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export const fetchSearchResults = async (searchId: string) => {
+    if (import.meta.env.MODE === "development") {
+        const rawText = localStorage.getItem("raw_text");
+        const correctedText = localStorage.getItem("corrected_text");
+        const products = JSON.parse(localStorage.getItem("products") || "[]");
+        return { products, correctedText, rawText };
+    }
+
     // Mock api call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const mockData: { products: Product[]; correctedText: string; rawText: string } = {
@@ -113,6 +171,11 @@ export const getRawTextResults = async (searchId: string) => {
 };
 
 export const fetchProductById = async (productId: string): Promise<Product> => {
+    if (import.meta.env.MODE === "development") {
+        const products = JSON.parse(localStorage.getItem("products") || "[]");
+        return products.find((p: Product) => p.id === productId)!;
+    }
+
     // MOCK DATA
     await new Promise((res) => setTimeout(res, 1000)); // Simulate network delay
 
