@@ -1,7 +1,3 @@
-export interface SearchRequestResponse {
-    searchId: string;
-}
-
 export interface SearchRequestInput {
     query: string;
     image: File | null;
@@ -16,10 +12,10 @@ export type Product = {
     title: string;
 };
 
-export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
+export async function searchRequest(input: SearchRequestInput): Promise<string> {
     let url = "http://localhost:5000/api/search";
+    url = "https://api.init-ai.com/api/search";
     if (import.meta.env.MODE === "production") {
-        url = "https://api.init-ai.com/api/search";
     }
     const { query } = input;
 
@@ -42,11 +38,11 @@ export async function searchRequest(input: SearchRequestInput): Promise<SearchRe
             throw new Error(message);
         }
 
-        const data: { query_id: { searchId: string }; corrected_text: string; products: any } = await response.json();
+        const data: { query_id: string; corrected_text: string; products: any } = await response.json();
 
         console.log(data);
 
-        const { searchId } = data.query_id;
+        const searchId = data.query_id;
         localStorage.setItem("raw_text", query);
         localStorage.setItem("corrected_text", data.corrected_text);
         localStorage.setItem(
@@ -65,7 +61,7 @@ export async function searchRequest(input: SearchRequestInput): Promise<SearchRe
             )
         );
 
-        return { searchId };
+        return searchId;
     } catch (err: any) {
         throw new Error(err.message || "An unknown network error occurred.");
     }

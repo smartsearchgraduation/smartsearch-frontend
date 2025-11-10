@@ -131,7 +131,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
         setIsLoading(true);
 
         try {
-            const { searchId } = await searchRequest({ query, image: imageFile });
+            const searchId = await searchRequest({ query, image: imageFile });
 
             props.onSearchSuccess(searchId);
             setQuery("");
