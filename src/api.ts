@@ -17,7 +17,9 @@ export type Product = {
 };
 
 export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
+    let url = "http://localhost:5000/api/search";
     if (import.meta.env.MODE === "production") {
+        url = "https://api.init-ai.com/api/search";
     }
     const { query } = input;
 
@@ -26,7 +28,7 @@ export async function searchRequest(input: SearchRequestInput): Promise<SearchRe
     };
 
     try {
-        const response = await fetch("http://localhost:5000/api/search", {
+        const response = await fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
