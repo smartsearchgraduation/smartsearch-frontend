@@ -19,7 +19,7 @@ export type Product = {
 export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
     let url = "http://localhost:5000/api/search";
     if (import.meta.env.MODE === "production") {
-        url = "http://https://api.init-ai.com/api/search";
+        url = "https://api.init-ai.com/api/search";
     }
     const { query } = input;
 
