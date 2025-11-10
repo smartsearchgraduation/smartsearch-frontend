@@ -18,58 +18,57 @@ export type Product = {
 
 export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
     if (import.meta.env.MODE === "production") {
-        const { query } = input;
+    }
+    const { query } = input;
 
-        const dataToSend = {
-            raw_text: query,
-        };
+    const dataToSend = {
+        raw_text: query,
+    };
 
-        try {
-            const response = await fetch("http://localhost:5000/api/search", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(dataToSend),
-            });
+    try {
+        const response = await fetch("http://localhost:5000/api/search", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+        });
 
-            if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
-                const message = errData.message || `Request failed with status ${response.status}`;
-                throw new Error(message);
-            }
-
-            const data: { query_id: { searchId: string }; corrected_text: string; products: any } =
-                await response.json();
-
-            console.log(data);
-
-            const { searchId } = data.query_id;
-            localStorage.setItem("raw_text", query);
-            localStorage.setItem("corrected_text", data.corrected_text);
-            localStorage.setItem(
-                "products",
-                JSON.stringify(
-                    data.products.map((p: any) => {
-                        return {
-                            id: p.product_id,
-                            name: p.name,
-                            imageUrl: "https://placehold.co/400",
-                            description: p.description,
-                            price: currencyFormatter.format(Number(p.price)),
-                            title: p.name,
-                        };
-                    })
-                )
-            );
-
-            return { searchId };
-        } catch (err: any) {
-            throw new Error(err.message || "An unknown network error occurred.");
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            const message = errData.message || `Request failed with status ${response.status}`;
+            throw new Error(message);
         }
+
+        const data: { query_id: { searchId: string }; corrected_text: string; products: any } = await response.json();
+
+        console.log(data);
+
+        const { searchId } = data.query_id;
+        localStorage.setItem("raw_text", query);
+        localStorage.setItem("corrected_text", data.corrected_text);
+        localStorage.setItem(
+            "products",
+            JSON.stringify(
+                data.products.map((p: any) => {
+                    return {
+                        id: p.product_id,
+                        name: p.name,
+                        imageUrl: "https://placehold.co/400",
+                        description: p.description,
+                        price: currencyFormatter.format(Number(p.price)),
+                        title: p.name,
+                    };
+                })
+            )
+        );
+
+        return { searchId };
+    } catch (err: any) {
+        throw new Error(err.message || "An unknown network error occurred.");
     }
 
-    const { query, image } = input;
+    /* const { query, image } = input;
     const formData = new FormData();
     formData.append("query", query);
     if (image) {
@@ -96,7 +95,7 @@ export async function searchRequest(input: SearchRequestInput): Promise<SearchRe
         return await response.json();
     } catch (err: any) {
         throw new Error(err.message || "An unknown network error occurred.");
-    }
+    } */
 }
 
 const currencyFormatter = new Intl.NumberFormat("en-US", {
@@ -106,13 +105,13 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 
 export const fetchSearchResults = async (searchId: string) => {
     if (import.meta.env.MODE === "production") {
-        const rawText = localStorage.getItem("raw_text");
-        const correctedText = localStorage.getItem("corrected_text");
-        const products = JSON.parse(localStorage.getItem("products") || "[]");
-        return { products, correctedText, rawText };
     }
+    const rawText = localStorage.getItem("raw_text");
+    const correctedText = localStorage.getItem("corrected_text");
+    const products = JSON.parse(localStorage.getItem("products") || "[]");
+    return { products, correctedText, rawText, searchId };
 
-    // Mock api call
+    /* // Mock api call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const mockData: { products: Product[]; correctedText: string; rawText: string } = {
         products: [
@@ -161,7 +160,7 @@ export const fetchSearchResults = async (searchId: string) => {
     }
 
     const data: { products: Product[]; correctedText: string; rawText: string } = await response.json();
-    return data;
+    return data; */
 };
 
 export const getRawTextResults = async (searchId: string) => {
