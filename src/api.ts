@@ -17,7 +17,7 @@ export type Product = {
 };
 
 export async function searchRequest(input: SearchRequestInput): Promise<SearchRequestResponse> {
-    if (import.meta.env.MODE === "development") {
+    if (import.meta.env.MODE === "production") {
         const { query } = input;
 
         const dataToSend = {
@@ -105,7 +105,7 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export const fetchSearchResults = async (searchId: string) => {
-    if (import.meta.env.MODE === "development") {
+    if (import.meta.env.MODE === "production") {
         const rawText = localStorage.getItem("raw_text");
         const correctedText = localStorage.getItem("corrected_text");
         const products = JSON.parse(localStorage.getItem("products") || "[]");
@@ -138,7 +138,7 @@ export const fetchSearchResults = async (searchId: string) => {
                 imageUrl: "https://placehold.co/400",
                 description: "Description 3",
                 price: currencyFormatter.format(30.5),
-                title: "Title 3",
+                title: "Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3",
             },
             {
                 id: "4",
@@ -171,7 +171,7 @@ export const getRawTextResults = async (searchId: string) => {
 };
 
 export const fetchProductById = async (productId: string): Promise<Product> => {
-    if (import.meta.env.MODE === "development") {
+    if (import.meta.env.MODE === "production") {
         const products = JSON.parse(localStorage.getItem("products") || "[]");
         return products.find((p: Product) => p.id === productId)!;
     }

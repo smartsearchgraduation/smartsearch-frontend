@@ -19,8 +19,8 @@ function ProductCard({ product }: { product: Product }) {
 
     return (
         <div
-            className="ring-2 ring-gray-200 rounded-lg shadow-md overflow-hidden bg-gray-200 focus-within:outline-2 
-                       hover:shadow-xl transition-shadow duration-200 relative group"
+            className="flex flex-col ring-2 ring-gray-200 rounded-lg shadow-md overflow-hidden bg-gray-200 
+                    focus-within:outline-2 hover:shadow-xl transition-shadow duration-200 relative group"
         >
             {product.imageUrl ? (
                 <div className="aspect-square w-full rounded-t-lg">
@@ -36,8 +36,8 @@ function ProductCard({ product }: { product: Product }) {
                 </div>
             )}
 
-            <div className="flex flex-col p-4 bg-gray-100">
-                <h3 className="font-bold sm:text-lg mr-auto max-w-full truncate">
+            <div className="h-full flex flex-col p-4 bg-gray-100">
+                <h3 className="font-bold sm:text-lg mr-auto mb-auto max-w-full line-clamp-2">
                     <Link
                         to={`/product/${product.id}`}
                         className="text-gray-900 after:content-[''] after:absolute after:inset-0 after:z-10"

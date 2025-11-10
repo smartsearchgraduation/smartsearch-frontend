@@ -46,7 +46,7 @@ function SearchPage() {
         }
 
         return (
-            <div className="grid sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))] grid-cols-2 gap-2 sm:gap-4">
+            <div className="grid sm:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] grid-cols-2 gap-2 sm:gap-4">
                 {results.products.map((product: Product) => (
                     <ProductCard key={product.id} product={product} />
                 ))}
@@ -55,7 +55,7 @@ function SearchPage() {
     };
 
     return (
-        <div className="min-h-screen max-w-6xl mx-auto bg-gray-100 py-6 px-2">
+        <div className="min-h-screen max-w-6xl mx-auto mb-12 bg-gray-100 py-6 px-2">
             <header className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <Link
                     to="/"
