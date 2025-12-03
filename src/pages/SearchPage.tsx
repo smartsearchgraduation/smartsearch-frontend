@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { fetchSearchResults, getRawTextResults, type Product } from "../api";
-import ProductCard from "../components/ProductCard";
 import { useQuery } from "@tanstack/react-query";
+import { fetchSearchResults, getRawTextResults, type Product } from "../lib/api";
+import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import LoadingWave from "../components/LoadingWave";
 
@@ -31,7 +31,7 @@ function SearchPage() {
 
         if (isError) {
             return (
-                <div role="alert" className="text-center text-red-500">
+                <div role="alert" className="text-center text-red-500 py-10">
                     {error?.message || "Failed to fetch search results."}
                 </div>
             );
@@ -39,7 +39,7 @@ function SearchPage() {
 
         if (!results || results.products.length === 0) {
             return (
-                <div role="status" className="text-center text-gray-500">
+                <div role="status" className="text-center text-gray-500 py-10">
                     No products found.
                 </div>
             );
@@ -59,32 +59,34 @@ function SearchPage() {
             <header className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
                 <Link
                     to="/"
-                    className="mb-4 flex gap-2 sm:gap-0 sm:flex-col sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
+                    className="mb-4 flex gap-2 sm:gap-0 sm:flex-wrap sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
                 >
                     <span className="text-emerald-600">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </Link>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />
             </header>
+
             {results && results.correctedText && (
-                <main>
+                <main className="mb-6">
                     {/* Visually hidden <h1> for page title and structure */}
                     <h1 className="visually-hidden">Search Results</h1>
                     <h2 className="text-gray-700 mb-1">
                         Showing results for: <span className="font-bold text-emerald-600">{results.correctedText}</span>
                     </h2>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <p className="text-gray-600 text-sm">
                         Search instead for:{" "}
                         <button
                             disabled // Disabled for now will enable later
                             onClick={async () => handleSearchSuccess(await getRawTextResults(searchId || ""))}
-                            className="text-emerald-600 hover:underline cursor-pointer"
+                            className="text-emerald-600 hover:underline cursor-pointer font-medium"
                         >
                             {results.rawText}
                         </button>
                     </p>
                 </main>
             )}
+
             {renderContent()}
         </div>
     );

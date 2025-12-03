@@ -8,7 +8,7 @@ import {
     type KeyboardEvent,
     type ClipboardEvent,
 } from "react";
-import { searchRequest } from "../api";
+import { searchRequest } from "../lib/api";
 
 function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void; autofocus?: boolean }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file

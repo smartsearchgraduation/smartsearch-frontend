@@ -13,7 +13,16 @@ export type Product = {
 };
 
 export async function searchRequest(input: SearchRequestInput): Promise<string> {
-    let url = "http://localhost:5000/api/search";
+    const { query } = input;
+    const formData = new FormData();
+    formData.append("query", query);
+
+    // Mock api call
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // throw new Error("An unknown network error occurred.");
+    return query;
+
+    /* let url = "http://localhost:5000/api/search";
     url = "https://api.init-ai.com/api/search";
     if (import.meta.env.MODE === "production") {
     }
@@ -64,35 +73,6 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
         return searchId;
     } catch (err: any) {
         throw new Error(err.message || "An unknown network error occurred.");
-    }
-
-    /* const { query, image } = input;
-    const formData = new FormData();
-    formData.append("query", query);
-    if (image) {
-        formData.append("image", image, image.name);
-    }
-
-    // Mock api call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // throw new Error("An unknown network error occurred.");
-    return { searchId: query };
-
-    try {
-        const response = await fetch("/api/search", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const message = errData.message || `Request failed with status ${response.status}`;
-            throw new Error(message);
-        }
-
-        return await response.json();
-    } catch (err: any) {
-        throw new Error(err.message || "An unknown network error occurred.");
     } */
 }
 
@@ -102,14 +82,14 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
 });
 
 export const fetchSearchResults = async (searchId: string) => {
-    if (import.meta.env.MODE === "production") {
+    /* if (import.meta.env.MODE === "production") {
     }
     const rawText = localStorage.getItem("raw_text");
     const correctedText = localStorage.getItem("corrected_text");
     const products = JSON.parse(localStorage.getItem("products") || "[]");
-    return { products, correctedText, rawText, searchId };
+    return { products, correctedText, rawText, searchId }; */
 
-    /* // Mock api call
+    // Mock api call
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const mockData: { products: Product[]; correctedText: string; rawText: string } = {
         products: [
@@ -158,7 +138,7 @@ export const fetchSearchResults = async (searchId: string) => {
     }
 
     const data: { products: Product[]; correctedText: string; rawText: string } = await response.json();
-    return data; */
+    return data;
 };
 
 export const getRawTextResults = async (searchId: string) => {
