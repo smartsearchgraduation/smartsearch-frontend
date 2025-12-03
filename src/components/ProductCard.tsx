@@ -21,12 +21,7 @@ function ProductCard({ product }: { product: Product }) {
     };
 
     return (
-        <Card
-            variant="interactive"
-            // We force bg-gray-200 here to match your original design exactly
-            // (The default Card is white, but your original was gray behind the image)
-            className="flex flex-col bg-gray-200 h-full group relative"
-        >
+        <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
             {product.imageUrl ? (
                 <div className="aspect-square w-full">
@@ -36,28 +31,28 @@ function ProductCard({ product }: { product: Product }) {
                 <div
                     role="img"
                     aria-label={product.name}
-                    className="aspect-square w-full flex items-center justify-center"
+                    className="flex aspect-square w-full items-center justify-center"
                 >
                     <p className="text-gray-700">No image available</p>
                 </div>
             )}
 
             {/* Content Section */}
-            <div className="h-full flex flex-col p-4 bg-gray-100">
-                <h3 className="font-bold sm:text-lg mr-auto mb-auto max-w-full line-clamp-2">
+            <div className="flex h-full flex-col bg-gray-100 p-4">
+                <h3 className="mr-auto mb-auto line-clamp-2 max-w-full font-bold sm:text-lg">
                     <Link
                         to={`/product/${product.id}`}
-                        className="text-gray-900 after:content-[''] after:absolute after:inset-0 after:z-10"
+                        className="text-gray-900 after:absolute after:inset-0 after:z-10 after:content-['']"
                     >
                         {product.title}
                     </Link>
                 </h3>
 
-                <div className="flex items-center justify-between mt-4">
+                <div className="mt-4 flex items-center justify-between">
                     <p className="text-gray-700">{product.price || "Not available"}</p>
 
                     {/* Vote Buttons (Z-20 to sit above the card link) */}
-                    <div className="flex gap-2 text-transparent relative z-20">
+                    <div className="relative z-20 flex gap-2 text-transparent">
                         <Button
                             variant="ghost"
                             size="icon"
@@ -67,7 +62,7 @@ function ProductCard({ product }: { product: Product }) {
                             className={cn("hover:bg-gray-200", vote === "like" ? "text-blue-400" : "text-gray-400")}
                         >
                             <svg
-                                className="w-5 h-5" // Fixed size for consistency
+                                className="h-5 w-5" // Fixed size for consistency
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -87,7 +82,7 @@ function ProductCard({ product }: { product: Product }) {
                             className={cn("hover:bg-gray-200", vote === "dislike" ? "text-red-400" : "text-gray-400")}
                         >
                             <svg
-                                className="w-5 h-5"
+                                className="h-5 w-5"
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"

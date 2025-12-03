@@ -17,7 +17,6 @@ interface TaxonomyType {
 interface ProductFormData {
     title: string;
     price: string;
-    comparePrice: string;
     description: string;
 }
 
@@ -31,12 +30,11 @@ const TAXONOMY: TaxonomyType = {
     Home: ["Decor", "Kitchen", "Bedding", "Lighting", "Furniture"],
 };
 
-const AddProductPage: React.FC = () => {
+function AddProductPage() {
     // --- Form State ---
     const [formData, setFormData] = useState<ProductFormData>({
         title: "",
         price: "",
-        comparePrice: "",
         description: "",
     });
 
@@ -73,13 +71,13 @@ const AddProductPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 py-6 px-2">
-            <form onSubmit={handleSubmit} className="max-w-6xl mx-auto space-y-6">
+        <div className="min-h-screen bg-gray-100 px-2 py-6">
+            <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-6">
                 {/* --- Header Section --- */}
-                <header className="mb-8 flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <header className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
                     <Link
                         to="/"
-                        className="flex gap-2 text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
+                        className="flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md"
                     >
                         <span className="text-emerald-600">Smart </span>
                         <span className="text-gray-800">Search</span>
@@ -99,9 +97,9 @@ const AddProductPage: React.FC = () => {
                     </div>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* --- LEFT COLUMN --- */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="space-y-6 lg:col-span-2">
                         {/* 1. Product Information */}
                         <Card>
                             <CardHeader>
@@ -127,7 +125,7 @@ const AddProductPage: React.FC = () => {
                                     placeholder="Describe your product using natural language..."
                                     footer={
                                         <div className="flex justify-end">
-                                            <span className="text-xs text-gray-400 font-bold">
+                                            <span className="text-xs font-bold text-gray-400">
                                                 {formData.description.length} chars
                                             </span>
                                         </div>
@@ -141,7 +139,7 @@ const AddProductPage: React.FC = () => {
                     </div>
 
                     {/* --- RIGHT COLUMN --- */}
-                    <div className="lg:col-span-1 space-y-6">
+                    <div className="space-y-6 lg:col-span-1">
                         {/* 3. Pricing */}
                         <Card>
                             <CardHeader>
@@ -154,7 +152,7 @@ const AddProductPage: React.FC = () => {
                                     value={formData.price}
                                     onChange={handleInputChange}
                                     placeholder="0.00"
-                                    leftIcon={<span className="text-gray-500 font-bold text-lg">$</span>}
+                                    leftIcon={<span className="text-lg font-bold text-gray-500">$</span>}
                                 />
                             </CardContent>
                         </Card>
@@ -172,6 +170,6 @@ const AddProductPage: React.FC = () => {
             </form>
         </div>
     );
-};
+}
 
 export default AddProductPage;

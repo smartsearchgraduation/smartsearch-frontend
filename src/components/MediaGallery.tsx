@@ -1,4 +1,4 @@
-import React, { useRef, useState, type ChangeEvent, type DragEvent, type ClipboardEvent } from "react";
+import { useRef, useState, type ChangeEvent, type DragEvent, type ClipboardEvent } from "react";
 import { Card, CardHeader, CardContent } from "./ui/Card"; // Adjust import path if needed
 import { cn } from "../lib/utils";
 
@@ -14,7 +14,7 @@ interface MediaGalleryProps {
     onImagesChange: (images: UploadedImage[]) => void;
 }
 
-export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChange }) => {
+export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -133,15 +133,15 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
                         }
                     }}
                     className={cn(
-                        "relative ring-2 rounded-[1.5rem] p-10 text-center cursor-pointer transition-all duration-200 outline-none",
+                        "relative cursor-pointer rounded-[1.5rem] p-10 text-center ring-2 transition-all duration-200 outline-none",
                         isDragging
-                            ? "ring-emerald-600 bg-emerald-50 scale-[1.01]"
-                            : "ring-gray-200 bg-gray-50 hover:bg-white hover:shadow-md focus:ring-emerald-600"
+                            ? "scale-[1.01] bg-emerald-50 ring-emerald-600"
+                            : "bg-gray-50 ring-gray-200 hover:bg-white hover:shadow-md focus:ring-emerald-600",
                     )}
                 >
                     {/* Visual Overlay for Dragging */}
                     <div
-                        className="absolute inset-0 rounded-[1.5rem] flex items-center justify-center text-white font-bold bg-emerald-600/90 transition-opacity duration-200 z-10 pointer-events-none"
+                        className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/90 font-bold text-white transition-opacity duration-200"
                         style={{ opacity: isDragging ? 1 : 0 }}
                     >
                         Drop images here to upload
@@ -157,9 +157,9 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
                     />
 
                     <div className="space-y-4">
-                        <div className="mx-auto w-16 h-16 bg-white ring-2 ring-gray-200 rounded-full flex items-center justify-center shadow-sm">
+                        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm ring-2 ring-gray-200">
                             <svg
-                                className="w-8 h-8 text-emerald-600"
+                                className="h-8 w-8 text-emerald-600"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -174,21 +174,21 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
                         </div>
                         <div>
                             <p className="text-lg font-bold text-gray-700">Drop your images here</p>
-                            <p className="text-sm text-gray-500 mt-1">or click to browse</p>
+                            <p className="mt-1 text-sm text-gray-500">or click to browse</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Image Grid Display */}
                 {images.length > 0 && (
-                    <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
                         {images.map((img, index) => (
                             <div
                                 key={img.id}
-                                className="group relative aspect-square bg-gray-100 ring-2 ring-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all"
+                                className="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 shadow-sm ring-2 ring-gray-200 transition-all hover:shadow-md"
                             >
-                                <img src={img.preview} alt="Preview" className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                                <img src={img.preview} alt="Preview" className="h-full w-full object-cover" />
+                                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
 
                                 <button
                                     type="button"
@@ -196,9 +196,9 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
                                         e.stopPropagation();
                                         removeImage(img.id);
                                     }}
-                                    className="absolute top-2 right-2 p-1.5 bg-gray-900/60 hover:bg-gray-900/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                    className="absolute top-2 right-2 cursor-pointer rounded-full bg-gray-900/60 p-1.5 text-white opacity-0 transition-all group-hover:opacity-100 hover:bg-gray-900/80"
                                 >
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
@@ -209,7 +209,7 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
                                 </button>
 
                                 {index === 0 && (
-                                    <span className="absolute bottom-2 left-2 px-2 py-1 bg-emerald-600/90 backdrop-blur-sm text-white text-[10px] font-bold uppercase rounded-md shadow-sm">
+                                    <span className="absolute bottom-2 left-2 rounded-md bg-emerald-600/90 px-2 py-1 text-[10px] font-bold text-white uppercase shadow-sm backdrop-blur-sm">
                                         Cover
                                     </span>
                                 )}
@@ -220,4 +220,4 @@ export const MediaGallery: React.FC<MediaGalleryProps> = ({ images, onImagesChan
             </CardContent>
         </Card>
     );
-};
+}
