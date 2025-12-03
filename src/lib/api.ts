@@ -30,16 +30,16 @@ export interface SearchResponse {
 }
 
 let BASE_URL = "https://api.init-ai.com";
-/* if (import.meta.env.DEV) {
+if (import.meta.env.DEV) {
     BASE_URL = "";
-} */
+}
 
 /**
  * Submits a search query (text + optional image).
  * Returns a searchId to poll or fetch results for.
  */
 export async function searchRequest(input: SearchRequestInput): Promise<string> {
-    const { query, image } = input;
+    const { query } = input;
     /* const formData = new FormData();
     formData.append("raw_text", query);
     if (image) {

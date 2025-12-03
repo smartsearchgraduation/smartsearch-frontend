@@ -8,13 +8,13 @@ import "./index.css";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
-            refetchOnWindowFocus: false, // <-- Disables it for all queries
+            staleTime: 1000 * 60 * 5,
+            refetchOnWindowFocus: false,
         },
     },
 });
 
 async function enableMocking() {
-    return;
     if (!import.meta.env.DEV) {
         return;
     }

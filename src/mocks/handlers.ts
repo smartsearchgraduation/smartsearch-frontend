@@ -1,47 +1,77 @@
 import { http, HttpResponse } from "msw";
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-});
-
 const mockProducts = [
     {
-        id: "1",
-        title: "Vintage Leather Jacket",
+        product_id: "1",
+        name: "Vintage Leather Jacket",
+        brand: { brand_id: 101, name: "UrbanStyle" },
+        price: 89.99,
         description: "A stylish vintage leather jacket.",
-        price: currencyFormatter.format(10.99),
+        is_relevant: true,
         images: ["https://placehold.co/400"],
-        category: "Clothing",
+        categories: [
+            { category_id: 2, name: "Clothing", parent: null },
+        ],
         subcategory: "Jackets",
     },
     {
-        id: "2",
-        title: "Classic Denim Jeans",
+        product_id: "2",
+        name: "Classic Denim Jeans",
+        brand: { brand_id: 102, name: "DenimCo" },
+        price: 45.50,
         description: "Comfortable classic fit denim jeans.",
-        price: currencyFormatter.format(20.97),
+        is_relevant: true,
         images: ["https://placehold.co/400"],
-        category: "Clothing",
+        categories: [
+            { category_id: 2, name: "Clothing", parent: null },
+        ],
         subcategory: "Jeans",
     },
     {
-        id: "3",
-        title: "Ergonomic Office Chair",
+        product_id: "3",
+        name: "Ergonomic Office Chair",
+        brand: { brand_id: 103, name: "OfficePro" },
+        price: 150.00,
         description: "An ergonomic chair for long hours at the desk.",
-        price: currencyFormatter.format(30.5),
+        is_relevant: false,
         images: ["https://placehold.co/400"],
-        category: "Home",
+        categories: [
+            { category_id: 3, name: "Home", parent: null },
+        ],
         subcategory: "Furniture",
     },
     {
-        id: "4",
-        title: "Smart Home Speaker",
+        product_id: "4",
+        name: "Smart Home Speaker",
+        brand: { brand_id: 104, name: "TechLife" },
+        price: 99.99,
         description: "Voice-activated smart speaker with great sound.",
-        price: currencyFormatter.format(40.99),
+        is_relevant: true,
         images: ["https://placehold.co/400"],
-        category: "Home",
-        subcategory: "Electronics",
+        categories: [
+            { category_id: 1, name: "Electronics", parent: null },
+        ],
+        subcategory: "Audio",
     },
+];
+
+const mockCategories = [
+    { category_id: 1, name: "Electronics", parent_category_id: null },
+    { category_id: 2, name: "Clothing", parent_category_id: null },
+    { category_id: 3, name: "Home", parent_category_id: null },
+    { category_id: 4, name: "Sports", parent_category_id: null },
+    { category_id: 7, name: "Smartphones", parent_category_id: 1 },
+    { category_id: 8, name: "Laptops", parent_category_id: 1 },
+    { category_id: 9, name: "Men's Clothing", parent_category_id: 2 },
+    { category_id: 10, name: "Women's Clothing", parent_category_id: 2 },
+];
+
+const mockBrands = [
+    { brand_id: 101, name: "UrbanStyle" },
+    { brand_id: 102, name: "DenimCo" },
+    { brand_id: 103, name: "OfficePro" },
+    { brand_id: 104, name: "TechLife" },
+    { brand_id: 105, name: "Sporty" },
 ];
 
 export const handlers = [
@@ -52,35 +82,35 @@ export const handlers = [
 
         // Return a fake search ID
         return HttpResponse.json({
-            searchId: "search-" + Math.random().toString(36).substr(2, 9),
+            search_id: "search-" + Math.random().toString(36).substr(2, 9),
         });
     }),
 
-    // 2. Get Search Results
-    http.get("/api/search-results/:searchId", async ({ params }) => {
+    // 2. Get Search Results (Changed from search-results to search/:searchId to match api.ts)
+    http.get("/api/search/:searchId", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 800));
         const { searchId } = params;
 
         return HttpResponse.json({
             products: mockProducts,
-            correctedText: "corrected text",
-            rawText: "raw text",
-            searchId,
+            corrected_text: "corrected text example",
+            raw_text: "raw query text",
+            search_id: searchId,
         });
     }),
 
-    // 3. Get Raw Text Results (Simulating a different endpoint logic)
+    // 3. Get Raw Text Results
     http.get("/api/raw-text-results/:searchId", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 500));
         return HttpResponse.json({
-            text: "raw text " + params.searchId,
+            text: "raw text result for " + params.searchId,
         });
     }),
 
     // 4. Get Product By ID
     http.get("/api/products/:productId", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        const product = mockProducts.find((p) => p.id === params.productId);
+        const product = mockProducts.find((p) => p.product_id === params.productId);
 
         if (!product) {
             return new HttpResponse(null, { status: 404 });
@@ -89,49 +119,30 @@ export const handlers = [
         return HttpResponse.json(product);
     }),
 
-    // 5. Create Product (New)
+    // 5. Create Product
     http.post("/api/products", async () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        return HttpResponse.json({ success: true, id: "new-product-id" });
+        return HttpResponse.json({ success: true, id: "new-product-id-" + Date.now() });
     }),
 
-    // 6. Vote Product (New)
-    http.post("/api/products/vote", async () => {
+    // 6. Vote/Feedback (Changed from products/vote to feedback)
+    http.post("/api/feedback", async () => {
         await new Promise((resolve) => setTimeout(resolve, 300));
-        return HttpResponse.json({ success: true });
+        return HttpResponse.json({}); // Returns void in api.ts, so empty json or just status 200 is fine
     }),
 
-    // 7. Upload Image (New)
-    http.post("/api/upload", async () => {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        return HttpResponse.json({ url: "https://placehold.co/400" });
-    }),
-
-    // 8. Get Taxonomy/Categories (New)
+    // 7. Get Categories
     http.get("/api/categories", async () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
         return HttpResponse.json({
-            categories: [
-                {
-                    category_id: 1,
-                    name: "Elektronik",
-                    parent_category_id: null,
-                    children: [
-                        { category_id: 7, name: "Akıllı Telefon", parent_category_id: 1, children: [] },
-                        { category_id: 8, name: "Bilgisayar", parent_category_id: 1, children: [] }
-                    ]
-                },
-                {
-                    category_id: 2,
-                    name: "Giyim",
-                    parent_category_id: null,
-                    children: [
-                        { category_id: 9, name: "Erkek Giyim", parent_category_id: 2, children: [] },
-                        { category_id: 10, name: "Kadın Giyim", parent_category_id: 2, children: [] }
-                    ]
-                }
-            ],
-            total: 4
+            categories: mockCategories,
+            total: mockCategories.length
         });
+    }),
+
+    // 8. Get Brands (New)
+    http.get("/api/brands", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return HttpResponse.json(mockBrands);
     }),
 ];
