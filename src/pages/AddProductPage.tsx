@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "../components/MediaGallery";
 import { CascadingSelector } from "../components/CascadingSelector";
-import { createProduct, fetchTaxonomy } from "../lib/api";
+import { createProduct, fetchCatagories } from "../lib/api";
 
 // UI Components
 import { Button } from "../components/ui/Button";
@@ -29,17 +29,18 @@ function AddProductPage() {
     });
 
     // Categorization State
-    const [selectedTag, setSelectedTag] = useState<string | null>(null);
-    const [selectedSubtag, setSelectedSubtag] = useState<string | null>(null);
+    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+    const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
 
     // Image State
     const [images, setImages] = useState<UploadedImage[]>([]);
 
     // --- Queries & Mutations ---
-    const { data: taxonomy = {} } = useQuery({
-        queryKey: ["taxonomy"],
-        queryFn: fetchTaxonomy,
+    const { data } = useQuery({
+        queryKey: ["catagories"],
+        queryFn: fetchCatagories,
     });
+    const categories = data?.categories || [];
 
     const mutation = useMutation({
         mutationFn: createProduct,
@@ -59,10 +60,10 @@ function AddProductPage() {
     };
 
     // --- Handlers: Categorization ---
-    const handleTagSelect = (tag: string) => {
-        if (selectedTag === tag) return;
-        setSelectedTag(tag);
-        setSelectedSubtag(null);
+    const handleCategorySelect = (id: number) => {
+        if (selectedCategoryId === id) return;
+        setSelectedCategoryId(id);
+        setSelectedSubcategoryId(null);
     };
 
     // --- Handler: Submit ---
@@ -70,14 +71,14 @@ function AddProductPage() {
         e.preventDefault();
 
         // Ensure required fields are present (though button is disabled otherwise)
-        if (!selectedTag || !selectedSubtag || images.length === 0) {
+        if (!selectedCategoryId || !selectedSubcategoryId || images.length === 0) {
             return;
         }
 
         mutation.mutate({
             ...formData,
-            category: selectedTag,
-            subcategory: selectedSubtag,
+            category_id: selectedCategoryId,
+            subcategory_id: selectedSubcategoryId,
             images: images.map((i) => i.preview), // Using preview URL as placeholder for now
         });
     };
@@ -91,13 +92,17 @@ function AddProductPage() {
             <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-6">
                 {/* --- Header Section --- */}
                 <header className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                    <Link
-                        to="/"
-                        className="flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md"
-                    >
-                        <span className="text-emerald-600">Smart </span>
-                        <span className="text-gray-800">Search</span>
-                    </Link>
+                    <div className="flex gap-2">
+                        <Link
+                            to="/"
+                            className="flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md"
+                        >
+                            <span className="text-emerald-600">Smart </span>
+                            <span className="text-gray-800">Search</span>
+                        </Link>
+                        <span className="text-4xl font-bold text-gray-600"> | </span>
+                        <span className="mt-auto text-2xl font-bold text-gray-600">Admin</span>
+                    </div>
 
                     <div className="flex gap-3">
                         <Button type="button" variant="secondary" onClick={handleDiscard}>
@@ -106,7 +111,9 @@ function AddProductPage() {
                         <Button
                             type="submit"
                             variant="primary"
-                            disabled={!formData.title || !selectedSubtag || images.length === 0 || mutation.isPending}
+                            disabled={
+                                !formData.title || !selectedSubcategoryId || images.length === 0 || mutation.isPending
+                            }
                         >
                             {mutation.isPending ? "Publishing..." : "Publish"}
                         </Button>
@@ -175,11 +182,11 @@ function AddProductPage() {
 
                         {/* 4. Organization */}
                         <CascadingSelector
-                            selectedTag={selectedTag}
-                            selectedSubtag={selectedSubtag}
-                            onTagSelect={handleTagSelect}
-                            onSubtagSelect={setSelectedSubtag}
-                            Data={taxonomy}
+                            selectedCategoryId={selectedCategoryId}
+                            selectedSubcategoryId={selectedSubcategoryId}
+                            onCategorySelect={handleCategorySelect}
+                            onSubcategorySelect={setSelectedSubcategoryId}
+                            categories={categories}
                         />
                     </div>
                 </div>

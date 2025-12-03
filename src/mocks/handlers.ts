@@ -108,15 +108,30 @@ export const handlers = [
     }),
 
     // 8. Get Taxonomy/Categories (New)
-    http.get("/api/taxonomy", async () => {
+    http.get("/api/categories", async () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
         return HttpResponse.json({
-            Engineering: ["Frontend", "Backend", "DevOps", "Mobile", "QA"],
-            Design: ["UI Design", "UX Research", "Graphic Design", "Motion", "Branding"],
-            Marketing: ["SEO", "Content", "Social Media", "Email", "Research"],
-            Product: ["Roadmap", "Specs", "User Research", "Analytics"],
-            Clothing: ["T-Shirts", "Jeans", "Jackets", "Shoes", "Accessories"],
-            Home: ["Decor", "Kitchen", "Bedding", "Lighting", "Furniture"],
+            categories: [
+                {
+                    category_id: 1,
+                    name: "Elektronik",
+                    parent_category_id: null,
+                    children: [
+                        { category_id: 7, name: "Akıllı Telefon", parent_category_id: 1, children: [] },
+                        { category_id: 8, name: "Bilgisayar", parent_category_id: 1, children: [] }
+                    ]
+                },
+                {
+                    category_id: 2,
+                    name: "Giyim",
+                    parent_category_id: null,
+                    children: [
+                        { category_id: 9, name: "Erkek Giyim", parent_category_id: 2, children: [] },
+                        { category_id: 10, name: "Kadın Giyim", parent_category_id: 2, children: [] }
+                    ]
+                }
+            ],
+            total: 4
         });
     }),
 ];

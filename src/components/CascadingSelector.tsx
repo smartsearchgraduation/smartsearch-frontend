@@ -1,21 +1,25 @@
 import { Card, CardHeader } from "./ui/Card"; // Adjust import path if needed
 import { cn } from "../lib/utils";
+import type { Category } from "../lib/api";
 
 interface CascadingSelectorProps {
-    selectedTag: string | null;
-    selectedSubtag: string | null;
-    onTagSelect: (tag: string) => void;
-    onSubtagSelect: (sub: string) => void;
-    Data: Record<string, string[]>;
+    selectedCategoryId: number | null;
+    selectedSubcategoryId: number | null;
+    onCategorySelect: (id: number) => void;
+    onSubcategorySelect: (id: number) => void;
+    categories: Category[];
 }
 
 export function CascadingSelector({
-    selectedTag,
-    selectedSubtag,
-    onTagSelect,
-    onSubtagSelect,
-    Data,
+    selectedCategoryId,
+    selectedSubcategoryId,
+    onCategorySelect,
+    onSubcategorySelect,
+    categories,
 }: CascadingSelectorProps) {
+    const selectedCategory = categories.find((c) => c.category_id === selectedCategoryId);
+    const selectedSubcategory = selectedCategory?.children.find((c) => c.category_id === selectedSubcategoryId);
+
     return (
         <Card className="h-[600px]">
             <CardHeader>
@@ -26,26 +30,26 @@ export function CascadingSelector({
             <div className="grid h-full flex-1 grid-rows-2 divide-y divide-gray-100 overflow-hidden">
                 {/* 1. Parent Categories */}
                 <div className="flex h-full flex-col overflow-hidden">
-                    <div className="flex-shrink-0 bg-gray-100 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-500 uppercase">
+                    <div className="flex-shrink-0 bg-gray-100 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-600 uppercase">
                         Primary Category
                     </div>
                     <div className="flex-grow space-y-2 overflow-y-auto p-4">
-                        {Object.keys(Data).map((tag) => (
+                        {categories.map((category) => (
                             <button
-                                key={tag}
+                                key={category.category_id}
                                 type="button"
-                                onClick={() => onTagSelect(tag)}
+                                onClick={() => onCategorySelect(category.category_id)}
                                 className={cn(
-                                    "flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200",
-                                    selectedTag === tag
-                                        ? "bg-emerald-50 text-emerald-700 shadow-sm ring-2 ring-emerald-100"
+                                    "flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200",
+                                    selectedCategoryId === category.category_id
+                                        ? "bg-emerald-100 text-emerald-900 shadow-sm ring-2 ring-emerald-600"
                                         : "text-gray-600 hover:bg-gray-100",
                                 )}
                             >
-                                {tag}
-                                {selectedTag === tag && (
+                                {category.name}
+                                {selectedCategoryId === category.category_id && (
                                     <svg
-                                        className="h-5 w-5 text-emerald-600"
+                                        className="h-5 w-5 text-emerald-900"
                                         fill="none"
                                         viewBox="0 0 24 24"
                                         stroke="currentColor"
@@ -65,11 +69,11 @@ export function CascadingSelector({
 
                 {/* 2. Sub Categories */}
                 <div className="flex h-full flex-col overflow-hidden bg-gray-50">
-                    <div className="flex-shrink-0 bg-gray-200/50 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-500 uppercase">
+                    <div className="flex-shrink-0 bg-gray-200/50 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-600 uppercase">
                         Sub Category
                     </div>
                     <div className="flex-grow space-y-2 overflow-y-auto p-4">
-                        {!selectedTag ? (
+                        {!selectedCategory ? (
                             <div className="flex h-full flex-col items-center justify-center text-gray-400 opacity-60">
                                 <svg className="mb-2 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
@@ -82,32 +86,32 @@ export function CascadingSelector({
                                 <span className="text-sm font-medium">Select a primary category</span>
                             </div>
                         ) : (
-                            Data[selectedTag].map((sub) => (
+                            selectedCategory.children.map((sub) => (
                                 <label
-                                    key={sub}
+                                    key={sub.category_id}
                                     className={cn(
                                         "flex cursor-pointer items-center rounded-lg px-4 py-3 text-sm transition-all duration-200",
-                                        selectedSubtag === sub
-                                            ? "scale-[1.02] bg-white shadow-md ring-2 ring-emerald-500"
+                                        selectedSubcategoryId === sub.category_id
+                                            ? "scale-[1.02] bg-white shadow-md ring-2 ring-emerald-600"
                                             : "hover:bg-white hover:shadow-sm",
                                     )}
                                 >
                                     <input
                                         type="radio"
                                         name="subtag"
-                                        checked={selectedSubtag === sub}
-                                        onChange={() => onSubtagSelect(sub)}
-                                        className="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                        checked={selectedSubcategoryId === sub.category_id}
+                                        onChange={() => onSubcategorySelect(sub.category_id)}
+                                        className="h-4 w-4 border-gray-300 text-emerald-900 accent-emerald-600 focus:outline-none"
                                     />
                                     <span
                                         className={cn(
                                             "ml-3",
-                                            selectedSubtag === sub
+                                            selectedSubcategoryId === sub.category_id
                                                 ? "font-bold text-gray-900"
                                                 : "font-medium text-gray-600",
                                         )}
                                     >
-                                        {sub}
+                                        {sub.name}
                                     </span>
                                 </label>
                             ))
@@ -117,13 +121,15 @@ export function CascadingSelector({
             </div>
 
             {/* --- Summary Footer --- */}
-            <div className="flex-shrink-0 border-t border-gray-100 bg-white p-4 text-center text-xs text-gray-500">
-                {selectedTag && selectedSubtag ? (
+            <div className="flex-shrink-0 border-t border-gray-100 bg-white p-4 text-center text-xs text-gray-600">
+                {selectedCategory && selectedSubcategory ? (
                     <div className="flex items-center justify-center gap-2">
-                        <span className="rounded-md bg-gray-100 px-2 py-1 font-bold text-gray-600">{selectedTag}</span>
+                        <span className="rounded-md bg-gray-200 px-2 py-1 font-bold text-gray-800">
+                            {selectedCategory.name}
+                        </span>
                         <span className="text-gray-300">/</span>
-                        <span className="rounded-md bg-emerald-100 px-2 py-1 font-bold text-emerald-700">
-                            {selectedSubtag}
+                        <span className="rounded-md bg-emerald-200 px-2 py-1 font-bold text-emerald-900">
+                            {selectedSubcategory.name}
                         </span>
                     </div>
                 ) : (

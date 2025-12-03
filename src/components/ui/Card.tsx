@@ -24,13 +24,13 @@ Card.displayName = "Card";
 
 // Optional: Header sub-component for consistency (seen in CascadingSelector and MediaGallery)
 export const CardHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn("flex-shrink-0 border-b border-gray-100 bg-gray-50 p-6", className)} {...props}>
+    <div className={cn("flex-shrink-0 border-b border-gray-100 bg-gray-50 p-4", className)} {...props}>
         {children}
     </div>
 );
 
 export const CardContent = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn("p-6", className)} {...props}>
+    <div className={cn("p-4", className)} {...props}>
         {children}
     </div>
 );

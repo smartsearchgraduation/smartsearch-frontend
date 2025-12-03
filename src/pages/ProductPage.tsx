@@ -75,10 +75,10 @@ function ProductPage() {
                 <div className="flex flex-col gap-4">
                     {/* Categories displayed as Tags/Badges */}
                     <div className="flex flex-wrap gap-2">
-                        <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-600 uppercase">
+                        <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-800 uppercase">
                             {category}
                         </span>
-                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold tracking-wider text-emerald-700 uppercase">
+                        <span className="rounded-full bg-emerald-200 px-3 py-1 text-xs font-bold tracking-wider text-emerald-900 uppercase">
                             {subcategory}
                         </span>
                     </div>

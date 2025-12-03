@@ -1,7 +1,7 @@
 import { useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { type Product, voteProduct } from "../lib/api";
+import { type Product, productFeedback } from "../lib/api";
 import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
@@ -11,7 +11,7 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     const [vote, setVote] = useState<"like" | "dislike" | null>(null);
 
     const mutation = useMutation({
-        mutationFn: (voteType: "like" | "dislike") => voteProduct(searchId, product.id, voteType),
+        mutationFn: (voteType: "like" | "dislike") => productFeedback(searchId, product.id, voteType),
         onError: () => {
             // Revert vote on error (simplified for this example)
             setVote(null);
