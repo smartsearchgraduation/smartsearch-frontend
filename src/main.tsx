@@ -14,6 +14,7 @@ const queryClient = new QueryClient({
 });
 
 async function enableMocking() {
+    return;
     if (!import.meta.env.DEV) {
         return;
     }

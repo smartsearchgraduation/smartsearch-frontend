@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent, type DragEvent, type ClipboardEvent } from "react";
-import { Card, CardHeader, CardContent } from "./ui/Card"; // Adjust import path if needed
+import { Card, CardHeader, CardContent } from "./ui/Card";
 import { cn } from "../lib/utils";
 
 // --- Types ---

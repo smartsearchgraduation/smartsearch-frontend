@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "../components/MediaGallery";
 import { CascadingSelector } from "../components/CascadingSelector";
-import { createProduct, fetchCatagories } from "../lib/api";
+import { createProduct, fetchCatagories, fetchBrands } from "../lib/api";
 
 // UI Components
 import { Button } from "../components/ui/Button";
@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader } from "../components/ui/Card";
 
 // --- Types & Interfaces ---
 interface ProductFormData {
-    title: string;
+    name: string;
     price: string;
     description: string;
 }
@@ -23,7 +23,7 @@ function AddProductPage() {
 
     // --- Form State ---
     const [formData, setFormData] = useState<ProductFormData>({
-        title: "",
+        name: "",
         price: "",
         description: "",
     });
@@ -36,11 +36,18 @@ function AddProductPage() {
     const [images, setImages] = useState<UploadedImage[]>([]);
 
     // --- Queries & Mutations ---
-    const { data } = useQuery({
-        queryKey: ["catagories"],
+    const { data: categoriesData } = useQuery({
+        queryKey: ["categories"],
         queryFn: fetchCatagories,
     });
-    const categories = data?.categories || [];
+    const categories = categoriesData?.categories || [];
+
+    const { data: brandsData } = useQuery({
+        queryKey: ["brands"],
+        queryFn: fetchBrands,
+    });
+    const brands = brandsData || [];
+    console.log(brands);
 
     const mutation = useMutation({
         mutationFn: createProduct,
@@ -67,19 +74,67 @@ function AddProductPage() {
     };
 
     // --- Handler: Submit ---
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         // Ensure required fields are present (though button is disabled otherwise)
         if (!selectedCategoryId || !selectedSubcategoryId || images.length === 0) {
+            alert("Please fill all fields and upload at least one image.");
             return;
         }
 
+        const convertImageToWebP = (file: File): Promise<File> => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    const MAX_SIZE = 1080;
+                    let { width, height } = img;
+
+                    // Maintain aspect ratio while resizing
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height = Math.round((height * MAX_SIZE) / width);
+                            width = MAX_SIZE;
+                        }
+                    } else if (height > MAX_SIZE) {
+                        width = Math.round((width * MAX_SIZE) / height);
+                        height = MAX_SIZE;
+                    }
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx) return reject(new Error("Failed to get canvas context"));
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(
+                        (blob) => {
+                            if (!blob) {
+                                return reject(new Error("Canvas to Blob conversion failed"));
+                            }
+                            const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".webp"), {
+                                type: "image/webp",
+                            });
+                            resolve(webpFile);
+                        },
+                        "image/webp",
+                        0.96,
+                    );
+                };
+                img.onerror = (err) => reject(err);
+            });
+        };
+
+        const convertedImages = await Promise.all(images.map((i) => convertImageToWebP(i.file)));
+
         mutation.mutate({
-            ...formData,
-            category_id: selectedCategoryId,
-            subcategory_id: selectedSubcategoryId,
-            images: images.map((i) => i.preview), // Using preview URL as placeholder for now
+            name: formData.name,
+            price: Number(formData.price),
+            description: formData.description,
+            brand: "a", // Placeholder for brand
+            category_ids: [selectedCategoryId, selectedSubcategoryId],
+            images: convertedImages,
         });
     };
 
@@ -108,13 +163,7 @@ function AddProductPage() {
                         <Button type="button" variant="secondary" onClick={handleDiscard}>
                             Discard
                         </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            disabled={
-                                !formData.title || !selectedSubcategoryId || images.length === 0 || mutation.isPending
-                            }
-                        >
+                        <Button type="submit" variant="primary">
                             {mutation.isPending ? "Publishing..." : "Publish"}
                         </Button>
                     </div>
@@ -132,8 +181,8 @@ function AddProductPage() {
                                 {/* Title */}
                                 <Input
                                     label="Product Title"
-                                    name="title"
-                                    value={formData.title}
+                                    name="name"
+                                    value={formData.name}
                                     onChange={handleInputChange}
                                     placeholder="e.g. Vintage Leather Jacket"
                                 />

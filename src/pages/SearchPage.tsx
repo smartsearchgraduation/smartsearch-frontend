@@ -48,7 +48,7 @@ function SearchPage() {
         return (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] sm:gap-4">
                 {results.products.map((product: Product) => (
-                    <ProductCard searchId={searchId} key={product.id} product={product} />
+                    <ProductCard searchId={searchId} key={product.product_id} product={product} />
                 ))}
             </div>
         );
@@ -67,12 +67,13 @@ function SearchPage() {
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-[37.5rem]" />
             </header>
 
-            {results && results.correctedText && (
+            {results && results.corrected_text && (
                 <main className="mb-6">
                     {/* Visually hidden <h1> for page title and structure */}
                     <h1 className="visually-hidden">Search Results</h1>
                     <h2 className="mb-1 text-gray-700">
-                        Showing results for: <span className="font-bold text-emerald-600">{results.correctedText}</span>
+                        Showing results for:{" "}
+                        <span className="font-bold text-emerald-600">{results.corrected_text}</span>
                     </h2>
                     <p className="text-sm text-gray-600">
                         Search instead for:{" "}
@@ -81,7 +82,7 @@ function SearchPage() {
                             onClick={async () => handleSearchSuccess(await getRawTextResults(searchId || ""))}
                             className="cursor-pointer font-medium text-emerald-600 hover:underline"
                         >
-                            {results.rawText}
+                            {results.raw_text}
                         </button>
                     </p>
                 </main>

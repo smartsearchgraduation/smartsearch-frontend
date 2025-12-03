@@ -19,6 +19,7 @@ function ProductPage() {
         queryFn: () => fetchProductById(productId!),
         enabled: !!productId,
     });
+    console.log(product);
 
     const handleSearchSuccess = (newSearchId: string) => {
         navigate(`/search/${newSearchId}`);
@@ -43,15 +44,15 @@ function ProductPage() {
             );
         }
 
-        const category = product.category || "Uncategorized";
-        const subcategory = product.subcategory || "General";
+        const category = product.categories[1]?.parent?.name || "Uncategorized";
+        const subcategory = product.categories[1]?.name || "General";
 
         return (
             <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
                 {/* Left Column: Image */}
                 <Card className="aspect-square w-full overflow-hidden border-none bg-gray-200 shadow-md">
                     {product.images[0] ? (
-                        <img src={product.images[0]} alt={product.title} className="h-full w-full object-cover" />
+                        <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
                     ) : (
                         <div className="flex h-full w-full flex-col items-center justify-center text-gray-400">
                             <svg
@@ -83,10 +84,12 @@ function ProductPage() {
                         </span>
                     </div>
 
-                    <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">{product.title}</h1>
+                    <h1 className="text-3xl text-gray-900 sm:text-4xl">
+                        <span className="font-bold">{product.brand.name}</span> <span>{product.name}</span>
+                    </h1>
 
                     <div className="text-3xl font-medium text-gray-700">
-                        {product.price ? `${product.price}` : "Price hidden"}
+                        {product.price ? `$${product.price}` : "Price hidden"}
                     </div>
 
                     {/* Description */}

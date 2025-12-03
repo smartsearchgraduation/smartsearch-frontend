@@ -1,4 +1,4 @@
-import { Card, CardHeader } from "./ui/Card"; // Adjust import path if needed
+import { Card, CardHeader } from "./ui/Card";
 import { cn } from "../lib/utils";
 import type { Category } from "../lib/api";
 
@@ -18,7 +18,7 @@ export function CascadingSelector({
     categories,
 }: CascadingSelectorProps) {
     const selectedCategory = categories.find((c) => c.category_id === selectedCategoryId);
-    const selectedSubcategory = selectedCategory?.children.find((c) => c.category_id === selectedSubcategoryId);
+    const selectedSubcategory = categories.find((c) => c.category_id === selectedSubcategoryId);
 
     return (
         <Card className="h-[600px]">
@@ -34,36 +34,38 @@ export function CascadingSelector({
                         Primary Category
                     </div>
                     <div className="flex-grow space-y-2 overflow-y-auto p-4">
-                        {categories.map((category) => (
-                            <button
-                                key={category.category_id}
-                                type="button"
-                                onClick={() => onCategorySelect(category.category_id)}
-                                className={cn(
-                                    "flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200",
-                                    selectedCategoryId === category.category_id
-                                        ? "bg-emerald-100 text-emerald-900 shadow-sm ring-2 ring-emerald-600"
-                                        : "text-gray-600 hover:bg-gray-100",
-                                )}
-                            >
-                                {category.name}
-                                {selectedCategoryId === category.category_id && (
-                                    <svg
-                                        className="h-5 w-5 text-emerald-900"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke="currentColor"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 5l7 7-7 7"
-                                        />
-                                    </svg>
-                                )}
-                            </button>
-                        ))}
+                        {categories
+                            .filter((c) => c.parent_category_id === null)
+                            .map((category) => (
+                                <button
+                                    key={category.category_id}
+                                    type="button"
+                                    onClick={() => onCategorySelect(category.category_id)}
+                                    className={cn(
+                                        "flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200",
+                                        selectedCategoryId === category.category_id
+                                            ? "bg-emerald-100 text-emerald-900 shadow-sm ring-2 ring-emerald-600"
+                                            : "text-gray-600 hover:bg-gray-100",
+                                    )}
+                                >
+                                    {category.name}
+                                    {selectedCategoryId === category.category_id && (
+                                        <svg
+                                            className="h-5 w-5 text-emerald-900"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 5l7 7-7 7"
+                                            />
+                                        </svg>
+                                    )}
+                                </button>
+                            ))}
                     </div>
                 </div>
 
@@ -86,35 +88,37 @@ export function CascadingSelector({
                                 <span className="text-sm font-medium">Select a primary category</span>
                             </div>
                         ) : (
-                            selectedCategory.children.map((sub) => (
-                                <label
-                                    key={sub.category_id}
-                                    className={cn(
-                                        "flex cursor-pointer items-center rounded-lg px-4 py-3 text-sm transition-all duration-200",
-                                        selectedSubcategoryId === sub.category_id
-                                            ? "scale-[1.02] bg-white shadow-md ring-2 ring-emerald-600"
-                                            : "hover:bg-white hover:shadow-sm",
-                                    )}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="subtag"
-                                        checked={selectedSubcategoryId === sub.category_id}
-                                        onChange={() => onSubcategorySelect(sub.category_id)}
-                                        className="h-4 w-4 border-gray-300 text-emerald-900 accent-emerald-600 focus:outline-none"
-                                    />
-                                    <span
+                            categories
+                                .filter((c) => c.parent_category_id === selectedCategory.category_id)
+                                .map((sub) => (
+                                    <label
+                                        key={sub.category_id}
                                         className={cn(
-                                            "ml-3",
+                                            "flex cursor-pointer items-center rounded-lg px-4 py-3 text-sm transition-all duration-200",
                                             selectedSubcategoryId === sub.category_id
-                                                ? "font-bold text-gray-900"
-                                                : "font-medium text-gray-600",
+                                                ? "scale-[1.02] bg-white shadow-md ring-2 ring-emerald-600"
+                                                : "hover:bg-white hover:shadow-sm",
                                         )}
                                     >
-                                        {sub.name}
-                                    </span>
-                                </label>
-                            ))
+                                        <input
+                                            type="radio"
+                                            name="subtag"
+                                            checked={selectedSubcategoryId === sub.category_id}
+                                            onChange={() => onSubcategorySelect(sub.category_id)}
+                                            className="h-4 w-4 border-gray-300 text-emerald-900 accent-emerald-600 focus:outline-none"
+                                        />
+                                        <span
+                                            className={cn(
+                                                "ml-3",
+                                                selectedSubcategoryId === sub.category_id
+                                                    ? "font-bold text-gray-900"
+                                                    : "font-medium text-gray-600",
+                                            )}
+                                        >
+                                            {sub.name}
+                                        </span>
+                                    </label>
+                                ))
                         )}
                     </div>
                 </div>

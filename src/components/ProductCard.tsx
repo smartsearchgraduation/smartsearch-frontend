@@ -8,10 +8,12 @@ import { cn } from "../lib/utils";
 
 function ProductCard({ searchId, product }: { searchId: string; product: Product }) {
     // We keep local state for immediate UI feedback (optimistic UI)
-    const [vote, setVote] = useState<"like" | "dislike" | null>(null);
+    const [vote, setVote] = useState<"like" | "dislike" | null>(
+        product.is_relevant == null ? null : product.is_relevant ? "like" : "dislike",
+    );
 
     const mutation = useMutation({
-        mutationFn: (voteType: "like" | "dislike") => productFeedback(searchId, product.id, voteType),
+        mutationFn: (voteType: "like" | "dislike") => productFeedback(searchId, product.product_id, voteType),
         onError: () => {
             // Revert vote on error (simplified for this example)
             setVote(null);
@@ -34,14 +36,14 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     return (
         <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
-            {product.images[0] ? (
+            {product.images?.[0] ? (
                 <div className="aspect-square w-full">
-                    <img src={product.images[0]} alt={product.title} className="h-full w-full object-contain" />
+                    <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
                 </div>
             ) : (
                 <div
                     role="img"
-                    aria-label={product.title}
+                    aria-label={product.name}
                     className="flex aspect-square w-full items-center justify-center"
                 >
                     <p className="text-gray-700">No image available</p>
@@ -50,17 +52,17 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
 
             {/* Content Section */}
             <div className="flex h-full flex-col bg-gray-100 p-4">
-                <h3 className="mr-auto mb-auto line-clamp-2 max-w-full font-bold sm:text-lg">
+                <h3 className="mr-auto mb-auto line-clamp-2 max-w-full sm:text-lg">
                     <Link
-                        to={`/product/${product.id}`}
+                        to={`/product/${product.product_id}`}
                         className="text-gray-900 after:absolute after:inset-0 after:z-10 after:content-['']"
                     >
-                        {product.title}
+                        <span className="font-bold">{product.brand.name}</span> <span>{product.name}</span>
                     </Link>
                 </h3>
 
                 <div className="mt-4 flex items-center justify-between">
-                    <p className="text-gray-700">{product.price || "Not available"}</p>
+                    <p className="text-gray-700">{"$" + product.price || "Not available"}</p>
 
                     {/* Vote Buttons (Z-20 to sit above the card link) */}
                     <div className="relative z-20 flex gap-2 text-transparent">

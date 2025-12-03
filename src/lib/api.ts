@@ -4,21 +4,35 @@ export interface SearchRequestInput {
 }
 
 export type Product = {
-    id: string;
-    title: string;
-    price: string;
+    product_id: string;
+    name: string;
+    brand: {
+        brand_id: number;
+        name: string;
+    };
+    price: number;
     description: string;
-    images: string[];
-    category: string;
+    is_relevant: boolean;
+    images: any[];
+    categories: {
+        category_id: number;
+        name: string;
+        parent: any;
+    }[];
     subcategory: string;
 };
 
 export interface SearchResponse {
     products: Product[];
-    correctedText: string;
-    rawText: string;
-    searchId: string;
+    corrected_text: string;
+    search_id: string;
+    raw_text: string;
 }
+
+let BASE_URL = "https://api.init-ai.com";
+/* if (import.meta.env.DEV) {
+    BASE_URL = "";
+} */
 
 /**
  * Submits a search query (text + optional image).
@@ -26,15 +40,16 @@ export interface SearchResponse {
  */
 export async function searchRequest(input: SearchRequestInput): Promise<string> {
     const { query, image } = input;
-    const formData = new FormData();
-    formData.append("query", query);
+    /* const formData = new FormData();
+    formData.append("raw_text", query);
     if (image) {
         formData.append("image", image);
-    }
+    } */
 
-    const response = await fetch("/api/search", {
+    const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
-        body: formData, // Send as FormData if handling files
+        body: JSON.stringify({ raw_text: query }),
+        headers: { "Content-Type": "application/json" }, // Send as FormData if handling files
     });
 
     if (!response.ok) {
@@ -42,20 +57,24 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
     }
 
     const data = await response.json();
-    return data.searchId;
+    return data.search_id;
 }
 
 /**
  * Fetches search results by ID.
  */
 export const fetchSearchResults = async (searchId: string): Promise<SearchResponse> => {
-    const response = await fetch(`/api/search-results/${searchId}`);
+    const startTime = performance.now();
+    const response = await fetch(BASE_URL + `/api/search/${searchId}`);
 
     if (!response.ok) {
         throw new Error("Failed to get results.");
     }
 
-    return response.json();
+    const data = await response.json();
+    const endTime = performance.now();
+    console.log(`fetchSearchResults took ${endTime - startTime}ms`);
+    return data;
 };
 
 /**
@@ -74,7 +93,7 @@ export const getRawTextResults = async (searchId: string): Promise<string> => {
  * Fetches a single product by ID.
  */
 export const fetchProductById = async (productId: string): Promise<Product> => {
-    const response = await fetch(`/api/products/${productId}`);
+    const response = await fetch(BASE_URL + `/api/products/${productId}`);
     if (!response.ok) {
         throw new Error("Product not found");
     }
@@ -85,22 +104,31 @@ export const fetchProductById = async (productId: string): Promise<Product> => {
  * Input for creating a new product.
  */
 export interface CreateProductInput {
-    title: string;
-    price: string;
+    name: string;
+    price: number;
     description: string;
-    images: string[];
-    category_id: number;
-    subcategory_id: number;
+    brand: string;
+    category_ids: number[];
+    images: File[];
 }
 
 /**
  * Creates a new product.
  */
 export const createProduct = async (productData: CreateProductInput): Promise<{ success: boolean; id: string }> => {
-    const response = await fetch("/api/products", {
+    const formData = new FormData();
+    formData.append("name", productData.name);
+    formData.append("price", productData.price.toString());
+    formData.append("description", productData.description);
+    formData.append("brand", productData.brand);
+    formData.append("category_ids", "1,2");
+    productData.images.forEach((imageFile) => {
+        formData.append("images", imageFile);
+    });
+
+    const response = await fetch(BASE_URL + "/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(productData),
+        body: formData,
     });
 
     if (!response.ok) {
@@ -117,13 +145,13 @@ export const productFeedback = async (
     productId: string,
     voteType: "like" | "dislike",
 ): Promise<void> => {
-    const response = await fetch(`/api/feedback`, {
+    const response = await fetch(BASE_URL + `/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            querry_id: searchId,
+            query_id: searchId,
             product_id: productId,
-            is_ok: voteType,
+            is_relevant: voteType == "like",
         }),
     });
 
@@ -132,31 +160,10 @@ export const productFeedback = async (
     }
 };
 
-/**
- * Uploads an image file.
- */
-export const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to upload image");
-    }
-
-    const data = await response.json();
-    return data.url;
-};
-
 export interface Category {
     category_id: number;
     name: string;
     parent_category_id: number | null;
-    children: Category[];
 }
 
 export interface CategoryResponse {
@@ -168,7 +175,18 @@ export interface CategoryResponse {
  * Fetches the categories for products.
  */
 export const fetchCatagories = async (): Promise<CategoryResponse> => {
-    const response = await fetch("/api/categories");
+    const response = await fetch(BASE_URL + "/api/categories");
+    if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+    }
+    return response.json();
+};
+
+/**
+ * Fetches the brands for products.
+ */
+export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[]> => {
+    const response = await fetch(BASE_URL + "/api/brands");
     if (!response.ok) {
         throw new Error("Failed to fetch categories");
     }
