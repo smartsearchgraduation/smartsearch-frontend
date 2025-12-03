@@ -1,36 +1,47 @@
 import { useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
-import { type Product } from "../lib/api";
+import { useMutation } from "@tanstack/react-query";
+import { type Product, voteProduct } from "../lib/api";
 import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
 
 function ProductCard({ product }: { product: Product }) {
+    // We keep local state for immediate UI feedback (optimistic UI)
     const [vote, setVote] = useState<"like" | "dislike" | null>(null);
+
+    const mutation = useMutation({
+        mutationFn: (voteType: "like" | "dislike") => voteProduct(product.id, voteType),
+        onError: () => {
+            // Revert vote on error (simplified for this example)
+            setVote(null);
+            alert("Failed to submit vote");
+        },
+    });
 
     const handleVoteClick = (e: MouseEvent<HTMLButtonElement>, voteType: "like" | "dislike") => {
         e.stopPropagation();
         e.preventDefault();
 
-        setVote((currentVote) => {
-            if (currentVote === voteType) {
-                return null;
-            }
-            return voteType;
-        });
+        const newVote = vote === voteType ? null : voteType;
+        setVote(newVote); // Optimistic update
+
+        if (newVote) {
+            mutation.mutate(newVote);
+        }
     };
 
     return (
         <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
-            {product.imageUrl ? (
+            {product.images[0] ? (
                 <div className="aspect-square w-full">
-                    <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain" />
+                    <img src={product.images[0]} alt={product.title} className="h-full w-full object-contain" />
                 </div>
             ) : (
                 <div
                     role="img"
-                    aria-label={product.name}
+                    aria-label={product.title}
                     className="flex aspect-square w-full items-center justify-center"
                 >
                     <p className="text-gray-700">No image available</p>
@@ -59,7 +70,7 @@ function ProductCard({ product }: { product: Product }) {
                             onClick={(e) => handleVoteClick(e, "like")}
                             aria-label="Product is relevant"
                             aria-pressed={vote === "like"}
-                            className={cn("hover:bg-gray-200", vote === "like" ? "text-blue-400" : "text-gray-400")}
+                            className={cn("hover:text-blue-500", vote === "like" ? "text-blue-400" : "text-gray-400")}
                         >
                             <svg
                                 className="h-5 w-5" // Fixed size for consistency
@@ -79,7 +90,7 @@ function ProductCard({ product }: { product: Product }) {
                             onClick={(e) => handleVoteClick(e, "dislike")}
                             aria-label="Product is not relevant"
                             aria-pressed={vote === "dislike"}
-                            className={cn("hover:bg-gray-200", vote === "dislike" ? "text-red-400" : "text-gray-400")}
+                            className={cn("hover:text-red-500", vote === "dislike" ? "text-red-400" : "text-gray-400")}
                         >
                             <svg
                                 className="h-5 w-5"

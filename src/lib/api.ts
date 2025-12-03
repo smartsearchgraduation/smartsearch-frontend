@@ -5,195 +5,140 @@ export interface SearchRequestInput {
 
 export type Product = {
     id: string;
-    name: string;
-    imageUrl: string;
-    description: string;
-    price: string;
     title: string;
+    price: string;
+    description: string;
+    images: string[];
+    category: string;
+    subcategory: string;
 };
 
-export async function searchRequest(input: SearchRequestInput): Promise<string> {
-    const { query } = input;
-    const formData = new FormData();
-    formData.append("query", query);
-
-    // Mock api call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // throw new Error("An unknown network error occurred.");
-    return query;
-
-    /* let url = "http://localhost:5000/api/search";
-    url = "https://api.init-ai.com/api/search";
-    if (import.meta.env.MODE === "production") {
-    }
-    const { query } = input;
-
-    const dataToSend = {
-        raw_text: query,
-    };
-
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(dataToSend),
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const message = errData.message || `Request failed with status ${response.status}`;
-            throw new Error(message);
-        }
-
-        const data: { query_id: string; corrected_text: string; products: any } = await response.json();
-
-        console.log(data);
-
-        const searchId = data.query_id;
-        localStorage.setItem("raw_text", query);
-        localStorage.setItem("corrected_text", data.corrected_text);
-        localStorage.setItem(
-            "products",
-            JSON.stringify(
-                data.products.map((p: any) => {
-                    return {
-                        id: p.product_id,
-                        name: p.name,
-                        imageUrl: "https://placehold.co/400",
-                        description: p.description,
-                        price: currencyFormatter.format(Number(p.price)),
-                        title: p.name,
-                    };
-                })
-            )
-        );
-
-        return searchId;
-    } catch (err: any) {
-        throw new Error(err.message || "An unknown network error occurred.");
-    } */
+export interface SearchResponse {
+    products: Product[];
+    correctedText: string;
+    rawText: string;
+    searchId: string;
 }
 
-const currencyFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-});
-
-export const fetchSearchResults = async (searchId: string) => {
-    /* if (import.meta.env.MODE === "production") {
+/**
+ * Submits a search query (text + optional image).
+ * Returns a searchId to poll or fetch results for.
+ */
+export async function searchRequest(input: SearchRequestInput): Promise<string> {
+    const { query, image } = input;
+    const formData = new FormData();
+    formData.append("query", query);
+    if (image) {
+        formData.append("image", image);
     }
-    const rawText = localStorage.getItem("raw_text");
-    const correctedText = localStorage.getItem("corrected_text");
-    const products = JSON.parse(localStorage.getItem("products") || "[]");
-    return { products, correctedText, rawText, searchId }; */
 
-    // Mock api call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const mockData: { products: Product[]; correctedText: string; rawText: string } = {
-        products: [
-            {
-                id: "1",
-                name: "Product 1",
-                imageUrl: "https://placehold.co/400",
-                description: "Description 1",
-                price: currencyFormatter.format(10.99),
-                title: "Title 1",
-            },
-            {
-                id: "2",
-                name: "Product 2",
-                imageUrl: "https://placehold.co/400",
-                description: "Description 2",
-                price: currencyFormatter.format(20.97),
-                title: "Title 2",
-            },
-            {
-                id: "3",
-                name: "Product 3",
-                imageUrl: "https://placehold.co/400",
-                description: "Description 3",
-                price: currencyFormatter.format(30.5),
-                title: "Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3 Title 3",
-            },
-            {
-                id: "4",
-                name: "Product 4",
-                imageUrl: "https://placehold.co/400",
-                description: "Description 4",
-                price: currencyFormatter.format(40.99),
-                title: "Title 4",
-            },
-        ],
-        correctedText: searchId.includes("raw") ? "" : "corrected text",
-        rawText: "raw text",
-    };
-    return mockData;
+    const response = await fetch("/api/search", {
+        method: "POST",
+        body: formData, // Send as FormData if handling files
+    });
 
+    if (!response.ok) {
+        throw new Error("Failed to submit search request");
+    }
+
+    const data = await response.json();
+    return data.searchId;
+}
+
+/**
+ * Fetches search results by ID.
+ */
+export const fetchSearchResults = async (searchId: string): Promise<SearchResponse> => {
     const response = await fetch(`/api/search-results/${searchId}`);
 
     if (!response.ok) {
         throw new Error("Failed to get results.");
     }
 
-    const data: { products: Product[]; correctedText: string; rawText: string } = await response.json();
-    return data;
+    return response.json();
 };
 
-export const getRawTextResults = async (searchId: string) => {
-    // Mock api call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return "raw text " + searchId;
-};
-
-export const fetchProductById = async (productId: string): Promise<Product> => {
-    if (import.meta.env.MODE === "production") {
-        const products = JSON.parse(localStorage.getItem("products") || "[]");
-        return products.find((p: Product) => p.id === productId)!;
+/**
+ * Fetches raw text results (for the 'Search instead for...' feature).
+ */
+export const getRawTextResults = async (searchId: string): Promise<string> => {
+    const response = await fetch(`/api/raw-text-results/${searchId}`);
+    if (!response.ok) {
+        throw new Error("Failed to get raw text results");
     }
+    const data = await response.json();
+    return data.text;
+};
 
-    // MOCK DATA
-    await new Promise((res) => setTimeout(res, 1000)); // Simulate network delay
-
-    const allProducts: Product[] = [
-        {
-            id: "1",
-            name: "Product 1",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 1",
-            price: currencyFormatter.format(10.99),
-            title: "Title 1",
-        },
-        {
-            id: "2",
-            name: "Product 2",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 2",
-            price: currencyFormatter.format(20.97),
-            title: "Title 2",
-        },
-        {
-            id: "3",
-            name: "Product 3",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 3",
-            price: currencyFormatter.format(30.5),
-            title: "Title 3",
-        },
-        {
-            id: "4",
-            name: "Product 4",
-            imageUrl: "https://placehold.co/400",
-            description: "Description 4",
-            price: currencyFormatter.format(40.99),
-            title: "Title 4",
-        },
-    ];
-    const product = allProducts.find((p) => p.id === productId);
-
-    if (!product) {
+/**
+ * Fetches a single product by ID.
+ */
+export const fetchProductById = async (productId: string): Promise<Product> => {
+    const response = await fetch(`/api/products/${productId}`);
+    if (!response.ok) {
         throw new Error("Product not found");
     }
-    return product;
+    return response.json();
+};
+
+/**
+ * Creates a new product.
+ */
+export const createProduct = async (productData: Omit<Product, "id">): Promise<{ success: boolean; id: string }> => {
+    const response = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(productData),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to create product");
+    }
+    return response.json();
+};
+
+/**
+ * Submits a vote (like/dislike) for a product.
+ */
+export const voteProduct = async (productId: string, voteType: "like" | "dislike"): Promise<void> => {
+    const response = await fetch(`/api/products/${productId}/vote`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ voteType }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to submit vote");
+    }
+};
+
+/**
+ * Uploads an image file.
+ */
+export const uploadImage = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to upload image");
+    }
+
+    const data = await response.json();
+    return data.url;
+};
+
+/**
+ * Fetches the taxonomy/categories for products.
+ */
+export const fetchTaxonomy = async (): Promise<Record<string, string[]>> => {
+    const response = await fetch("/api/taxonomy");
+    if (!response.ok) {
+        throw new Error("Failed to fetch taxonomy");
+    }
+    return response.json();
 };

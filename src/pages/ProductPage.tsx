@@ -43,15 +43,15 @@ function ProductPage() {
             );
         }
 
-        const category = (product as any).category || "Uncategorized";
-        const subcategory = (product as any).subcategory || "General";
+        const category = product.category || "Uncategorized";
+        const subcategory = product.subcategory || "General";
 
         return (
             <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
                 {/* Left Column: Image */}
                 <Card className="aspect-square w-full overflow-hidden border-none bg-gray-200 shadow-md">
-                    {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
+                    {product.images[0] ? (
+                        <img src={product.images[0]} alt={product.title} className="h-full w-full object-cover" />
                     ) : (
                         <div className="flex h-full w-full flex-col items-center justify-center text-gray-400">
                             <svg

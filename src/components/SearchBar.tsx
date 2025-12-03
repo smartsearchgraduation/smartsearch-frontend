@@ -322,11 +322,10 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             </div>
             {/* --- Drag and Drop Overlay --- */}
             <div
-                className="absolute inset-0 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/80 font-bold text-white transition-opacity duration-200"
-                style={{
-                    opacity: isDragging ? 1 : 0,
-                    pointerEvents: isDragging ? "auto" : "none",
-                }}
+                className={
+                    "absolute inset-0 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/80 font-bold text-white transition-opacity duration-200 " +
+                    (isDragging ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")
+                }
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >

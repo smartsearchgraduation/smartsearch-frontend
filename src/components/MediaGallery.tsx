@@ -141,8 +141,10 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                 >
                     {/* Visual Overlay for Dragging */}
                     <div
-                        className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/90 font-bold text-white transition-opacity duration-200"
-                        style={{ opacity: isDragging ? 1 : 0 }}
+                        className={cn(
+                            "pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/90 font-bold text-white transition-opacity duration-200",
+                            isDragging ? "opacity-100" : "opacity-0",
+                        )}
                     >
                         Drop images here to upload
                     </div>

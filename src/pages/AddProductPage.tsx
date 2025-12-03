@@ -1,7 +1,9 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "../components/MediaGallery";
 import { CascadingSelector } from "../components/CascadingSelector";
+import { createProduct, fetchTaxonomy } from "../lib/api";
 
 // UI Components
 import { Button } from "../components/ui/Button";
@@ -10,27 +12,15 @@ import { Textarea } from "../components/ui/Textarea";
 import { Card, CardContent, CardHeader } from "../components/ui/Card";
 
 // --- Types & Interfaces ---
-interface TaxonomyType {
-    [key: string]: string[];
-}
-
 interface ProductFormData {
     title: string;
     price: string;
     description: string;
 }
 
-// --- Constants & Data ---
-const TAXONOMY: TaxonomyType = {
-    Engineering: ["Frontend", "Backend", "DevOps", "Mobile", "QA"],
-    Design: ["UI Design", "UX Research", "Graphic Design", "Motion", "Branding"],
-    Marketing: ["SEO", "Content", "Social Media", "Email", "Research"],
-    Product: ["Roadmap", "Specs", "User Research", "Analytics"],
-    Clothing: ["T-Shirts", "Jeans", "Jackets", "Shoes", "Accessories"],
-    Home: ["Decor", "Kitchen", "Bedding", "Lighting", "Furniture"],
-};
-
 function AddProductPage() {
+    const navigate = useNavigate();
+
     // --- Form State ---
     const [formData, setFormData] = useState<ProductFormData>({
         title: "",
@@ -44,6 +34,23 @@ function AddProductPage() {
 
     // Image State
     const [images, setImages] = useState<UploadedImage[]>([]);
+
+    // --- Queries & Mutations ---
+    const { data: taxonomy = {} } = useQuery({
+        queryKey: ["taxonomy"],
+        queryFn: fetchTaxonomy,
+    });
+
+    const mutation = useMutation({
+        mutationFn: createProduct,
+        onSuccess: () => {
+            // Show success message
+            alert("Product created successfully!");
+        },
+        onError: (error) => {
+            alert("Failed to create product: " + error.message);
+        },
+    });
 
     // --- Handlers: Text Inputs ---
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -61,13 +68,22 @@ function AddProductPage() {
     // --- Handler: Submit ---
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        console.log("Submitting Product:", {
+
+        // Ensure required fields are present (though button is disabled otherwise)
+        if (!selectedTag || !selectedSubtag || images.length === 0) {
+            return;
+        }
+
+        mutation.mutate({
             ...formData,
             category: selectedTag,
             subcategory: selectedSubtag,
-            images: images.map((i) => i.file.name),
+            images: images.map((i) => i.preview), // Using preview URL as placeholder for now
         });
-        alert("Product saved! Check console for data object.");
+    };
+
+    const handleDiscard = () => {
+        navigate("/");
     };
 
     return (
@@ -84,15 +100,15 @@ function AddProductPage() {
                     </Link>
 
                     <div className="flex gap-3">
-                        <Button type="button" variant="secondary" onClick={() => console.log("Discard clicked")}>
+                        <Button type="button" variant="secondary" onClick={handleDiscard}>
                             Discard
                         </Button>
                         <Button
                             type="submit"
                             variant="primary"
-                            disabled={!formData.title || !selectedSubtag || images.length === 0}
+                            disabled={!formData.title || !selectedSubtag || images.length === 0 || mutation.isPending}
                         >
-                            Publish
+                            {mutation.isPending ? "Publishing..." : "Publish"}
                         </Button>
                     </div>
                 </header>
@@ -163,7 +179,7 @@ function AddProductPage() {
                             selectedSubtag={selectedSubtag}
                             onTagSelect={handleTagSelect}
                             onSubtagSelect={setSelectedSubtag}
-                            Data={TAXONOMY}
+                            Data={taxonomy}
                         />
                     </div>
                 </div>
