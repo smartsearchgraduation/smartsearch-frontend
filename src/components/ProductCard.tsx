@@ -6,12 +6,12 @@ import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ searchId, product }: { searchId: string; product: Product }) {
     // We keep local state for immediate UI feedback (optimistic UI)
     const [vote, setVote] = useState<"like" | "dislike" | null>(null);
 
     const mutation = useMutation({
-        mutationFn: (voteType: "like" | "dislike") => voteProduct(product.id, voteType),
+        mutationFn: (voteType: "like" | "dislike") => voteProduct(searchId, product.id, voteType),
         onError: () => {
             // Revert vote on error (simplified for this example)
             setVote(null);

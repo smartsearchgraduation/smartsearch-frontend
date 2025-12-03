@@ -16,8 +16,6 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>("");
     const [isDragging, setIsDragging] = useState(false);
-    // Removed manual isLoading and error states in favor of mutation state
-
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const charLimit = 300;
@@ -324,7 +322,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             <div
                 className={
                     "absolute inset-0 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/80 font-bold text-white transition-opacity duration-200 " +
-                    (isDragging ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")
+                    (isDragging ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0")
                 }
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}

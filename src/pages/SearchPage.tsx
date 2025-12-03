@@ -6,7 +6,7 @@ import SearchBar from "../components/SearchBar";
 import LoadingWave from "../components/LoadingWave";
 
 function SearchPage() {
-    const { searchId } = useParams<{ searchId: string }>();
+    const { searchId } = useParams() as { searchId: string };
     const navigate = useNavigate();
 
     const {
@@ -48,7 +48,7 @@ function SearchPage() {
         return (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] sm:gap-4">
                 {results.products.map((product: Product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard searchId={searchId} key={product.id} product={product} />
                 ))}
             </div>
         );

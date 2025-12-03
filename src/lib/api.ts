@@ -100,11 +100,15 @@ export const createProduct = async (productData: Omit<Product, "id">): Promise<{
 /**
  * Submits a vote (like/dislike) for a product.
  */
-export const voteProduct = async (productId: string, voteType: "like" | "dislike"): Promise<void> => {
-    const response = await fetch(`/api/products/${productId}/vote`, {
+export const voteProduct = async (searchId: string, productId: string, voteType: "like" | "dislike"): Promise<void> => {
+    const response = await fetch(`/api/products/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ voteType }),
+        body: JSON.stringify({
+            searchId,
+            productId,
+            voteType,
+        }),
     });
 
     if (!response.ok) {

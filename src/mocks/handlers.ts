@@ -96,7 +96,7 @@ export const handlers = [
     }),
 
     // 6. Vote Product (New)
-    http.post("/api/products/:productId/vote", async () => {
+    http.post("/api/products/vote", async () => {
         await new Promise((resolve) => setTimeout(resolve, 300));
         return HttpResponse.json({ success: true });
     }),
