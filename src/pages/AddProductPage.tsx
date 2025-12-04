@@ -150,23 +150,24 @@ function AddProductPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 px-2 py-6">
-            <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-6">
-                {/* --- Header Section --- */}
-                <header className="mb-8 flex flex-col items-center gap-4 sm:flex-row">
-                    <div className="flex gap-2">
-                        <Link
-                            to="/"
-                            className="flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md"
-                        >
-                            <span className="text-emerald-600">Smart </span>
-                            <span className="text-gray-800">Search</span>
-                        </Link>
-                        <span className="text-4xl font-bold text-gray-600"> | </span>
-                        <span className="mt-auto text-2xl font-bold text-gray-600">Admin</span>
-                    </div>
-                </header>
-
+        <div className="mx-auto min-h-screen max-w-7xl bg-gray-100 pt-6">
+            {/* --- Header Section --- */}
+            <header className="mb-8 flex flex-col items-center gap-4 sm:flex-row">
+                <div className="flex gap-2">
+                    <Link
+                        to="/"
+                        className="flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md"
+                    >
+                        <span className="text-emerald-600">Smart </span>
+                        <span className="text-gray-800">Search</span>
+                    </Link>
+                    <span className="text-4xl font-bold text-gray-600"> | </span>
+                    <Link to="/admin" className="mt-auto">
+                        <span className="text-2xl font-bold text-gray-600">Admin</span>
+                    </Link>
+                </div>
+            </header>
+            <form onSubmit={handleSubmit} className="mx-auto space-y-6">
                 <div className="flex items-center justify-between px-2">
                     <h1 className="text-2xl font-bold text-gray-800">Add New Product</h1>
 
@@ -182,9 +183,9 @@ function AddProductPage() {
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* --- LEFT COLUMN --- */}
-                    <div className="space-y-6 lg:col-span-2">
+                    <div className="flex flex-col gap-6 lg:col-span-2">
                         {/* Product Information */}
-                        <Card>
+                        <Card className="flex-grow">
                             <CardHeader>
                                 <h2 className="text-xl font-bold text-gray-800">Product Information</h2>
                             </CardHeader>
