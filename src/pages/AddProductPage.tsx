@@ -10,6 +10,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Textarea } from "../components/ui/Textarea";
 import { Card, CardContent, CardHeader } from "../components/ui/Card";
+import { Combobox } from "../components/ui/Combobox";
 
 // --- Types & Interfaces ---
 interface ProductFormData {
@@ -32,6 +33,9 @@ function AddProductPage() {
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
     const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number | null>(null);
 
+    // Brand State
+    const [brandName, setBrandName] = useState<string>("");
+
     // Image State
     const [images, setImages] = useState<UploadedImage[]>([]);
 
@@ -47,7 +51,10 @@ function AddProductPage() {
         queryFn: fetchBrands,
     });
     const brands = brandsData || [];
-    console.log(brands);
+    const brandOptions = brands.map((b) => ({
+        value: b.brand_id,
+        label: b.name,
+    }));
 
     const mutation = useMutation({
         mutationFn: createProduct,
@@ -77,9 +84,9 @@ function AddProductPage() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        // Ensure required fields are present (though button is disabled otherwise)
-        if (!selectedCategoryId || !selectedSubcategoryId || images.length === 0) {
-            alert("Please fill all fields and upload at least one image.");
+        // Ensure required fields are present
+        if (!selectedCategoryId || !selectedSubcategoryId || images.length === 0 || !brandName.trim()) {
+            alert("Please fill all fields, enter a brand, and upload at least one image.");
             return;
         }
 
@@ -132,7 +139,7 @@ function AddProductPage() {
             name: formData.name,
             price: Number(formData.price),
             description: formData.description,
-            brand: "a", // Placeholder for brand
+            brand: brandName, // Use the string directly
             category_ids: [selectedCategoryId, selectedSubcategoryId],
             images: convertedImages,
         });
@@ -146,7 +153,7 @@ function AddProductPage() {
         <div className="min-h-screen bg-gray-100 px-2 py-6">
             <form onSubmit={handleSubmit} className="mx-auto max-w-6xl space-y-6">
                 {/* --- Header Section --- */}
-                <header className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                <header className="mb-8 flex flex-col items-center gap-4 sm:flex-row">
                     <div className="flex gap-2">
                         <Link
                             to="/"
@@ -158,6 +165,10 @@ function AddProductPage() {
                         <span className="text-4xl font-bold text-gray-600"> | </span>
                         <span className="mt-auto text-2xl font-bold text-gray-600">Admin</span>
                     </div>
+                </header>
+
+                <div className="flex items-center justify-between px-2">
+                    <h1 className="text-2xl font-bold text-gray-800">Add New Product</h1>
 
                     <div className="flex gap-3">
                         <Button type="button" variant="secondary" onClick={handleDiscard}>
@@ -167,12 +178,12 @@ function AddProductPage() {
                             {mutation.isPending ? "Publishing..." : "Publish"}
                         </Button>
                     </div>
-                </header>
+                </div>
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* --- LEFT COLUMN --- */}
                     <div className="space-y-6 lg:col-span-2">
-                        {/* 1. Product Information */}
+                        {/* Product Information */}
                         <Card>
                             <CardHeader>
                                 <h2 className="text-xl font-bold text-gray-800">Product Information</h2>
@@ -193,7 +204,7 @@ function AddProductPage() {
                                     name="description"
                                     value={formData.description}
                                     onChange={handleInputChange}
-                                    rows={6}
+                                    rows={5}
                                     placeholder="Describe your product using natural language..."
                                     footer={
                                         <div className="flex justify-end">
@@ -203,33 +214,36 @@ function AddProductPage() {
                                         </div>
                                     }
                                 />
+
+                                {/* Pricing and Brand */}
+                                <div className="flex items-center justify-between gap-4">
+                                    <Combobox
+                                        label="Brand"
+                                        options={brandOptions}
+                                        value={brandName}
+                                        onChange={setBrandName}
+                                        placeholder="Select or type a brand..."
+                                    />
+                                    <Input
+                                        label="Price"
+                                        name="price"
+                                        type="number"
+                                        value={formData.price}
+                                        onChange={handleInputChange}
+                                        placeholder="0.00"
+                                        leftIcon={<span className="text-lg font-bold text-gray-500">$</span>}
+                                    />
+                                </div>
                             </CardContent>
                         </Card>
 
-                        {/* 2. Media Gallery */}
+                        {/* Media Gallery */}
                         <MediaGallery images={images} onImagesChange={setImages} />
                     </div>
 
                     {/* --- RIGHT COLUMN --- */}
                     <div className="space-y-6 lg:col-span-1">
-                        {/* 3. Pricing */}
-                        <Card>
-                            <CardHeader>
-                                <h2 className="text-xl font-bold text-gray-800">Pricing</h2>
-                            </CardHeader>
-                            <CardContent className="flex flex-col">
-                                <Input
-                                    name="price"
-                                    type="number"
-                                    value={formData.price}
-                                    onChange={handleInputChange}
-                                    placeholder="0.00"
-                                    leftIcon={<span className="text-lg font-bold text-gray-500">$</span>}
-                                />
-                            </CardContent>
-                        </Card>
-
-                        {/* 4. Organization */}
+                        {/* Categories */}
                         <CascadingSelector
                             selectedCategoryId={selectedCategoryId}
                             selectedSubcategoryId={selectedSubcategoryId}

@@ -175,7 +175,7 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                             </svg>
                         </div>
                         <div>
-                            <p className="text-lg font-bold text-gray-700">Drop your images here</p>
+                            <h3 className="text-lg font-bold text-gray-700">Drop your images here</h3>
                             <p className="mt-1 text-sm text-gray-500">or click to browse</p>
                         </div>
                     </div>

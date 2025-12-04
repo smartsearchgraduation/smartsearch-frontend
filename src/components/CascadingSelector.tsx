@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import { Card, CardHeader } from "./ui/Card";
 import { cn } from "../lib/utils";
 import type { Category } from "../lib/api";
@@ -20,8 +21,29 @@ export function CascadingSelector({
     const selectedCategory = categories.find((c) => c.category_id === selectedCategoryId);
     const selectedSubcategory = categories.find((c) => c.category_id === selectedSubcategoryId);
 
+    const activeCategoryRef = useRef<HTMLLabelElement>(null);
+    const activeSubCategoryRef = useRef<HTMLLabelElement>(null);
+
+    useEffect(() => {
+        if (activeCategoryRef.current) {
+            activeCategoryRef.current.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+            });
+        }
+    }, [selectedCategoryId]);
+
+    useEffect(() => {
+        if (activeSubCategoryRef.current) {
+            activeSubCategoryRef.current.scrollIntoView({
+                block: "nearest",
+                behavior: "smooth",
+            });
+        }
+    }, [selectedSubcategoryId]);
+
     return (
-        <Card className="h-[600px]">
+        <Card className="h-full">
             <CardHeader>
                 <h2 className="text-lg font-bold text-gray-800">Category</h2>
             </CardHeader>
@@ -29,26 +51,36 @@ export function CascadingSelector({
             {/* --- Main Content Area --- */}
             <div className="grid h-full flex-1 grid-rows-2 divide-y divide-gray-100 overflow-hidden">
                 {/* 1. Parent Categories */}
-                <div className="flex h-full flex-col overflow-hidden">
-                    <div className="flex-shrink-0 bg-gray-100 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-600 uppercase">
+                <fieldset className="group flex h-full flex-col overflow-hidden">
+                    <legend className="visually-hidden">Primary Category</legend>
+                    <div
+                        aria-hidden="true"
+                        className="flex-shrink-0 bg-gray-100 px-6 py-2 text-xs font-bold tracking-wider text-gray-600 uppercase group-focus-within:bg-emerald-100 group-focus-within:text-emerald-900"
+                    >
                         Primary Category
                     </div>
                     <div className="flex-grow space-y-2 overflow-y-auto p-4">
                         {categories
                             .filter((c) => c.parent_category_id === null)
                             .map((category) => (
-                                <button
+                                <label
                                     key={category.category_id}
-                                    type="button"
-                                    onClick={() => onCategorySelect(category.category_id)}
+                                    ref={selectedCategoryId === category.category_id ? activeCategoryRef : null}
                                     className={cn(
-                                        "flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200",
+                                        "flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-bold transition-all duration-200 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:ring-offset-2",
                                         selectedCategoryId === category.category_id
                                             ? "bg-emerald-100 text-emerald-900 shadow-sm ring-2 ring-emerald-600"
                                             : "text-gray-600 hover:bg-gray-100",
                                     )}
                                 >
-                                    {category.name}
+                                    <input
+                                        type="radio"
+                                        name="primary_category"
+                                        className="visually-hidden"
+                                        checked={selectedCategoryId === category.category_id}
+                                        onChange={() => onCategorySelect(category.category_id)}
+                                    />
+                                    <span>{category.name}</span>
                                     {selectedCategoryId === category.category_id && (
                                         <svg
                                             className="h-5 w-5 text-emerald-900"
@@ -64,14 +96,18 @@ export function CascadingSelector({
                                             />
                                         </svg>
                                     )}
-                                </button>
+                                </label>
                             ))}
                     </div>
-                </div>
+                </fieldset>
 
                 {/* 2. Sub Categories */}
-                <div className="flex h-full flex-col overflow-hidden bg-gray-50">
-                    <div className="flex-shrink-0 bg-gray-200/50 px-6 py-2 text-[10px] font-bold tracking-wider text-gray-600 uppercase">
+                <fieldset className="group flex h-full flex-col overflow-hidden bg-gray-50">
+                    <legend className="visually-hidden">Sub Category</legend>
+                    <div
+                        aria-hidden="true"
+                        className="flex-shrink-0 bg-gray-200/50 px-6 py-2 text-xs font-bold tracking-wider text-gray-600 uppercase group-focus-within:bg-emerald-100 group-focus-within:text-emerald-900"
+                    >
                         Sub Category
                     </div>
                     <div className="flex-grow space-y-2 overflow-y-auto p-4">
@@ -93,6 +129,7 @@ export function CascadingSelector({
                                 .map((sub) => (
                                     <label
                                         key={sub.category_id}
+                                        ref={selectedSubcategoryId === sub.category_id ? activeSubCategoryRef : null}
                                         className={cn(
                                             "flex cursor-pointer items-center rounded-lg px-4 py-3 text-sm transition-all duration-200",
                                             selectedSubcategoryId === sub.category_id
@@ -121,7 +158,7 @@ export function CascadingSelector({
                                 ))
                         )}
                     </div>
-                </div>
+                </fieldset>
             </div>
 
             {/* --- Summary Footer --- */}

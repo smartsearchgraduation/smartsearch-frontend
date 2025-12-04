@@ -9,35 +9,29 @@ const mockProducts = [
         description: "A stylish vintage leather jacket.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [
-            { category_id: 2, name: "Clothing", parent: null },
-        ],
+        categories: [{ category_id: 2, name: "Clothing", parent: null }],
         subcategory: "Jackets",
     },
     {
         product_id: "2",
         name: "Classic Denim Jeans",
         brand: { brand_id: 102, name: "DenimCo" },
-        price: 45.50,
+        price: 45.5,
         description: "Comfortable classic fit denim jeans.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [
-            { category_id: 2, name: "Clothing", parent: null },
-        ],
+        categories: [{ category_id: 2, name: "Clothing", parent: null }],
         subcategory: "Jeans",
     },
     {
         product_id: "3",
         name: "Ergonomic Office Chair",
         brand: { brand_id: 103, name: "OfficePro" },
-        price: 150.00,
+        price: 150.0,
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: false,
         images: ["https://placehold.co/400"],
-        categories: [
-            { category_id: 3, name: "Home", parent: null },
-        ],
+        categories: [{ category_id: 3, name: "Home", parent: null }],
         subcategory: "Furniture",
     },
     {
@@ -48,9 +42,7 @@ const mockProducts = [
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [
-            { category_id: 1, name: "Electronics", parent: null },
-        ],
+        categories: [{ category_id: 1, name: "Electronics", parent: null }],
         subcategory: "Audio",
     },
 ];
@@ -60,10 +52,19 @@ const mockCategories = [
     { category_id: 2, name: "Clothing", parent_category_id: null },
     { category_id: 3, name: "Home", parent_category_id: null },
     { category_id: 4, name: "Sports", parent_category_id: null },
+    { category_id: 5, name: "Beauty", parent_category_id: null },
+    { category_id: 6, name: "Books", parent_category_id: null },
     { category_id: 7, name: "Smartphones", parent_category_id: 1 },
     { category_id: 8, name: "Laptops", parent_category_id: 1 },
     { category_id: 9, name: "Men's Clothing", parent_category_id: 2 },
     { category_id: 10, name: "Women's Clothing", parent_category_id: 2 },
+    { category_id: 11, name: "Furniture", parent_category_id: 3 },
+    { category_id: 12, name: "Sports Equipment", parent_category_id: 4 },
+    { category_id: 13, name: "Fitness Gear", parent_category_id: 4 },
+    { category_id: 14, name: "Makeup", parent_category_id: 5 },
+    { category_id: 15, name: "Skincare", parent_category_id: 5 },
+    { category_id: 16, name: "Novels", parent_category_id: 6 },
+    { category_id: 17, name: "Fiction", parent_category_id: 6 },
 ];
 
 const mockBrands = [
@@ -136,7 +137,7 @@ export const handlers = [
         await new Promise((resolve) => setTimeout(resolve, 500));
         return HttpResponse.json({
             categories: mockCategories,
-            total: mockCategories.length
+            total: mockCategories.length,
         });
     }),
 

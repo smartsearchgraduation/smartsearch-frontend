@@ -8,10 +8,20 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-    ({ className, wrapperClassName, label, footer, ...props }, ref) => {
+    ({ className, wrapperClassName, label, footer, id, ...props }, ref) => {
+        const generatedId = React.useId();
+        const textareaId = id || generatedId;
+
         return (
             <div className={cn("w-full", wrapperClassName)}>
-                {label && <label className="mb-2 ml-4 block text-sm font-bold text-gray-700">{label}</label>}
+                {label && (
+                    <label
+                        htmlFor={textareaId}
+                        className="mb-2 ml-4 block text-sm font-bold text-gray-700"
+                    >
+                        {label}
+                    </label>
+                )}
                 <div
                     className={cn(
                         "transition-alloverflow-hidden relative flex flex-col rounded-[1.5rem] bg-white shadow-sm ring-2 ring-gray-200 duration-200",
@@ -19,6 +29,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
                     )}
                 >
                     <textarea
+                        id={textareaId}
                         className={cn(
                             "w-full resize-none rounded-[1.5rem] border-none bg-transparent px-6 py-4 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
                             className,
