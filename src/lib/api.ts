@@ -13,11 +13,14 @@ export type Product = {
     price: number;
     description: string;
     is_relevant: boolean;
-    images: any[];
+    images: string[];
     categories: {
         category_id: number;
         name: string;
-        parent: any;
+        parent: {
+            category_id: number;
+            name: string;
+        } | null;
     }[];
     subcategory: string;
 };
