@@ -24,7 +24,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 )}
                 <div
                     className={cn(
-                        "relative flex items-center rounded-[1.5rem] bg-white shadow-sm ring-2 ring-gray-200 transition-all duration-200",
+                        "relative flex items-center rounded-lg bg-white shadow-sm ring-2 ring-gray-200 transition-all duration-200",
                         "focus-within:shadow-md focus-within:ring-emerald-600",
                         "disabled:cursor-not-allowed disabled:opacity-50",
                     )}
@@ -34,7 +34,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         type={type}
                         id={inputId}
                         className={cn(
-                            "w-full rounded-[1.5rem] border-none bg-transparent px-6 py-3 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
+                            "w-full rounded-lg border-none bg-transparent px-4 py-2 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
                             leftIcon && "pl-2", // adjust padding if icon exists
                             className,
                         )}

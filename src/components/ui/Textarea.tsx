@@ -24,20 +24,20 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
                 )}
                 <div
                     className={cn(
-                        "transition-alloverflow-hidden relative flex flex-col rounded-[1.5rem] bg-white shadow-sm ring-2 ring-gray-200 duration-200",
+                        "transition-alloverflow-hidden relative flex flex-col rounded-lg bg-white shadow-sm ring-2 ring-gray-200 duration-200",
                         "focus-within:shadow-md focus-within:ring-emerald-600",
                     )}
                 >
                     <textarea
                         id={textareaId}
                         className={cn(
-                            "w-full resize-none rounded-[1.5rem] border-none bg-transparent px-6 py-4 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
+                            "w-full resize-none rounded-lg border-none bg-transparent px-4 py-2 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
                             className,
                         )}
                         ref={ref}
                         {...props}
                     />
-                    {footer && <div className="mt-auto px-6 pb-3">{footer}</div>}
+                    {footer && <div className="mt-auto px-4 pb-2">{footer}</div>}
                 </div>
             </div>
         );

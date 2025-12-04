@@ -86,7 +86,7 @@ function AddProductPage() {
 
         // Ensure required fields are present
         if (!selectedCategoryId || !selectedSubcategoryId || images.length === 0 || !brandName.trim()) {
-            alert("Please fill all fields, enter a brand, and upload at least one image.");
+            alert("Please fill all fields, and upload at least one image.");
             return;
         }
 
@@ -146,11 +146,11 @@ function AddProductPage() {
     };
 
     const handleDiscard = () => {
-        navigate("/");
+        navigate("/admin");
     };
 
     return (
-        <div className="mx-auto min-h-screen max-w-7xl bg-gray-100 pt-6">
+        <div className="mx-auto min-h-screen max-w-6xl bg-gray-100 py-6">
             {/* --- Header Section --- */}
             <header className="mb-8 flex flex-col items-center gap-4 sm:flex-row">
                 <div className="flex gap-2">
@@ -185,8 +185,8 @@ function AddProductPage() {
                     {/* --- LEFT COLUMN --- */}
                     <div className="flex flex-col gap-6 lg:col-span-2">
                         {/* Product Information */}
-                        <Card className="flex-grow">
-                            <CardHeader>
+                        <Card className="overflow-visible">
+                            <CardHeader className="rounded-t-lg">
                                 <h2 className="text-xl font-bold text-gray-800">Product Information</h2>
                             </CardHeader>
                             <CardContent className="space-y-6">
@@ -243,9 +243,9 @@ function AddProductPage() {
                     </div>
 
                     {/* --- RIGHT COLUMN --- */}
-                    <div className="space-y-6 lg:col-span-1">
-                        {/* Categories */}
+                    <div className="lg:col-span-1">
                         <CascadingSelector
+                            className="sticky top-6 max-h-[600px]"
                             selectedCategoryId={selectedCategoryId}
                             selectedSubcategoryId={selectedSubcategoryId}
                             onCategorySelect={handleCategorySelect}

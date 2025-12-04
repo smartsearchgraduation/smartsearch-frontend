@@ -168,10 +168,10 @@ export function Combobox({
                 {isOpen && (
                     <ul
                         ref={listRef}
-                        className="absolute z-50 mt-2 max-h-60 w-full overflow-auto rounded-2xl border border-gray-100 bg-white py-2 shadow-xl ring-1 ring-black/5"
+                        className="absolute z-50 mt-2 max-h-60 w-full overflow-auto rounded-lg border border-gray-100 bg-white py-2 shadow-xl ring-1 ring-black/5"
                     >
                         {filteredOptions.length === 0 ? (
-                            <li className="px-6 py-3 text-sm text-gray-500">
+                            <li className="px-4 py-2 text-sm text-gray-500">
                                 No matching brands found. You can add "{value}".
                             </li>
                         ) : (
@@ -187,7 +187,7 @@ export function Combobox({
                                         onClick={() => handleSelect(option)}
                                         onMouseEnter={() => setHighlightedIndex(index)}
                                         className={cn(
-                                            "flex cursor-pointer items-center justify-between px-6 py-3 text-sm transition-colors",
+                                            "flex cursor-pointer items-center justify-between px-4 py-2 text-sm transition-colors",
                                             isHighlighted
                                                 ? "bg-emerald-100 font-semibold text-emerald-900"
                                                 : "text-gray-700",

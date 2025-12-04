@@ -9,6 +9,7 @@ interface CascadingSelectorProps {
     onCategorySelect: (id: number) => void;
     onSubcategorySelect: (id: number) => void;
     categories: Category[];
+    className?: string;
 }
 
 export function CascadingSelector({
@@ -17,6 +18,7 @@ export function CascadingSelector({
     onCategorySelect,
     onSubcategorySelect,
     categories,
+    className,
 }: CascadingSelectorProps) {
     const selectedCategory = categories.find((c) => c.category_id === selectedCategoryId);
     const selectedSubcategory = categories.find((c) => c.category_id === selectedSubcategoryId);
@@ -43,15 +45,15 @@ export function CascadingSelector({
     }, [selectedSubcategoryId]);
 
     return (
-        <Card className="h-full">
+        <Card className={className}>
             <CardHeader>
                 <h2 className="text-lg font-bold text-gray-800">Category</h2>
             </CardHeader>
 
             {/* --- Main Content Area --- */}
-            <div className="grid h-full flex-1 grid-rows-2 divide-y divide-gray-100 overflow-hidden">
+            <div className="grid flex-1 grid-rows-2 divide-y divide-gray-100 overflow-hidden">
                 {/* 1. Parent Categories */}
-                <fieldset className="group flex h-full flex-col overflow-hidden">
+                <fieldset className="group flex flex-col overflow-hidden">
                     <legend className="visually-hidden">Primary Category</legend>
                     <div
                         aria-hidden="true"
@@ -102,7 +104,7 @@ export function CascadingSelector({
                 </fieldset>
 
                 {/* 2. Sub Categories */}
-                <fieldset className="group flex h-full flex-col overflow-hidden bg-gray-50">
+                <fieldset className="group flex flex-col overflow-hidden bg-gray-50">
                     <legend className="visually-hidden">Sub Category</legend>
                     <div
                         aria-hidden="true"

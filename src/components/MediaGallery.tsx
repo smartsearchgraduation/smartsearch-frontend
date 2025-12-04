@@ -144,7 +144,7 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                                 }
                             }}
                             className={cn(
-                                "relative col-span-2 flex flex-col items-center justify-center rounded-[1.5rem] text-center ring-2 transition-all duration-200 outline-none sm:col-span-4 aspect-[2/1] sm:aspect-[4/1]",
+                                "relative col-span-2 flex flex-col items-center justify-center rounded-lg text-center ring-2 transition-all duration-200 outline-none sm:col-span-4 aspect-[2/1] sm:aspect-[4/1]",
                                 isDragging
                                     ? "scale-[1.01] bg-emerald-50 ring-emerald-600"
                                     : "bg-gray-50 ring-gray-200 hover:bg-white hover:shadow-md focus:ring-emerald-600",
@@ -153,7 +153,7 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                             {/* Visual Overlay for Dragging */}
                             <div
                                 className={cn(
-                                    "pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-[1.5rem] bg-emerald-600/90 font-bold text-white transition-opacity duration-200",
+                                    "pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-emerald-600/90 font-bold text-white transition-opacity duration-200",
                                     isDragging ? "opacity-100" : "opacity-0",
                                 )}
                             >
