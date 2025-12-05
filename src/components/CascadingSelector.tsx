@@ -61,7 +61,7 @@ export function CascadingSelector({
                     >
                         Primary Category
                     </div>
-                    <div className="flex-grow space-y-2 overflow-y-auto p-4">
+                    <div tabIndex={-1} className="flex-grow space-y-2 overflow-y-auto p-4">
                         {categories
                             .filter((c) => c.parent_category_id === null)
                             .map((category) => (
@@ -112,7 +112,7 @@ export function CascadingSelector({
                     >
                         Sub Category
                     </div>
-                    <div className="flex-grow space-y-2 overflow-y-auto p-4">
+                    <div tabIndex={-1} className="flex-grow space-y-2 overflow-y-auto p-4">
                         {!selectedCategory ? (
                             <div className="flex h-full flex-col items-center justify-center text-gray-400 opacity-60">
                                 <svg className="mb-2 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
