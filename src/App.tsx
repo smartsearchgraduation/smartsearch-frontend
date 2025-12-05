@@ -16,12 +16,26 @@ function App() {
             <Route path="/search/:searchId" element={<SearchPage />} />
             <Route path="/product/:productId" element={<ProductPage />} />
 
-            <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>}>
+            <Route
+                path="/admin"
+                element={
+                    <ProtectedRoute>
+                        <AdminPage />
+                    </ProtectedRoute>
+                }
+            >
                 <Route index element={<Navigate to="products" replace />} />
                 <Route path="products" element={<ProductListPage />} />
                 <Route path="statistics" element={<StatisticsPage />} />
             </Route>
-            <Route path="/admin/add-product" element={<ProtectedRoute><AddProductPage /></ProtectedRoute>} />
+            <Route
+                path="/admin/add-product"
+                element={
+                    <ProtectedRoute>
+                        <AddProductPage />
+                    </ProtectedRoute>
+                }
+            />
         </Routes>
     );
 }

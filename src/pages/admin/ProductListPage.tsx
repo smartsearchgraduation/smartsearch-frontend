@@ -103,7 +103,7 @@ function ProductListPage() {
             {/* Products Grid */}
             <div className="grid grid-cols-[auto_1fr_150px_100px_auto] gap-4">
                 {/* Header Row */}
-                <div className="contents text-xs font-semibold uppercase text-gray-500">
+                <div className="contents text-xs font-semibold text-gray-500 uppercase">
                     <div className="px-4">Image</div>
                     <div className="px-4">Product Details</div>
                     <div className="px-4">Category</div>
@@ -112,24 +112,14 @@ function ProductListPage() {
                 </div>
 
                 {isLoading ? (
-                    <div className="col-span-full py-12 text-center text-gray-500">
-                        Loading products...
-                    </div>
+                    <div className="col-span-full py-12 text-center text-gray-500">Loading products...</div>
                 ) : isError ? (
-                    <div className="col-span-full py-12 text-center text-red-500">
-                        Failed to load products.
-                    </div>
+                    <div className="col-span-full py-12 text-center text-red-500">Failed to load products.</div>
                 ) : paginatedProducts.length === 0 ? (
-                    <div className="col-span-full py-12 text-center text-gray-500">
-                        No products found.
-                    </div>
+                    <div className="col-span-full py-12 text-center text-gray-500">No products found.</div>
                 ) : (
                     paginatedProducts.map((product) => (
-                        <ProductListItem
-                            key={product.product_id}
-                            product={product}
-                            onEdit={handleOpenEdit}
-                        />
+                        <ProductListItem key={product.product_id} product={product} onEdit={handleOpenEdit} />
                     ))
                 )}
             </div>

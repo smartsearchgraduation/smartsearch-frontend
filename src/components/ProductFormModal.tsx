@@ -242,13 +242,13 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
                     <Button type="button" variant="secondary" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button type="submit" variant="primary" disabled={isPending || isLoadingImages}>
+                    <Button type="submit" variant="primary" disabled={isPending || isLoadingImages} form="product-form">
                         {isPending ? "Saving..." : isEditMode ? "Save Changes" : "Publish Product"}
                     </Button>
                 </div>
             }
         >
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* --- LEFT COLUMN --- */}
                     <div className="flex flex-col gap-6 lg:col-span-2">

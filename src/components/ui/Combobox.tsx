@@ -127,10 +127,7 @@ export function Combobox({
     return (
         <div className={cn("w-full", className)} ref={containerRef} onBlur={handleBlur}>
             {label && (
-                <label
-                    htmlFor={comboId}
-                    className="mb-2 ml-4 block text-sm font-bold text-gray-700"
-                >
+                <label htmlFor={comboId} className="mb-2 ml-4 block text-sm font-bold text-gray-700">
                     {label}
                 </label>
             )}

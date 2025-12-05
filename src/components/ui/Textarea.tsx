@@ -15,10 +15,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         return (
             <div className={cn("w-full", wrapperClassName)}>
                 {label && (
-                    <label
-                        htmlFor={textareaId}
-                        className="mb-2 ml-4 block text-sm font-bold text-gray-700"
-                    >
+                    <label htmlFor={textareaId} className="mb-2 ml-4 block text-sm font-bold text-gray-700">
                         {label}
                     </label>
                 )}

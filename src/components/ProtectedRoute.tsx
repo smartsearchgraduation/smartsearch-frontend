@@ -13,7 +13,8 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
     useEffect(() => {
         const adminAccess = localStorage.getItem(ADMIN_ACCESS_KEY);
-        if (adminAccess === "true") { // Check for the string "true"
+        if (adminAccess === "true") {
+            // Check for the string "true"
             setHasAccess(true);
         } else {
             // Optional: You could show a message or redirect immediately.
@@ -24,7 +25,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
     if (hasAccess === null) {
         // Still checking localStorage, render nothing or a loading spinner
-        return null; 
+        return null;
     }
 
     if (!hasAccess) {

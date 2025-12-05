@@ -210,14 +210,17 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
 /**
  * Updates an existing product.
  */
-export const updateProduct = async (productId: string, productData: CreateProductInput): Promise<{ success: boolean }> => {
+export const updateProduct = async (
+    productId: string,
+    productData: CreateProductInput,
+): Promise<{ success: boolean }> => {
     const formData = new FormData();
     formData.append("name", productData.name);
     formData.append("price", productData.price.toString());
     formData.append("description", productData.description);
     formData.append("brand", productData.brand);
     formData.append("category_ids", productData.category_ids.join(","));
-    
+
     productData.images.forEach((image) => {
         formData.append("images", image);
     });
