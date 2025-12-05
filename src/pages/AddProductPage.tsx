@@ -59,7 +59,6 @@ function AddProductPage() {
     const mutation = useMutation({
         mutationFn: createProduct,
         onSuccess: () => {
-            // Show success message
             alert("Product created successfully!");
         },
         onError: (error) => {
@@ -139,7 +138,7 @@ function AddProductPage() {
             name: formData.name,
             price: Number(formData.price),
             description: formData.description,
-            brand: brandName, // Use the string directly
+            brand: brandName,
             category_ids: [selectedCategoryId, selectedSubcategoryId],
             images: convertedImages,
         });

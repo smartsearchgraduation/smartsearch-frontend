@@ -14,17 +14,13 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     useEffect(() => {
         const adminAccess = localStorage.getItem(ADMIN_ACCESS_KEY);
         if (adminAccess === "true") {
-            // Check for the string "true"
             setHasAccess(true);
         } else {
-            // Optional: You could show a message or redirect immediately.
-            // For now, we'll just prevent rendering and let Navigate handle it if needed.
             setHasAccess(false);
         }
     }, [navigate]);
 
     if (hasAccess === null) {
-        // Still checking localStorage, render nothing or a loading spinner
         return null;
     }
 
@@ -33,7 +29,6 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
         return <Navigate to="/" replace />;
     }
 
-    // If access is granted, render the children components
     return <>{children}</>;
 }
 

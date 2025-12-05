@@ -59,8 +59,8 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
         mutation.reset(); // Clear errors on new input
 
         // Auto-grow logic
-        event.target.style.height = "auto"; // Reset height to shrink if text is deleted
-        event.target.style.height = `${event.target.scrollHeight}px`; // Set to new scroll height
+        event.target.style.height = "auto";
+        event.target.style.height = `${event.target.scrollHeight}px`;
     };
 
     // --- Paste Image Handler ---
@@ -70,7 +70,6 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
-            // Check if the item is a file and is an image
             if (item.kind === "file" && item.type.startsWith("image/")) {
                 const file = item.getAsFile();
                 if (file) {
@@ -86,7 +85,6 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
     const removeImage = () => {
         setImageFile(null);
         mutation.reset();
-        // Clear the file input value so the same file can be re-added
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
@@ -94,7 +92,6 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     // --- Drag-and-Drop Handlers ---
     const handleDragOver = (event: DragEvent<HTMLElement>) => {
-        // Check if the dragged item is an image file
         let isImageFile = false;
         if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
             for (let i = 0; i < event.dataTransfer.items.length; i++) {
@@ -129,15 +126,13 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
 
     // --- Form Submit Logic ---
     const handleFormSubmit = (event?: FormEvent<HTMLFormElement>) => {
-        event?.preventDefault(); // Prevent default form submission
+        event?.preventDefault();
 
         if (mutation.isPending) {
             return;
         }
 
         if (query.trim() === "") {
-            // We could set a local error here, or just ignore.
-            // Since the UI button is disabled when query is empty, this is a fallback.
             return;
         }
 

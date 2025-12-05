@@ -10,7 +10,7 @@ interface ProductListItemProps {
 export function ProductListItem({ product, onEdit }: ProductListItemProps) {
     return (
         <Card className="col-span-full grid grid-cols-subgrid items-center gap-6 p-4 transition-colors hover:bg-gray-50">
-            {/* Image Section - Chunkier (w-32 = 128px) */}
+            {/* Image Section */}
             <div className="h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                 {product.images[0] ? (
                     <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
@@ -28,7 +28,7 @@ export function ProductListItem({ product, onEdit }: ProductListItemProps) {
                 )}
             </div>
 
-            {/* Main Info - Bigger Title */}
+            {/* Main Info */}
             <div className="flex min-w-0 flex-col gap-2">
                 <h3 className="truncate text-xl font-bold text-gray-900">{product.name}</h3>
                 <p className="line-clamp-2 text-sm text-gray-500">{product.description}</p>

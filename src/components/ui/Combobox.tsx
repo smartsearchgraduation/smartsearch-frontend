@@ -74,7 +74,7 @@ export function Combobox({
         }
     }, [highlightedIndex, isOpen, filteredOptions.length]);
 
-    // Handle Typing: Just pass the text up
+    // Handle Typing: Pass the text up
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
         setIsOpen(true);
@@ -134,7 +134,7 @@ export function Combobox({
             <div className="relative">
                 <Input
                     id={comboId}
-                    value={value} // Controlled directly by parent
+                    value={value}
                     onChange={handleInputChange}
                     onFocus={() => setIsOpen(true)}
                     onKeyDown={handleKeyDown}
@@ -174,10 +174,7 @@ export function Combobox({
                         ) : (
                             filteredOptions.map((option, index) => {
                                 const isHighlighted = index === highlightedIndex;
-
-                                // Visual check: Does the typed value match this option exactly?
                                 const isSelected = value.toLowerCase() === option.label.toLowerCase();
-
                                 return (
                                     <li
                                         key={option.value}

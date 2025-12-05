@@ -74,7 +74,7 @@ function ProductPage() {
                 </Card>
 
                 <div className="flex flex-col gap-4">
-                    {/* Categories displayed as Tags/Badges */}
+                    {/* Categories */}
                     <div className="flex flex-wrap gap-2">
                         <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-800 uppercase">
                             {category}

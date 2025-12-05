@@ -87,7 +87,7 @@ export const handlers = [
         });
     }),
 
-    // 2. Get Search Results (Changed from search-results to search/:searchId to match api.ts)
+    // 2. Get Search Results
     http.get("/api/search/:searchId", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 800));
         const { searchId } = params;
@@ -138,7 +138,7 @@ export const handlers = [
         return HttpResponse.json({ success: true });
     }),
 
-    // 6. Vote/Feedback (Changed from products/vote to feedback)
+    // 6. Vote/Feedback
     http.post("/api/feedback", async () => {
         await new Promise((resolve) => setTimeout(resolve, 300));
         return HttpResponse.json({}); // Returns void in api.ts, so empty json or just status 200 is fine
@@ -153,7 +153,7 @@ export const handlers = [
         });
     }),
 
-    // 8. Get Brands (New)
+    // 8. Get Brands
     http.get("/api/brands", async () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
         return HttpResponse.json(mockBrands);

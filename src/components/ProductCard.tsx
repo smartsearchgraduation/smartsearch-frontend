@@ -15,7 +15,6 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     const mutation = useMutation({
         mutationFn: (voteType: "like" | "dislike") => productFeedback(searchId, product.product_id, voteType),
         onError: () => {
-            // Revert vote on error (simplified for this example)
             setVote(null);
             alert("Failed to submit vote");
         },
@@ -64,7 +63,7 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                 <div className="mt-4 flex items-center justify-between">
                     <p className="text-gray-700">{"$" + product.price || "Not available"}</p>
 
-                    {/* Vote Buttons (Z-20 to sit above the card link) */}
+                    {/* Vote Buttons */}
                     <div className="relative z-20 flex gap-2 text-transparent">
                         <Button
                             variant="ghost"

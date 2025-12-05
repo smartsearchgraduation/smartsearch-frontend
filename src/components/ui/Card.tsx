@@ -6,7 +6,7 @@ const cardVariants = cva("bg-white ring-2 ring-gray-200 rounded-lg overflow-hidd
     variants: {
         variant: {
             default: "shadow-md",
-            interactive: "shadow-md hover:shadow-xl transition-shadow duration-200 cursor-pointer", // Matches ProductCard behavior
+            interactive: "shadow-md hover:shadow-xl transition-shadow duration-200 cursor-pointer",
             flat: "shadow-none ring-1 bg-gray-50",
         },
     },
@@ -22,7 +22,6 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({ className, va
 });
 Card.displayName = "Card";
 
-// Optional: Header sub-component for consistency (seen in CascadingSelector and MediaGallery)
 export const CardHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
     <div className={cn("flex-shrink-0 border-b border-gray-100 bg-gray-50 p-4", className)} {...props}>
         {children}

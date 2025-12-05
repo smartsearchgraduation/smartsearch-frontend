@@ -32,7 +32,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         id={inputId}
                         className={cn(
                             "w-full rounded-lg border-none bg-transparent px-4 py-2 text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none",
-                            leftIcon && "pl-2", // adjust padding if icon exists
+                            leftIcon && "pl-2",
                             className,
                         )}
                         ref={ref}

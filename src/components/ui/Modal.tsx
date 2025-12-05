@@ -10,7 +10,7 @@ interface ModalProps {
     className?: string;
     title?: string;
     description?: string;
-    footer?: ReactNode; // New prop for sticky footer
+    footer?: ReactNode;
 }
 
 export function Modal({ isOpen, onClose, children, className, title, description, footer }: ModalProps) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent, useId } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "./MediaGallery";
 import { CascadingSelector } from "./CascadingSelector";
@@ -76,15 +76,11 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
             // Brand
             setBrandName(product.brand.name);
 
-            // Categories
-            // Assuming the product has at least one category which is the subcategory,
-            // and that subcategory has a parent which is the main category.
             const subCategory = product.categories.find((c) => c.parent !== null);
             if (subCategory) {
                 setSelectedSubcategoryId(subCategory.category_id);
                 setSelectedCategoryId(subCategory.parent!.category_id);
             } else if (product.categories.length > 0) {
-                // Fallback if only main category is present (shouldn't happen with this logic but safety first)
                 setSelectedCategoryId(product.categories[0].category_id);
             }
 
@@ -99,8 +95,8 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
                         const file = new File([blob], fileName, { type: blob.type });
                         return {
                             file,
-                            id: Math.random().toString(36).substr(2, 9),
-                            preview: url, // Use original URL or created object URL? Original is fine, but MediaGallery uses preview.
+                            id: useId(),
+                            preview: url,
                         } as UploadedImage;
                     });
                     const loadedImages = await Promise.all(imagePromises);
@@ -170,7 +166,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
             return;
         }
 
-        // Image Conversion Logic (Reuse from AddProductPage)
+        // Image Conversion Logic
         const convertImageToWebP = (file: File): Promise<File> => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -236,7 +232,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
             isOpen={isOpen}
             onClose={onClose}
             title={isEditMode ? "Edit Product" : "Add New Product"}
-            className="h-[90vh] w-[90vw] max-w-7xl" // Custom size as requested "really big"
+            className="h-[90vh] w-[90vw] max-w-7xl"
             footer={
                 <div className="flex items-center justify-end gap-3">
                     <Button type="button" variant="secondary" onClick={onClose}>

@@ -69,7 +69,6 @@ function SearchPage() {
 
             {results && results.corrected_text != results.raw_text && (
                 <main className="mb-6">
-                    {/* Visually hidden <h1> for page title and structure */}
                     <h1 className="visually-hidden">Search Results</h1>
                     <h2 className="mb-1 text-gray-700">
                         Showing results for:{" "}

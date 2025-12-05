@@ -7,21 +7,18 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                // Matches "Publish" button
                 primary:
                     "bg-emerald-600 text-white ring-2 ring-emerald-600 hover:bg-emerald-700 shadow-md hover:shadow-lg",
 
-                // Matches "Discard" button
                 secondary: "bg-white text-gray-600 ring-2 ring-gray-200 hover:bg-gray-50 hover:shadow-md",
 
-                // Matches SearchBar icon buttons
                 ghost: "bg-transparent hover:bg-gray-200 text-gray-600 hover:text-gray-800",
 
                 destructive: "bg-red-50 text-red-600 ring-2 ring-red-100 hover:bg-red-100",
             },
             size: {
-                default: "px-6 py-2 text-sm", // Standard text buttons
-                icon: "w-10 h-10 p-2", // SearchBar icons
+                default: "px-6 py-2 text-sm",
+                icon: "w-10 h-10 p-2",
                 sm: "px-3 py-1 text-xs",
                 lg: "px-8 py-3 text-lg",
             },
