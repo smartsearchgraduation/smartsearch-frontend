@@ -104,6 +104,17 @@ export const fetchProductById = async (productId: string): Promise<Product> => {
 };
 
 /**
+ * Fetches all products.
+ */
+export const fetchProducts = async (): Promise<Product[]> => {
+    const response = await fetch(BASE_URL + "/api/products");
+    if (!response.ok) {
+        throw new Error("Failed to fetch products");
+    }
+    return response.json();
+};
+
+/**
  * Input for creating a new product.
  */
 export interface CreateProductInput {
@@ -124,7 +135,7 @@ export const createProduct = async (productData: CreateProductInput): Promise<{ 
     formData.append("price", productData.price.toString());
     formData.append("description", productData.description);
     formData.append("brand", productData.brand);
-    formData.append("category_ids", "1,2");
+    formData.append("category_ids", productData.category_ids.join(","));
     productData.images.forEach((imageFile) => {
         formData.append("images", imageFile);
     });
@@ -192,6 +203,32 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
     const response = await fetch(BASE_URL + "/api/brands");
     if (!response.ok) {
         throw new Error("Failed to fetch categories");
+    }
+    return response.json();
+};
+
+/**
+ * Updates an existing product.
+ */
+export const updateProduct = async (productId: string, productData: CreateProductInput): Promise<{ success: boolean }> => {
+    const formData = new FormData();
+    formData.append("name", productData.name);
+    formData.append("price", productData.price.toString());
+    formData.append("description", productData.description);
+    formData.append("brand", productData.brand);
+    formData.append("category_ids", productData.category_ids.join(","));
+    
+    productData.images.forEach((image) => {
+        formData.append("images", image);
+    });
+
+    const response = await fetch(BASE_URL + `/api/products/${productId}`, {
+        method: "PUT",
+        body: formData,
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update product");
     }
     return response.json();
 };

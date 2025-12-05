@@ -144,7 +144,7 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                                 }
                             }}
                             className={cn(
-                                "relative col-span-2 flex flex-col items-center justify-center rounded-lg text-center ring-2 transition-all duration-200 outline-none sm:col-span-4 aspect-[2/1] sm:aspect-[4/1]",
+                                "relative col-span-2 flex aspect-[2/1] flex-col items-center justify-center rounded-lg text-center ring-2 transition-all duration-200 outline-none sm:col-span-4 sm:aspect-[4/1]",
                                 isDragging
                                     ? "scale-[1.01] bg-emerald-50 ring-emerald-600"
                                     : "bg-gray-50 ring-gray-200 hover:bg-white hover:shadow-md focus:ring-emerald-600",
@@ -237,14 +237,14 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                                 className={cn(
                                     "relative flex aspect-square cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all outline-none",
                                     isDragging
-                                        ? "border-emerald-500 bg-emerald-50 scale-[1.02]"
+                                        ? "scale-[1.02] border-emerald-500 bg-emerald-50"
                                         : "border-gray-300 bg-gray-50 hover:border-emerald-500 hover:bg-white focus:border-emerald-500",
                                 )}
                             >
                                 <svg
                                     className={cn(
                                         "h-8 w-8 transition-colors",
-                                        isDragging ? "text-emerald-600" : "text-gray-400 group-hover:text-emerald-600"
+                                        isDragging ? "text-emerald-600" : "text-gray-400 group-hover:text-emerald-600",
                                     )}
                                     fill="none"
                                     stroke="currentColor"
@@ -257,10 +257,12 @@ export function MediaGallery({ images, onImagesChange }: MediaGalleryProps) {
                                         d="M12 4v16m8-8H4"
                                     />
                                 </svg>
-                                <span className={cn(
-                                    "mt-2 text-xs font-medium",
-                                    isDragging ? "text-emerald-700" : "text-gray-500"
-                                )}>
+                                <span
+                                    className={cn(
+                                        "mt-2 text-xs font-medium",
+                                        isDragging ? "text-emerald-700" : "text-gray-500",
+                                    )}
+                                >
                                     Add Image
                                 </span>
                             </div>

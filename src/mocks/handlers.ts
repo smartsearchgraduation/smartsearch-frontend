@@ -120,10 +120,22 @@ export const handlers = [
         return HttpResponse.json(product);
     }),
 
+    // Get All Products
+    http.get("/api/products", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        return HttpResponse.json(mockProducts);
+    }),
+
     // 5. Create Product
     http.post("/api/products", async () => {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return HttpResponse.json({ success: true, id: "new-product-id-" + Date.now() });
+    }),
+
+    // Update Product
+    http.put("/api/products/:productId", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return HttpResponse.json({ success: true });
     }),
 
     // 6. Vote/Feedback (Changed from products/vote to feedback)

@@ -9,7 +9,14 @@ function HomePage() {
     };
 
     return (
-        <main className="flex h-[100dvh] w-[100dvw] flex-col items-center justify-center bg-gray-100 p-2">
+        <main className="relative flex h-[100dvh] w-[100dvw] flex-col items-center justify-center bg-gray-100 p-2">
+            <Link
+                to="/admin"
+                className="absolute right-4 top-4 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
+            >
+                Admin
+            </Link>
+
             <Link to="/">
                 <h1 className="mb-12 text-5xl font-bold text-gray-800 text-shadow-md">
                     <span className="text-emerald-600">Smart </span>

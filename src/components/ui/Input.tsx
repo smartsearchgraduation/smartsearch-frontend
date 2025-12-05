@@ -15,10 +15,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className={cn("w-full", wrapperClassName)}>
                 {label && (
-                    <label
-                        htmlFor={inputId}
-                        className="mb-2 ml-4 block text-sm font-bold text-gray-700"
-                    >
+                    <label htmlFor={inputId} className="mb-2 ml-4 block text-sm font-bold text-gray-700">
                         {label}
                     </label>
                 )}
@@ -29,7 +26,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         "disabled:cursor-not-allowed disabled:opacity-50",
                     )}
                 >
-                    {leftIcon && <div className="pl-4 text-gray-500">{leftIcon}</div>}
+                    {leftIcon && <div className="pl-2 text-gray-500">{leftIcon}</div>}
                     <input
                         type={type}
                         id={inputId}
