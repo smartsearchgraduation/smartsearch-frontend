@@ -1,5 +1,5 @@
 interface LoadingWaveProps {
-    message?: string; // '?' makes the prop optional
+    message?: string;
 }
 
 const wrapperClass = "loading-wave-component";

@@ -1,7 +1,5 @@
+/* Remove default #root styles that conflict with full-page layouts */
 #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
-    text-align: center;
-    background-color: #eee;
+    width: 100%;
+    height: 100%;
 }

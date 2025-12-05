@@ -1,8 +1,9 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import SearchBar from "../components/SearchBar";
-import { fetchProductById } from "../api";
+import { fetchProductById } from "../lib/api";
 import LoadingWave from "../components/LoadingWave";
+import { Card } from "../components/ui/Card";
 
 function ProductPage() {
     const { productId } = useParams<{ productId: string }>();
@@ -18,19 +19,18 @@ function ProductPage() {
         queryFn: () => fetchProductById(productId!),
         enabled: !!productId,
     });
+    console.log(product);
 
     const handleSearchSuccess = (newSearchId: string) => {
         navigate(`/search/${newSearchId}`);
     };
 
     const renderContent = () => {
-        if (isLoading) {
-            return <LoadingWave message="Loading product details" />;
-        }
+        if (isLoading) return <LoadingWave message="Loading product details" />;
 
         if (isError) {
             return (
-                <div role="alert" className="text-center text-red-500">
+                <div role="alert" className="py-12 text-center text-red-500">
                     {error?.message || "Failed to fetch product."}
                 </div>
             );
@@ -38,50 +38,82 @@ function ProductPage() {
 
         if (!product) {
             return (
-                <div role="status" className="text-center text-gray-500">
+                <div role="status" className="py-12 text-center text-gray-500">
                     Product not found.
                 </div>
             );
         }
 
+        const category = product.categories[1]?.parent?.name || "Uncategorized";
+        const subcategory = product.categories[1]?.name || "General";
+
         return (
-            <div className="flex flex-col sm:flex-row ring-2 ring-gray-200 shadow-lg rounded-lg overflow-hidden bg-gray-50 sm:gap-4 mx-auto">
-                {/* Image Section */}
-                <div className="aspect-square sm:w-1/2 bg-gray-200">
-                    {product.imageUrl ? (
-                        <img src={product.imageUrl} alt="" className="w-full object-cover" />
+            <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
+                {/* Left Column: Image */}
+                <Card className="aspect-square w-full overflow-hidden border-none bg-gray-200 shadow-md">
+                    {product.images[0] ? (
+                        <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
                     ) : (
-                        <div
-                            role="img"
-                            aria-label={`No image available for ${product.title}`}
-                            className="w-full h-96 flex items-center justify-center bg-gray-200"
-                        >
-                            <p className="text-gray-700">No image available</p>
+                        <div className="flex h-full w-full flex-col items-center justify-center text-gray-400">
+                            <svg
+                                className="mb-2 h-16 w-16 opacity-50"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                            </svg>
+                            <span>No image available</span>
                         </div>
                     )}
-                </div>
+                </Card>
 
-                <div className="flex gap-4 sm:w-1/2 p-4 flex flex-col">
-                    <h1 className="text-3xl font-bold text-gray-900">{product.title}</h1>
-                    <p className="text-gray-600 text-lg">{product.description}</p>
-                    <p className="text-2xl text-gray-700">{product.price ? `${product.price}` : "Not available"}</p>
+                <div className="flex flex-col gap-4">
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-2">
+                        <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-800 uppercase">
+                            {category}
+                        </span>
+                        <span className="rounded-full bg-emerald-200 px-3 py-1 text-xs font-bold tracking-wider text-emerald-900 uppercase">
+                            {subcategory}
+                        </span>
+                    </div>
+
+                    <h1 className="text-3xl text-gray-900 sm:text-4xl">
+                        <span className="font-bold">{product.brand.name}</span> <span>{product.name}</span>
+                    </h1>
+
+                    <div className="text-3xl font-medium text-gray-700">
+                        {product.price ? `$${product.price}` : "Price hidden"}
+                    </div>
+
+                    {/* Description */}
+                    <div className="prose prose-lg mt-2 leading-relaxed text-gray-600">
+                        <p>{product.description}</p>
+                    </div>
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="min-h-screen max-w-6xl mx-auto bg-gray-100 py-6 px-2">
-            <header className="mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="mx-auto min-h-screen max-w-6xl bg-gray-100 px-2 py-6">
+            <header className="mb-8 flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <Link
                     to="/"
-                    className="mb-4 flex gap-2 sm:gap-0 sm:flex-col sm:mb-auto text-4xl font-bold text-gray-800 text-shadow-md outline-none cursor-pointer"
+                    className="mb-4 flex cursor-pointer gap-2 text-4xl font-bold text-gray-800 outline-none text-shadow-md sm:mb-auto sm:flex-wrap"
                 >
                     <span className="text-emerald-600">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </Link>
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-150" />
             </header>
+
             <main>{renderContent()}</main>
         </div>
     );

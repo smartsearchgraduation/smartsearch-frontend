@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 
 function HomePage() {
@@ -9,13 +9,26 @@ function HomePage() {
     };
 
     return (
-        <main className="w-[100dvw] h-[100dvh] p-2 flex flex-col items-center justify-center bg-gray-100">
-            <h1 className="text-5xl font-bold mb-12 text-gray-800 text-shadow-md">
-                <span className="text-emerald-600">Smart </span>
-                <span className="text-gray-800">Search</span>
-            </h1>
+        <main className="relative flex h-[100dvh] w-[100dvw] flex-col items-center justify-center bg-gray-100 p-2">
+            <Link
+                to="/admin"
+                className="absolute top-4 right-4 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
+            >
+                Admin
+            </Link>
 
-            <SearchBar className="w-full max-w-150 mb-12" onSearchSuccess={handleSearchSuccess} autofocus={true} />
+            <Link to="/">
+                <h1 className="mb-12 text-5xl font-bold text-gray-800 text-shadow-md">
+                    <span className="text-emerald-600">Smart </span>
+                    <span className="text-gray-800">Search</span>
+                </h1>
+            </Link>
+
+            <SearchBar
+                className="mb-12 w-full max-w-[37.5rem]"
+                onSearchSuccess={handleSearchSuccess}
+                autofocus={true}
+            />
         </main>
     );
 }
