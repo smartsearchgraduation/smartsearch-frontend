@@ -190,7 +190,6 @@ export interface CategoryResponse {
  */
 export const fetchCatagories = async (): Promise<CategoryResponse> => {
     const response = await fetch(BASE_URL + "/api/categories");
-    console.log(response);
     if (!response.ok) {
         throw new Error("Failed to fetch categories");
     }
@@ -202,7 +201,6 @@ export const fetchCatagories = async (): Promise<CategoryResponse> => {
  */
 export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[]> => {
     const response = await fetch(BASE_URL + "/api/brands");
-    console.log(response);
     if (!response.ok) {
         throw new Error("Failed to fetch brands");
     }

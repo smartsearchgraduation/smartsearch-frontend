@@ -51,12 +51,12 @@ function AddProductPage() {
         queryKey: ["brands"],
         queryFn: fetchBrands,
     });
+    console.log(brandsData);
     const brands = brandsData || [];
     const brandOptions = brands.map((b) => ({
         value: b.brand_id,
         label: b.name,
     }));
-    console.log(brandOptions);
 
     const mutation = useMutation({
         mutationFn: createProduct,
