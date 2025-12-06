@@ -45,6 +45,7 @@ function AddProductPage() {
         queryFn: fetchCatagories,
     });
     const categories = categoriesData?.categories || [];
+    console.log(categories);
 
     const { data: brandsData } = useQuery({
         queryKey: ["brands"],
@@ -55,6 +56,7 @@ function AddProductPage() {
         value: b.brand_id,
         label: b.name,
     }));
+    console.log(brandOptions);
 
     const mutation = useMutation({
         mutationFn: createProduct,
