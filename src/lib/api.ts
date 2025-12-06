@@ -204,7 +204,7 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
     if (!response.ok) {
         throw new Error("Failed to fetch brands");
     }
-    return response.json();
+    return (await response.json()).brands;
 };
 
 /**
