@@ -193,7 +193,9 @@ export const fetchCatagories = async (): Promise<CategoryResponse> => {
     if (!response.ok) {
         throw new Error("Failed to fetch categories");
     }
-    return response.json();
+    const data = response.json();
+    console.log(data);
+    return data;
 };
 
 /**
@@ -202,9 +204,11 @@ export const fetchCatagories = async (): Promise<CategoryResponse> => {
 export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[]> => {
     const response = await fetch(BASE_URL + "/api/brands");
     if (!response.ok) {
-        throw new Error("Failed to fetch categories");
+        throw new Error("Failed to fetch brands");
     }
-    return response.json();
+    const data = response.json();
+    console.log(data);
+    return data;
 };
 
 /**
