@@ -194,7 +194,9 @@ export const fetchCatagories = async (): Promise<CategoryResponse> => {
     if (!response.ok) {
         throw new Error("Failed to fetch categories");
     }
-    return response.json();
+    const data = response.json();
+    console.log(data);
+    return data;
 };
 
 /**
@@ -206,7 +208,9 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
     if (!response.ok) {
         throw new Error("Failed to fetch brands");
     }
-    return response.json();
+    const data = response.json();
+    console.log(data);
+    return data;
 };
 
 /**
