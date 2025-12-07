@@ -28,14 +28,7 @@ function App() {
                 <Route path="products" element={<ProductListPage />} />
                 <Route path="statistics" element={<StatisticsPage />} />
             </Route>
-            <Route
-                path="/admin/add-product"
-                element={
-                    <ProtectedRoute>
-                        <AddProductPage />
-                    </ProtectedRoute>
-                }
-            />
+            <Route path="/admin/add-product" element={<AddProductPage />} />
         </Routes>
     );
 }
