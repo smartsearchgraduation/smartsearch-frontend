@@ -11,7 +11,7 @@ function HomePage() {
     return (
         <main className="relative flex h-[100dvh] w-[100dvw] flex-col items-center justify-center bg-gray-100 p-2">
             <Link
-                to="/admin"
+                to="/admin/add-product"
                 className="absolute top-4 right-4 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
             >
                 Admin
