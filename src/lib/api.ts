@@ -67,16 +67,12 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
  * Fetches search results by ID.
  */
 export const fetchSearchResults = async (searchId: string): Promise<SearchResponse> => {
-    const startTime = performance.now();
     const response = await fetch(BASE_URL + `/api/search/${searchId}`);
-
     if (!response.ok) {
         throw new Error("Failed to get results.");
     }
 
     const data = await response.json();
-    const endTime = performance.now();
-    console.log(`fetchSearchResults took ${endTime - startTime}ms`);
     return data;
 };
 
@@ -235,3 +231,42 @@ export const updateProduct = async (
     }
     return response.json();
 };
+
+/**
+ * Deletes an existing product.
+ */
+export const deleteProduct = async (productId: string): Promise<{ success: boolean }> => {
+    const response = await fetch(BASE_URL + `/api/products/${productId}`, {
+        method: "DELETE",
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to delete product");
+    }
+    return response.json();
+};
+
+/**
+ * Records the duration of a search request (from user click to results view).
+ */
+export const recordSearchDuration = async (searchId: string, durationMs: number): Promise<void> => {
+    // Fire and forget, but we await to catch network errors if we wanted to.
+    // In a real app, we might use navigator.sendBeacon or similar for analytics.
+    // For now, a simple fetch is fine.
+    try {
+        await fetch(BASE_URL + "/api/analytics/search-duration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ search_id: searchId, duration_ms: durationMs }),
+        });
+    } catch (error) {
+        console.error("Failed to record search duration", error);
+    }
+};
+
+/* The image logic
+Upload Immediately: When the user selects a new image from their computer, the Frontend immediately uploads it to a generic endpoint (e.g., POST /api/uploads).
+Get ID: The Backend saves the file (to S3, disk, etc.) and returns a unique Image ID (or URL).
+Update State: The Frontend adds this new ID to its local list of currentImageIds.
+Save the Product: When the user clicks "Save Product," the Frontend sends the full list of IDs currently attached to the product. 
+*/

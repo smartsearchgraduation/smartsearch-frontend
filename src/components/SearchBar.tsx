@@ -11,20 +11,25 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { searchRequest } from "../lib/api";
 
-function SearchBar(props: { className: string; onSearchSuccess: (searchId: string) => void; autofocus?: boolean }) {
+function SearchBar(props: {
+    className: string;
+    onSearchSuccess: (searchId: string, startTime?: number) => void;
+    autofocus?: boolean;
+}) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>("");
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    const startTimeRef = useRef<number | null>(null);
     const charLimit = 300;
 
     // Mutation for search request
     const mutation = useMutation({
         mutationFn: searchRequest,
         onSuccess: (searchId) => {
-            props.onSearchSuccess(searchId);
+            props.onSearchSuccess(searchId, startTimeRef.current ?? undefined);
             setQuery("");
             removeImage();
 
@@ -136,6 +141,7 @@ function SearchBar(props: { className: string; onSearchSuccess: (searchId: strin
             return;
         }
 
+        startTimeRef.current = performance.now();
         mutation.mutate({ query, image: imageFile });
     };
 

@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-const mockProducts = [
+let mockProducts = [
     {
         product_id: "1",
         name: "Vintage Leather Jacket",
@@ -9,7 +9,13 @@ const mockProducts = [
         description: "A stylish vintage leather jacket.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [{ category_id: 2, name: "Clothing", parent: null }],
+        categories: [
+            {
+                category_id: 18,
+                name: "Jackets",
+                parent: { category_id: 2, name: "Clothing" },
+            },
+        ],
         subcategory: "Jackets",
     },
     {
@@ -20,7 +26,13 @@ const mockProducts = [
         description: "Comfortable classic fit denim jeans.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [{ category_id: 2, name: "Clothing", parent: null }],
+        categories: [
+            {
+                category_id: 19,
+                name: "Jeans",
+                parent: { category_id: 2, name: "Clothing" },
+            },
+        ],
         subcategory: "Jeans",
     },
     {
@@ -31,7 +43,13 @@ const mockProducts = [
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: false,
         images: ["https://placehold.co/400"],
-        categories: [{ category_id: 3, name: "Home", parent: null }],
+        categories: [
+            {
+                category_id: 11,
+                name: "Furniture",
+                parent: { category_id: 3, name: "Home" },
+            },
+        ],
         subcategory: "Furniture",
     },
     {
@@ -42,7 +60,13 @@ const mockProducts = [
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: true,
         images: ["https://placehold.co/400"],
-        categories: [{ category_id: 1, name: "Electronics", parent: null }],
+        categories: [
+            {
+                category_id: 20,
+                name: "Audio",
+                parent: { category_id: 1, name: "Electronics" },
+            },
+        ],
         subcategory: "Audio",
     },
 ];
@@ -65,6 +89,9 @@ const mockCategories = [
     { category_id: 15, name: "Skincare", parent_category_id: 5 },
     { category_id: 16, name: "Novels", parent_category_id: 6 },
     { category_id: 17, name: "Fiction", parent_category_id: 6 },
+    { category_id: 18, name: "Jackets", parent_category_id: 2 },
+    { category_id: 19, name: "Jeans", parent_category_id: 2 },
+    { category_id: 20, name: "Audio", parent_category_id: 1 },
 ];
 
 const mockBrands = [
@@ -156,6 +183,21 @@ export const handlers = [
     // 8. Get Brands
     http.get("/api/brands", async () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        return HttpResponse.json(mockBrands);
+        return HttpResponse.json({ brands: mockBrands });
+    }),
+
+    // 9. Delete Product
+    http.delete("/api/products/:productId", async ({ params }) => {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        const { productId } = params;
+        mockProducts = mockProducts.filter((p) => p.product_id !== productId);
+        return HttpResponse.json({ success: true });
+    }),
+
+    // 10. Record Search Duration
+    http.post("/api/analytics/search-duration", async ({ request }) => {
+        const body = await request.json();
+        console.log("Analytics received:", body);
+        return HttpResponse.json({ success: true });
     }),
 ];

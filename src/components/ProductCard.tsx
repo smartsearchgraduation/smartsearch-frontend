@@ -5,6 +5,7 @@ import { type Product, productFeedback } from "../lib/api";
 import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
+import { ImageCarousel } from "./ImageCarousel";
 
 function ProductCard({ searchId, product }: { searchId: string; product: Product }) {
     // We keep local state for immediate UI feedback (optimistic UI)
@@ -35,23 +36,11 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     return (
         <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
-            {product.images?.[0] ? (
-                <div className="aspect-square w-full">
-                    <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
-                </div>
-            ) : (
-                <div
-                    role="img"
-                    aria-label={product.name}
-                    className="flex aspect-square w-full items-center justify-center"
-                >
-                    <p className="text-gray-700">No image available</p>
-                </div>
-            )}
+            <ImageCarousel images={product.images} alt={product.name} className="aspect-square w-full" />
 
             {/* Content Section */}
-            <div className="flex h-full flex-col bg-gray-100 p-4">
-                <h3 className="mr-auto mb-auto line-clamp-2 max-w-full sm:text-lg">
+            <div className="flex flex-1 flex-col bg-gray-100 p-4">
+                <h3 className="mr-auto mb-auto line-clamp-2 h-full max-w-full sm:text-lg">
                     <Link
                         to={`/product/${product.product_id}`}
                         className="text-gray-900 after:absolute after:inset-0 after:z-10 after:content-['']"

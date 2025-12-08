@@ -4,14 +4,14 @@ import SearchBar from "../components/SearchBar";
 function HomePage() {
     const navigate = useNavigate();
 
-    const handleSearchSuccess = (searchId: string) => {
-        navigate(`/search/${searchId}`);
+    const handleSearchSuccess = (searchId: string, startTime?: number) => {
+        navigate(`/search/${searchId}`, { state: { startTime } });
     };
 
     return (
         <main className="relative flex h-[100dvh] w-[100dvw] flex-col items-center justify-center bg-gray-100 p-2">
             <Link
-                to="/admin/add-product"
+                to="/admin"
                 className="absolute top-4 right-4 text-sm font-medium text-gray-400 transition-colors hover:text-gray-600"
             >
                 Admin

@@ -1,6 +1,7 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
+import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSearchResults, getRawTextResults, type Product } from "../lib/api";
+import { fetchSearchResults, getRawTextResults, recordSearchDuration, type Product } from "../lib/api";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import LoadingWave from "../components/LoadingWave";
@@ -8,6 +9,9 @@ import LoadingWave from "../components/LoadingWave";
 function SearchPage() {
     const { searchId } = useParams() as { searchId: string };
     const navigate = useNavigate();
+    const location = useLocation();
+    const startTime = location.state?.startTime as number | undefined;
+    const recordedRef = useRef<string | null>(null);
 
     const {
         data: results,
@@ -20,8 +24,19 @@ function SearchPage() {
         enabled: !!searchId,
     });
 
-    const handleSearchSuccess = (newSearchId: string) => {
-        navigate(`/search/${newSearchId}`);
+    useEffect(() => {
+        if (results && !isLoading && !isError && startTime !== undefined && recordedRef.current !== searchId) {
+            const endTime = performance.now();
+            // Check for valid duration (handles page reloads where performance.now() resets)
+            if (endTime > startTime) {
+                recordSearchDuration(searchId, endTime - startTime);
+            }
+            recordedRef.current = searchId;
+        }
+    }, [results, isLoading, isError, startTime, searchId]);
+
+    const handleSearchSuccess = (newSearchId: string, newStartTime?: number) => {
+        navigate(`/search/${newSearchId}`, { state: { startTime: newStartTime } });
     };
 
     const renderContent = () => {

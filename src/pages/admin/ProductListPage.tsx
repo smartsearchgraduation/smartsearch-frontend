@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Pagination } from "../../components/ui/Pagination";
 import { ProductListItem } from "../../components/ProductListItem";
 import { ProductFormModal } from "../../components/ProductFormModal";
-import { fetchProducts, type Product } from "../../lib/api";
+import { fetchProducts, deleteProduct, type Product } from "../../lib/api";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,6 +15,8 @@ function ProductListPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
+    const queryClient = useQueryClient();
+
     const {
         data: products = [],
         isLoading,
@@ -22,6 +24,17 @@ function ProductListPage() {
     } = useQuery({
         queryKey: ["products"],
         queryFn: fetchProducts,
+    });
+
+    const deleteProductMutation = useMutation({
+        mutationFn: deleteProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            alert("Product has been deleted successfully.");
+        },
+        onError: (error) => {
+            alert(`Failed to delete product: ${error.message}`);
+        },
     });
 
     // --- Filtering Logic ---
@@ -67,6 +80,12 @@ function ProductListPage() {
         setSelectedProduct(product);
         setIsModalOpen(true);
     };
+
+    function handleDelete(product: Product): void {
+        if (window.confirm(`Are you sure you want to delete ${product.name}?`)) {
+            deleteProductMutation.mutate(product.product_id);
+        }
+    }
 
     return (
         <div className="space-y-6">
@@ -119,7 +138,12 @@ function ProductListPage() {
                     <div className="col-span-full py-12 text-center text-gray-500">No products found.</div>
                 ) : (
                     paginatedProducts.map((product) => (
-                        <ProductListItem key={product.product_id} product={product} onEdit={handleOpenEdit} />
+                        <ProductListItem
+                            key={product.product_id}
+                            product={product}
+                            onEdit={handleOpenEdit}
+                            onDelete={handleDelete}
+                        />
                     ))
                 )}
             </div>
