@@ -23,7 +23,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(({ className, va
 Card.displayName = "Card";
 
 export const CardHeader = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-    <div className={cn("flex-shrink-0 border-b border-gray-100 bg-gray-50 p-4", className)} {...props}>
+    <div className={cn("flex-shrink-0 rounded-t-lg border-b border-gray-100 bg-gray-50 p-4", className)} {...props}>
         {children}
     </div>
 );

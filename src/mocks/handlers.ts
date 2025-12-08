@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-const mockProducts = [
+let mockProducts = [
     {
         product_id: "1",
         name: "Vintage Leather Jacket",
@@ -8,8 +8,14 @@ const mockProducts = [
         price: 89.99,
         description: "A stylish vintage leather jacket.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
-        categories: [{ category_id: 2, name: "Clothing", parent: null }],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        categories: [
+            {
+                category_id: 18,
+                name: "Jackets",
+                parent: { category_id: 2, name: "Clothing" },
+            },
+        ],
         subcategory: "Jackets",
     },
     {
@@ -19,8 +25,14 @@ const mockProducts = [
         price: 45.5,
         description: "Comfortable classic fit denim jeans.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
-        categories: [{ category_id: 2, name: "Clothing", parent: null }],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        categories: [
+            {
+                category_id: 19,
+                name: "Jeans",
+                parent: { category_id: 2, name: "Clothing" },
+            },
+        ],
         subcategory: "Jeans",
     },
     {
@@ -30,8 +42,14 @@ const mockProducts = [
         price: 150.0,
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: false,
-        images: ["https://placehold.co/400"],
-        categories: [{ category_id: 3, name: "Home", parent: null }],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        categories: [
+            {
+                category_id: 11,
+                name: "Furniture",
+                parent: { category_id: 3, name: "Home" },
+            },
+        ],
         subcategory: "Furniture",
     },
     {
@@ -41,8 +59,14 @@ const mockProducts = [
         price: 99.99,
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
-        categories: [{ category_id: 1, name: "Electronics", parent: null }],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        categories: [
+            {
+                category_id: 20,
+                name: "Audio",
+                parent: { category_id: 1, name: "Electronics" },
+            },
+        ],
         subcategory: "Audio",
     },
 ];
@@ -65,6 +89,9 @@ const mockCategories = [
     { category_id: 15, name: "Skincare", parent_category_id: 5 },
     { category_id: 16, name: "Novels", parent_category_id: 6 },
     { category_id: 17, name: "Fiction", parent_category_id: 6 },
+    { category_id: 18, name: "Jackets", parent_category_id: 2 },
+    { category_id: 19, name: "Jeans", parent_category_id: 2 },
+    { category_id: 20, name: "Audio", parent_category_id: 1 },
 ];
 
 const mockBrands = [
@@ -120,6 +147,27 @@ export const handlers = [
         return HttpResponse.json(product);
     }),
 
+    // Get Product Images
+    http.get("/api/products/:productId/images", async ({ params }) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const product = mockProducts.find((p) => p.product_id === params.productId);
+
+        if (!product) {
+            return new HttpResponse(null, { status: 404 });
+        }
+
+        const images = product.images.map((url, index) => ({
+            image_id: index + 1,
+            url: url,
+        }));
+
+        return HttpResponse.json({
+            product_id: product.product_id,
+            images: images,
+            total: images.length,
+        });
+    }),
+
     // Get All Products
     http.get("/api/products", async () => {
         await new Promise((resolve) => setTimeout(resolve, 600));
@@ -156,6 +204,21 @@ export const handlers = [
     // 8. Get Brands
     http.get("/api/brands", async () => {
         await new Promise((resolve) => setTimeout(resolve, 500));
-        return HttpResponse.json(mockBrands);
+        return HttpResponse.json({ brands: mockBrands });
+    }),
+
+    // 9. Delete Product
+    http.delete("/api/products/:productId", async ({ params }) => {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        const { productId } = params;
+        mockProducts = mockProducts.filter((p) => p.product_id !== productId);
+        return HttpResponse.json({ success: true });
+    }),
+
+    // 10. Record Search Duration
+    http.post("/api/analytics/search-duration", async ({ request }) => {
+        const body = await request.json();
+        console.log("Analytics received:", body);
+        return HttpResponse.json({ success: true });
     }),
 ];

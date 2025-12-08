@@ -187,7 +187,7 @@ function AddProductPage() {
                     <div className="flex flex-col gap-6 lg:col-span-2">
                         {/* Product Information */}
                         <Card className="overflow-visible">
-                            <CardHeader className="rounded-t-lg">
+                            <CardHeader>
                                 <h2 className="text-xl font-bold text-gray-800">Product Information</h2>
                             </CardHeader>
                             <CardContent className="space-y-6">

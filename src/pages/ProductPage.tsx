@@ -4,6 +4,7 @@ import SearchBar from "../components/SearchBar";
 import { fetchProductById } from "../lib/api";
 import LoadingWave from "../components/LoadingWave";
 import { Card } from "../components/ui/Card";
+import { ImageCarousel } from "../components/ImageCarousel";
 
 function ProductPage() {
     const { productId } = useParams<{ productId: string }>();
@@ -21,8 +22,8 @@ function ProductPage() {
     });
     console.log(product);
 
-    const handleSearchSuccess = (newSearchId: string) => {
-        navigate(`/search/${newSearchId}`);
+    const handleSearchSuccess = (newSearchId: string, startTime?: number) => {
+        navigate(`/search/${newSearchId}`, { state: { startTime } });
     };
 
     const renderContent = () => {
@@ -51,26 +52,7 @@ function ProductPage() {
             <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">
                 {/* Left Column: Image */}
                 <Card className="aspect-square w-full overflow-hidden border-none bg-gray-200 shadow-md">
-                    {product.images[0] ? (
-                        <img src={product.images[0]} alt={product.name} className="h-full w-full object-contain" />
-                    ) : (
-                        <div className="flex h-full w-full flex-col items-center justify-center text-gray-400">
-                            <svg
-                                className="mb-2 h-16 w-16 opacity-50"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={1.5}
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                            </svg>
-                            <span>No image available</span>
-                        </div>
-                    )}
+                    <ImageCarousel images={product.images} alt={product.name} className="h-full w-full" />
                 </Card>
 
                 <div className="flex flex-col gap-4">

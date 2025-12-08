@@ -1,11 +1,11 @@
 import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Pagination } from "../../components/ui/Pagination";
 import { ProductListItem } from "../../components/ProductListItem";
 import { ProductFormModal } from "../../components/ProductFormModal";
-import { fetchProducts, type Product } from "../../lib/api";
+import { fetchProducts, deleteProduct, type Product } from "../../lib/api";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -15,13 +15,23 @@ function ProductListPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
-    const {
-        data: products = [],
-        isLoading,
-        isError,
-    } = useQuery({
+    const queryClient = useQueryClient();
+
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["products"],
         queryFn: fetchProducts,
+    });
+    const products = data?.products || [];
+
+    const deleteProductMutation = useMutation({
+        mutationFn: deleteProduct,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            alert("Product has been deleted successfully.");
+        },
+        onError: (error) => {
+            alert(`Failed to delete product: ${error.message}`);
+        },
     });
 
     // --- Filtering Logic ---
@@ -32,10 +42,8 @@ function ProductListPage() {
         return products.filter((product) => {
             const nameMatch = product.name.toLowerCase().includes(lowerQuery);
             const brandMatch = product.brand.name.toLowerCase().includes(lowerQuery);
-            const categoryMatch = product.categories.some(
-                (c) => c.name.toLowerCase().includes(lowerQuery) || c.parent?.name.toLowerCase().includes(lowerQuery),
-            );
-            const subcategoryMatch = product.subcategory.toLowerCase().includes(lowerQuery);
+            const categoryMatch = product.categories[0]?.name.toLowerCase().includes(lowerQuery) || false;
+            const subcategoryMatch = product.categories[1]?.name.toLowerCase().includes(lowerQuery) || false;
 
             return nameMatch || brandMatch || categoryMatch || subcategoryMatch;
         });
@@ -68,19 +76,22 @@ function ProductListPage() {
         setIsModalOpen(true);
     };
 
+    function handleDelete(product: Product): void {
+        if (window.confirm(`Are you sure you want to delete ${product.name}?`)) {
+            deleteProductMutation.mutate(product.product_id);
+        }
+    }
+
     return (
         <div className="space-y-6">
+            <h1 className="hidden">Products</h1>
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Products</h2>
-                <Button onClick={handleOpenAdd}>Add Product</Button>
-            </div>
-
-            {/* Search Bar */}
-            <div className="max-w-md">
                 <Input
-                    placeholder="Search products..."
+                    placeholder="Search by name, brand, or category..."
+                    wrapperClassName="max-w-[600px]"
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    label="Find a product"
                     leftIcon={
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -98,7 +109,11 @@ function ProductListPage() {
                         </svg>
                     }
                 />
+                <Button onClick={handleOpenAdd}>Add Product</Button>
             </div>
+
+            {/* Search Bar */}
+            <div className="max-w-md"></div>
 
             {/* Products Grid */}
             <div className="grid grid-cols-[auto_1fr_150px_100px_auto] gap-4">
@@ -119,7 +134,12 @@ function ProductListPage() {
                     <div className="col-span-full py-12 text-center text-gray-500">No products found.</div>
                 ) : (
                     paginatedProducts.map((product) => (
-                        <ProductListItem key={product.product_id} product={product} onEdit={handleOpenEdit} />
+                        <ProductListItem
+                            key={product.product_id}
+                            product={product}
+                            onEdit={handleOpenEdit}
+                            onDelete={handleDelete}
+                        />
                     ))
                 )}
             </div>
