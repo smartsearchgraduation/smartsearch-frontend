@@ -8,7 +8,7 @@ let mockProducts = [
         price: 89.99,
         description: "A stylish vintage leather jacket.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
                 category_id: 18,
@@ -25,7 +25,7 @@ let mockProducts = [
         price: 45.5,
         description: "Comfortable classic fit denim jeans.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
                 category_id: 19,
@@ -42,7 +42,7 @@ let mockProducts = [
         price: 150.0,
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: false,
-        images: ["https://placehold.co/400"],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
                 category_id: 11,
@@ -59,7 +59,7 @@ let mockProducts = [
         price: 99.99,
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: true,
-        images: ["https://placehold.co/400"],
+        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
                 category_id: 20,

@@ -89,17 +89,14 @@ function ProductListPage() {
 
     return (
         <div className="space-y-6">
+            <h1 className="hidden">Products</h1>
             <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-800">Products</h2>
-                <Button onClick={handleOpenAdd}>Add Product</Button>
-            </div>
-
-            {/* Search Bar */}
-            <div className="max-w-md">
                 <Input
-                    placeholder="Search products..."
+                    placeholder="Search by name, brand, or category..."
+                    wrapperClassName="max-w-[600px]"
                     value={searchQuery}
                     onChange={handleSearchChange}
+                    label="Find a product"
                     leftIcon={
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -117,7 +114,11 @@ function ProductListPage() {
                         </svg>
                     }
                 />
+                <Button onClick={handleOpenAdd}>Add Product</Button>
             </div>
+
+            {/* Search Bar */}
+            <div className="max-w-md"></div>
 
             {/* Products Grid */}
             <div className="grid grid-cols-[auto_1fr_150px_100px_auto] gap-4">

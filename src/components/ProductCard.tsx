@@ -36,7 +36,12 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     return (
         <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
-            <ImageCarousel images={product.images} alt={product.name} className="aspect-square w-full" />
+            <ImageCarousel
+                images={product.images}
+                alt={product.name}
+                className="relative z-20 aspect-square w-full"
+                url={`/product/${product.product_id}`}
+            />
 
             {/* Content Section */}
             <div className="flex flex-1 flex-col bg-gray-100 p-4">
