@@ -117,11 +117,11 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
                         <Button
                             variant="secondary"
                             size="icon"
-                            className="pointer-events-auto h-8 w-8 rounded-full bg-white/80 shadow-md hover:bg-white"
+                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md ring-gray-700 hover:bg-gray-600"
                             onClick={handlePrev}
                             aria-label="Previous image"
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -133,11 +133,11 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
                         <Button
                             variant="secondary"
                             size="icon"
-                            className="pointer-events-auto h-8 w-8 rounded-full bg-white/80 shadow-md hover:bg-white"
+                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md ring-gray-700 hover:bg-gray-600"
                             onClick={handleNext}
                             aria-label="Next image"
                         >
-                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </Button>
@@ -150,7 +150,9 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
                                 key={idx}
                                 className={cn(
                                     "h-1.5 rounded-full shadow-sm transition-all",
-                                    idx === currentIndex ? "w-4 bg-emerald-500" : "w-1.5 bg-white/60",
+                                    idx === currentIndex
+                                        ? "w-4 bg-emerald-500 ring-1 ring-black"
+                                        : "w-1.5 bg-gray-300/60 ring-1 ring-black",
                                 )}
                             />
                         ))}

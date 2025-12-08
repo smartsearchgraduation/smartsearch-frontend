@@ -147,6 +147,27 @@ export const handlers = [
         return HttpResponse.json(product);
     }),
 
+    // Get Product Images
+    http.get("/api/products/:productId/images", async ({ params }) => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        const product = mockProducts.find((p) => p.product_id === params.productId);
+
+        if (!product) {
+            return new HttpResponse(null, { status: 404 });
+        }
+
+        const images = product.images.map((url, index) => ({
+            image_id: index + 1,
+            url: url,
+        }));
+
+        return HttpResponse.json({
+            product_id: product.product_id,
+            images: images,
+            total: images.length,
+        });
+    }),
+
     // Get All Products
     http.get("/api/products", async () => {
         await new Promise((resolve) => setTimeout(resolve, 600));

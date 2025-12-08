@@ -102,7 +102,7 @@ export const fetchProductById = async (productId: string): Promise<Product> => {
 /**
  * Fetches all products.
  */
-export const fetchProducts = async (): Promise<Product[]> => {
+export const fetchProducts = async (): Promise<{ products: Product[]; total: 7 }> => {
     const response = await fetch(BASE_URL + "/api/products");
     if (!response.ok) {
         throw new Error("Failed to fetch products");
@@ -203,6 +203,28 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
     return (await response.json()).brands;
 };
 
+export interface ProductImage {
+    image_id: number;
+    url: string;
+}
+
+export interface ProductImagesResponse {
+    product_id: number;
+    images: ProductImage[];
+    total: number;
+}
+
+/**
+ * Fetches all images for a product.
+ */
+export const fetchProductImages = async (productId: string): Promise<ProductImagesResponse> => {
+    const response = await fetch(BASE_URL + `/api/products/${productId}/images`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch product images");
+    }
+    return response.json();
+};
+
 /**
  * Updates an existing product.
  */
@@ -250,9 +272,7 @@ export const deleteProduct = async (productId: string): Promise<{ success: boole
  * Records the duration of a search request (from user click to results view).
  */
 export const recordSearchDuration = async (searchId: string, durationMs: number): Promise<void> => {
-    // Fire and forget, but we await to catch network errors if we wanted to.
-    // In a real app, we might use navigator.sendBeacon or similar for analytics.
-    // For now, a simple fetch is fine.
+    console.log("Recording search duration", durationMs);
     try {
         await fetch(BASE_URL + "/api/analytics/search-duration", {
             method: "POST",

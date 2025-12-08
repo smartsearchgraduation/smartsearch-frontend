@@ -47,10 +47,10 @@ export function ProductListItem({ product, onEdit, onDelete }: ProductListItemPr
             {/* Category Info */}
             <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                 <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-800 uppercase">
-                    {product.categories.find((c) => c.parent !== null)?.parent?.name || "Uncategorized"}
+                    {product.categories[0]?.name || "No category"}
                 </span>
                 <span className="rounded-full bg-emerald-200 px-3 py-1 text-xs font-bold tracking-wider text-emerald-900 uppercase">
-                    {product.subcategory}
+                    {product.categories[1]?.name || "No subcategory"}
                 </span>
             </div>
 

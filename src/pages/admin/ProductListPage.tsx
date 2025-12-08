@@ -17,14 +17,11 @@ function ProductListPage() {
 
     const queryClient = useQueryClient();
 
-    const {
-        data: products = [],
-        isLoading,
-        isError,
-    } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ["products"],
         queryFn: fetchProducts,
     });
+    const products = data?.products || [];
 
     const deleteProductMutation = useMutation({
         mutationFn: deleteProduct,
@@ -45,10 +42,8 @@ function ProductListPage() {
         return products.filter((product) => {
             const nameMatch = product.name.toLowerCase().includes(lowerQuery);
             const brandMatch = product.brand.name.toLowerCase().includes(lowerQuery);
-            const categoryMatch = product.categories.some(
-                (c) => c.name.toLowerCase().includes(lowerQuery) || c.parent?.name.toLowerCase().includes(lowerQuery),
-            );
-            const subcategoryMatch = product.subcategory.toLowerCase().includes(lowerQuery);
+            const categoryMatch = product.categories[0]?.name.toLowerCase().includes(lowerQuery) || false;
+            const subcategoryMatch = product.categories[1]?.name.toLowerCase().includes(lowerQuery) || false;
 
             return nameMatch || brandMatch || categoryMatch || subcategoryMatch;
         });

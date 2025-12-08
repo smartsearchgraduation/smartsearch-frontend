@@ -1,8 +1,8 @@
-import { useState, useEffect, type ChangeEvent, type FormEvent, useId } from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "./MediaGallery";
 import { CascadingSelector } from "./CascadingSelector";
-import { createProduct, updateProduct, fetchCatagories, fetchBrands, type Product } from "../lib/api";
+import { createProduct, updateProduct, fetchCatagories, fetchBrands, fetchProductImages, type Product } from "../lib/api";
 import { Modal } from "./ui/Modal";
 
 // UI Components
@@ -73,29 +73,25 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
                 description: product.description,
             });
 
-            // Brand
+            // Brand and Category
             setBrandName(product.brand.name);
-
-            const subCategory = product.categories.find((c) => c.parent !== null);
-            if (subCategory) {
-                setSelectedSubcategoryId(subCategory.category_id);
-                setSelectedCategoryId(subCategory.parent!.category_id);
-            } else if (product.categories.length > 0) {
-                setSelectedCategoryId(product.categories[0].category_id);
-            }
+            setSelectedSubcategoryId(product.categories[1]?.category_id || null);
+            setSelectedCategoryId(product.categories[0]?.category_id || null);
 
             // Images - Convert URLs to Files to keep MediaGallery happy
             const fetchImages = async () => {
                 setIsLoadingImages(true);
                 try {
-                    const imagePromises = product.images.map(async (url) => {
+                    const { images: fetchedImages } = await fetchProductImages(product.product_id);
+                    const imagePromises = fetchedImages.map(async (img) => {
+                        const url = img.url;
                         const response = await fetch(url);
                         const blob = await response.blob();
                         const fileName = url.split("/").pop() || "image.webp";
                         const file = new File([blob], fileName, { type: blob.type });
                         return {
                             file,
-                            id: useId(),
+                            id: crypto.randomUUID(),
                             preview: url,
                         } as UploadedImage;
                     });
@@ -315,7 +311,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
                     {/* --- RIGHT COLUMN --- */}
                     <div className="lg:col-span-1">
                         <CascadingSelector
-                            className="max-h-[600px]"
+                            className="max-h-[720px]"
                             selectedCategoryId={selectedCategoryId}
                             selectedSubcategoryId={selectedSubcategoryId}
                             onCategorySelect={handleCategorySelect}
