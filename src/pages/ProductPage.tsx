@@ -20,7 +20,6 @@ function ProductPage() {
         queryFn: () => fetchProductById(productId!),
         enabled: !!productId,
     });
-    console.log(product);
 
     const handleSearchSuccess = (newSearchId: string, startTime?: number) => {
         navigate(`/search/${newSearchId}`, { state: { startTime } });

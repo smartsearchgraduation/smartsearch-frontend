@@ -283,10 +283,3 @@ export const recordSearchDuration = async (searchId: string, durationMs: number)
         console.error("Failed to record search duration", error);
     }
 };
-
-/* The image logic
-Upload Immediately: When the user selects a new image from their computer, the Frontend immediately uploads it to a generic endpoint (e.g., POST /api/uploads).
-Get ID: The Backend saves the file (to S3, disk, etc.) and returns a unique Image ID (or URL).
-Update State: The Frontend adds this new ID to its local list of currentImageIds.
-Save the Product: When the user clicks "Save Product," the Frontend sends the full list of IDs currently attached to the product. 
-*/
