@@ -2,7 +2,7 @@ import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "./MediaGallery";
 import { CascadingSelector } from "./CascadingSelector";
-import { createProduct, updateProduct, fetchCatagories, fetchBrands, fetchProductImages, type Product } from "../lib/api";
+import { createProduct, updateProduct, fetchCatagories, fetchBrands, fetchProductImages, type Product, type CreateProductInput } from "../lib/api";
 import { Modal } from "./ui/Modal";
 
 // UI Components
@@ -128,7 +128,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: any) => updateProduct(product!.product_id, data),
+        mutationFn: (data: CreateProductInput) => updateProduct(product!.product_id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["products"] }); // Refresh list
             onClose();

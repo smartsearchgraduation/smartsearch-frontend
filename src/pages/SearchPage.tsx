@@ -10,8 +10,13 @@ function SearchPage() {
     const { searchId } = useParams() as { searchId: string };
     const navigate = useNavigate();
     const location = useLocation();
-    const startTime = location.state?.startTime as number | undefined;
+    const searchDuration = location.state?.searchDuration as number | undefined;
     const recordedRef = useRef<string | null>(null);
+    const loadStartTimeRef = useRef<number>(performance.now());
+
+    useEffect(() => {
+        loadStartTimeRef.current = performance.now();
+    }, [searchId]);
 
     const {
         data: results,
@@ -25,18 +30,21 @@ function SearchPage() {
     });
 
     useEffect(() => {
-        if (results && !isLoading && !isError && startTime !== undefined && recordedRef.current !== searchId) {
-            const endTime = performance.now();
-            // Check for valid duration (handles page reloads where performance.now() resets)
-            if (endTime > startTime) {
-                recordSearchDuration(searchId, endTime - startTime);
+        if (results && !isLoading && !isError && searchDuration !== undefined && recordedRef.current !== searchId) {
+            // Use sessionStorage to prevent duplicate logging across reloads
+            const sessionKey = `recorded_search_${searchId}`;
+            if (!sessionStorage.getItem(sessionKey)) {
+                const loadEndTime = performance.now();
+                const productLoadDuration = loadEndTime - loadStartTimeRef.current;
+                recordSearchDuration(searchId, searchDuration, productLoadDuration);
+                sessionStorage.setItem(sessionKey, "true");
             }
             recordedRef.current = searchId;
         }
-    }, [results, isLoading, isError, startTime, searchId]);
+    }, [results, isLoading, isError, searchDuration, searchId]);
 
-    const handleSearchSuccess = (newSearchId: string, newStartTime?: number) => {
-        navigate(`/search/${newSearchId}`, { state: { startTime: newStartTime } });
+    const handleSearchSuccess = (newSearchId: string, newSearchDuration?: number) => {
+        navigate(`/search/${newSearchId}`, { state: { searchDuration: newSearchDuration } });
     };
 
     const renderContent = () => {
