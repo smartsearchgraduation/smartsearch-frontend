@@ -4,8 +4,8 @@ import SearchBar from "../components/SearchBar";
 function HomePage() {
     const navigate = useNavigate();
 
-    const handleSearchSuccess = (searchId: string, startTime?: number) => {
-        navigate(`/search/${searchId}`, { state: { startTime } });
+    const handleSearchSuccess = (searchId: string, searchDuration?: number) => {
+        navigate(`/search/${searchId}`, { state: { searchDuration } });
     };
 
     return (

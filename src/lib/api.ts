@@ -271,13 +271,24 @@ export const deleteProduct = async (productId: string): Promise<{ success: boole
 /**
  * Records the duration of a search request (from user click to results view).
  */
-export const recordSearchDuration = async (searchId: string, durationMs: number): Promise<void> => {
-    console.log("Recording search duration", durationMs);
+export const recordSearchDuration = async (
+    searchId: string,
+    searchDuration: number,
+    productLoadDuration: number,
+): Promise<void> => {
+    console.log(
+        `Recording search duration. Request: ${Math.round(searchDuration)}ms, Load: ${Math.round(productLoadDuration)}ms`,
+    );
     try {
         await fetch(BASE_URL + "/api/analytics/search-duration", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ search_id: searchId, duration_ms: durationMs }),
+            body: JSON.stringify({
+                search_id: searchId,
+                duration_ms: searchDuration + productLoadDuration,
+                search_duration_ms: searchDuration,
+                product_load_duration_ms: productLoadDuration,
+            }),
         });
     } catch (error) {
         console.error("Failed to record search duration", error);

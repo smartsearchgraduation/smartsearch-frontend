@@ -13,7 +13,7 @@ import { searchRequest } from "../lib/api";
 
 function SearchBar(props: {
     className: string;
-    onSearchSuccess: (searchId: string, startTime?: number) => void;
+    onSearchSuccess: (searchId: string, searchDuration?: number) => void;
     autofocus?: boolean;
 }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
@@ -29,7 +29,9 @@ function SearchBar(props: {
     const mutation = useMutation({
         mutationFn: searchRequest,
         onSuccess: (searchId) => {
-            props.onSearchSuccess(searchId, startTimeRef.current ?? undefined);
+            const endTime = performance.now();
+            const duration = startTimeRef.current ? endTime - startTimeRef.current : 0;
+            props.onSearchSuccess(searchId, duration);
             setQuery("");
             removeImage();
 

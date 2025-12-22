@@ -178,6 +178,7 @@ export function Combobox({
                                 return (
                                     <li
                                         key={option.value}
+                                        onMouseDown={(e) => e.preventDefault()}
                                         onClick={() => handleSelect(option)}
                                         onMouseEnter={() => setHighlightedIndex(index)}
                                         className={cn(
