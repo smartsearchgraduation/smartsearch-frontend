@@ -2,7 +2,15 @@ import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { MediaGallery, type UploadedImage } from "./MediaGallery";
 import { CascadingSelector } from "./CascadingSelector";
-import { createProduct, updateProduct, fetchCatagories, fetchBrands, fetchProductImages, type Product, type CreateProductInput } from "../lib/api";
+import {
+    createProduct,
+    updateProduct,
+    fetchCatagories,
+    fetchBrands,
+    fetchProductImages,
+    type Product,
+    type CreateProductInput,
+} from "../lib/api";
 import { Modal } from "./ui/Modal";
 
 // UI Components
@@ -84,7 +92,7 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
                 try {
                     const { images: fetchedImages } = await fetchProductImages(product.product_id);
                     const imagePromises = fetchedImages.map(async (img) => {
-                        const url = img.url;
+                        const url = img.image;
                         const response = await fetch(url);
                         const blob = await response.blob();
                         const fileName = url.split("/").pop() || "image.webp";

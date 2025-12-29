@@ -204,8 +204,8 @@ export const fetchBrands = async (): Promise<{ brand_id: number; name: string }[
 };
 
 export interface ProductImage {
-    image_id: number;
-    url: string;
+    product_id: number;
+    image: string;
 }
 
 export interface ProductImagesResponse {
@@ -213,6 +213,17 @@ export interface ProductImagesResponse {
     images: ProductImage[];
     total: number;
 }
+
+/**
+ * Fetches the cover image for a product.
+ */
+export const fetchProductImage = async (productId: string): Promise<ProductImage> => {
+    const response = await fetch(BASE_URL + `/api/products/${productId}/image`);
+    if (!response.ok) {
+        throw new Error("Failed to fetch product image");
+    }
+    return response.json();
+};
 
 /**
  * Fetches all images for a product.
