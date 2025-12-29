@@ -44,8 +44,8 @@ function ProductPage() {
             );
         }
 
-        const category = product.categories[1]?.parent?.name || "Uncategorized";
-        const subcategory = product.categories[1]?.name || "General";
+        const category = product.categories[0]?.parent?.name || "Uncategorized";
+        const subcategory = product.categories[0]?.name || "General";
 
         return (
             <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2">

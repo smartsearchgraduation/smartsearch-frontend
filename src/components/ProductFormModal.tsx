@@ -83,14 +83,15 @@ export function ProductFormModal({ isOpen, onClose, product }: ProductFormModalP
 
             // Brand and Category
             setBrandName(product.brand.name);
-            setSelectedSubcategoryId(product.categories[1]?.category_id || null);
-            setSelectedCategoryId(product.categories[0]?.category_id || null);
+            setSelectedSubcategoryId(product.categories[0]?.category_id || null);
+            setSelectedCategoryId(product.categories[0]?.parent?.category_id || null);
 
             // Images - Convert URLs to Files to keep MediaGallery happy
             const fetchImages = async () => {
                 setIsLoadingImages(true);
                 try {
                     const { images: fetchedImages } = await fetchProductImages(product.product_id);
+                    console.log(fetchedImages);
                     const imagePromises = fetchedImages.map(async (img) => {
                         const url = img.image;
                         const response = await fetch(url);

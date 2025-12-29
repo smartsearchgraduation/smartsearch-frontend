@@ -11,7 +11,6 @@ interface ProductListItemProps {
 
 export function ProductListItem({ product, onEdit, onDelete }: ProductListItemProps) {
     const [coverImage, setCoverImage] = useState<string | null>(null);
-    console.log(product);
 
     useEffect(() => {
         const getCoverImage = async () => {
@@ -61,10 +60,10 @@ export function ProductListItem({ product, onEdit, onDelete }: ProductListItemPr
             {/* Category Info */}
             <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                 <span className="rounded-full bg-gray-200 px-3 py-1 text-xs font-bold tracking-wider text-gray-800 uppercase">
-                    {product.categories[0]?.name || "No category"}
+                    {product.categories[0]?.parent?.name || "No category"}
                 </span>
                 <span className="rounded-full bg-emerald-200 px-3 py-1 text-xs font-bold tracking-wider text-emerald-900 uppercase">
-                    {product.categories[0]?.parent?.name || "No subcategory"}
+                    {product.categories[0]?.name || "No subcategory"}
                 </span>
             </div>
 

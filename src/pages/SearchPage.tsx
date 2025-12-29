@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchSearchResults, getRawTextResults, recordSearchDuration, type Product } from "../lib/api";
 import ProductCard from "../components/ProductCard";
@@ -13,9 +13,11 @@ function SearchPage() {
     const searchDuration = location.state?.searchDuration as number | undefined;
     const recordedRef = useRef<string | null>(null);
     const loadStartTimeRef = useRef<number>(performance.now());
+    const [isRedirecting, setIsRedirecting] = useState(false);
 
     useEffect(() => {
         loadStartTimeRef.current = performance.now();
+        setIsRedirecting(false);
     }, [searchId]);
 
     const {
@@ -47,9 +49,20 @@ function SearchPage() {
         navigate(`/search/${newSearchId}`, { state: { searchDuration: newSearchDuration } });
     };
 
+    const handleRawTextSearch = async () => {
+        setIsRedirecting(true);
+        try {
+            const newSearchId = await getRawTextResults(searchId || "");
+            handleSearchSuccess(newSearchId);
+        } catch (error) {
+            console.error("Failed to fetch raw text results", error);
+            setIsRedirecting(false);
+        }
+    };
+
     const renderContent = () => {
-        if (isLoading) {
-            return <LoadingWave message="Loading results" />;
+        if (isLoading || isRedirecting) {
+            return <LoadingWave message={isRedirecting ? "Redirecting to raw search" : "Loading results"} />;
         }
 
         if (isError) {
@@ -90,7 +103,7 @@ function SearchPage() {
                 <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-[37.5rem]" />
             </header>
 
-            {results && results.corrected_text != results.raw_text && (
+            {!isRedirecting && results && results.corrected_text != results.raw_text && (
                 <main className="mb-6">
                     <h1 className="visually-hidden">Search Results</h1>
                     <h2 className="mb-1 text-gray-700">
@@ -100,9 +113,10 @@ function SearchPage() {
                     <p className="text-sm text-gray-600">
                         Search instead for:{" "}
                         <button
-                            disabled // Disabled for now will enable later
-                            onClick={async () => handleSearchSuccess(await getRawTextResults(searchId || ""))}
+                            // Need to carry the image with me will look into when adding the image search
+                            onClick={handleRawTextSearch}
                             className="cursor-pointer font-medium text-emerald-600 hover:underline"
+                            disabled={isRedirecting}
                         >
                             {results.raw_text}
                         </button>

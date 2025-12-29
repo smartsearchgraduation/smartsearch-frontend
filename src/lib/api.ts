@@ -52,7 +52,7 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
     const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
         body: JSON.stringify({ raw_text: query }),
-        headers: { "Content-Type": "application/json" }, // Send as FormData if handling files
+        headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -80,12 +80,16 @@ export const fetchSearchResults = async (searchId: string): Promise<SearchRespon
  * Fetches raw text results (for the 'Search instead for...' feature).
  */
 export const getRawTextResults = async (searchId: string): Promise<string> => {
-    const response = await fetch(`/api/raw-text-results/${searchId}`);
+    const response = await fetch(BASE_URL + "/api/search", {
+        method: "POST",
+        body: JSON.stringify({ raw_text_flag: true, search_id: searchId }),
+        headers: { "Content-Type": "application/json" },
+    });
     if (!response.ok) {
         throw new Error("Failed to get raw text results");
     }
     const data = await response.json();
-    return data.text;
+    return data.search_id;
 };
 
 /**
@@ -296,7 +300,6 @@ export const recordSearchDuration = async (
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 search_id: searchId,
-                duration_ms: searchDuration + productLoadDuration,
                 search_duration_ms: searchDuration,
                 product_load_duration_ms: productLoadDuration,
             }),
