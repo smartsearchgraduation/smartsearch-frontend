@@ -300,11 +300,19 @@ export const recordSearchDuration = async (
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 search_id: searchId,
-                search_duration_ms: searchDuration,
-                product_load_duration_ms: productLoadDuration,
+                search_duration: searchDuration,
+                product_load_duration: productLoadDuration,
             }),
         });
     } catch (error) {
         console.error("Failed to record search duration", error);
     }
+};
+
+export const fetchDurationStatistics = async (): Promise<any> => {
+    const response = await fetch(BASE_URL + "/api/analytics/logs");
+    if (!response.ok) {
+        throw new Error("Failed to fetch duration statistics");
+    }
+    return response.json();
 };

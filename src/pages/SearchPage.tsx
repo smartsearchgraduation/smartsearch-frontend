@@ -51,9 +51,11 @@ function SearchPage() {
 
     const handleRawTextSearch = async () => {
         setIsRedirecting(true);
+        const startTime = performance.now();
         try {
             const newSearchId = await getRawTextResults(searchId || "");
-            handleSearchSuccess(newSearchId);
+            const duration = performance.now() - startTime;
+            handleSearchSuccess(newSearchId, duration);
         } catch (error) {
             console.error("Failed to fetch raw text results", error);
             setIsRedirecting(false);
