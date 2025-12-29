@@ -1,4 +1,5 @@
-import type { Product } from "../lib/api";
+import { useEffect, useState } from "react";
+import { fetchProductImage, type Product } from "../lib/api";
 import { Button } from "./ui/Button";
 import { Card } from "./ui/Card";
 
@@ -9,16 +10,29 @@ interface ProductListItemProps {
 }
 
 export function ProductListItem({ product, onEdit, onDelete }: ProductListItemProps) {
+    const [coverImage, setCoverImage] = useState<string | null>(null);
+    console.log(product);
+
+    useEffect(() => {
+        const getCoverImage = async () => {
+            if (product.product_id) {
+                try {
+                    const { image } = await fetchProductImage(product.product_id);
+                    setCoverImage(image);
+                } catch (error) {
+                    console.error("Failed to fetch product images:", error);
+                }
+            }
+        };
+        getCoverImage();
+    }, [product.product_id]);
+
     return (
         <Card className="col-span-full grid grid-cols-subgrid items-center gap-6 p-4 transition-colors hover:bg-gray-50">
             {/* Image Section */}
-            <div className="h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
-                {product.images[0] ? (
-                    <img
-                        src={product.images[0]}
-                        alt={product.name + " thumbnail"}
-                        className="h-full w-full object-cover"
-                    />
+            <div className="h-32 w-32 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                {coverImage ? (
+                    <img src={coverImage} alt={product.name + " thumbnail"} className="object-fit h-full w-full" />
                 ) : (
                     <div className="flex h-full w-full items-center justify-center text-gray-300">
                         <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +64,7 @@ export function ProductListItem({ product, onEdit, onDelete }: ProductListItemPr
                     {product.categories[0]?.name || "No category"}
                 </span>
                 <span className="rounded-full bg-emerald-200 px-3 py-1 text-xs font-bold tracking-wider text-emerald-900 uppercase">
-                    {product.categories[1]?.name || "No subcategory"}
+                    {product.categories[0]?.parent?.name || "No subcategory"}
                 </span>
             </div>
 
