@@ -102,6 +102,60 @@ const mockBrands = [
     { brand_id: 105, name: "Sporty" },
 ];
 
+const generateMockAnalyticsData = () => {
+    const data = [
+        {
+            search_id: 34,
+            backend_total_time: 4139.71,
+            correction_time: 2041.96,
+            db_time: 13.26,
+            faiss_time: 2082.95,
+            product_load_duration: 513.2,
+            search_duration: 4442.3,
+            relevancy_score: 0.45,
+            result_count: 12,
+        },
+        {
+            search_id: 35,
+            backend_total_time: 2091.63,
+            correction_time: 0,
+            db_time: 13.11,
+            faiss_time: 2076.08,
+            product_load_duration: 358.8,
+            search_duration: 2530.1,
+            relevancy_score: 0.92,
+            result_count: 240,
+        },
+    ];
+
+    for (let i = 0; i < 48; i++) {
+        const hasCorrection = Math.random() > 0.8;
+        const correction = hasCorrection ? 1500 + Math.random() * 1000 : 0;
+        const faiss = 100 + Math.random() * 800;
+        const db = 10 + Math.random() * 20;
+        const overhead = 50 + Math.random() * 100;
+        const backendTotal = correction + faiss + db + overhead;
+        const networkLag = 50 + Math.random() * 300;
+        const searchDuration = backendTotal + networkLag;
+        const productLoad = 200 + Math.random() * 400;
+        const relevancy = 0.3 + Math.random() * 0.7;
+        const count = Math.floor(Math.random() * 500);
+
+        data.push({
+            search_id: 100 + i,
+            backend_total_time: backendTotal,
+            correction_time: correction,
+            db_time: db,
+            faiss_time: faiss,
+            product_load_duration: productLoad,
+            search_duration: searchDuration,
+            relevancy_score: relevancy,
+            result_count: count,
+        });
+    }
+    return data.sort((a, b) => b.search_duration - a.search_duration);
+};
+
 export const handlers = [
     // 1. Search Request
     http.post("/api/search", async () => {
@@ -220,5 +274,11 @@ export const handlers = [
         const body = await request.json();
         console.log("Analytics received:", body);
         return HttpResponse.json({ success: true });
+    }),
+
+    // 11. Get Analytics Logs
+    http.get("/api/analytics/logs", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        return HttpResponse.json(generateMockAnalyticsData());
     }),
 ];

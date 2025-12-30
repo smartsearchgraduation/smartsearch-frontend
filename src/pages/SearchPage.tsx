@@ -132,3 +132,4 @@ function SearchPage() {
 }
 
 export default SearchPage;
+// TODO: Show the current search querry in search bar?

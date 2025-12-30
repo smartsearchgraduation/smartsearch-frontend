@@ -309,7 +309,19 @@ export const recordSearchDuration = async (
     }
 };
 
-export const fetchDurationStatistics = async (): Promise<any> => {
+export interface SearchData {
+    search_id: number;
+    backend_total_time: number;
+    correction_time: number;
+    db_time: number;
+    faiss_time: number;
+    product_load_duration: number;
+    search_duration: number;
+    relevancy_score?: number;
+    result_count: number;
+}
+
+export const fetchDurationStatistics = async (): Promise<SearchData[]> => {
     const response = await fetch(BASE_URL + "/api/analytics/logs");
     if (!response.ok) {
         throw new Error("Failed to fetch duration statistics");
