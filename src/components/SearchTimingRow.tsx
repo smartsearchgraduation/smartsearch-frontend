@@ -33,7 +33,7 @@ export const SearchTimingRow = ({ data }: { data: SearchData }) => {
                         <span className="font-mono text-gray-400">#</span>
                         {data.search_id}
                     </h3>
-                    {data.correction_time > 1000 && (
+                    {data.correction_time > 3000 && (
                         <span className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700 uppercase">
                             <Icons.Wrench className="h-3 w-3" /> High Correction
                         </span>
