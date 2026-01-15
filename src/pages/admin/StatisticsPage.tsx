@@ -27,21 +27,21 @@ const DetailedStatCard = ({
                 <div className={`rounded-lg p-2 ${bgClass}`}>
                     <Icon className="h-5 w-5" />
                 </div>
-                <span className="text-xs font-medium text-gray-500">AVG</span>
+                <span className="text-xs font-medium text-gray-700">AVG</span>
             </div>
             <div>
                 <h4 className="text-sm font-medium tracking-wide text-gray-500 uppercase">{title}</h4>
                 <div className="mt-1 text-2xl font-bold text-gray-900">
                     {stats ? Math.round(stats.avg).toLocaleString() : "-"}{" "}
-                    <span className="text-sm font-normal text-gray-400">ms</span>
+                    <span className="text-sm font-normal text-gray-600">ms</span>
                 </div>
-                <div className="mt-2 text-xs text-gray-400">
+                <div className="mt-2 text-xs text-gray-500">
                     Range:{" "}
-                    <span className="font-medium text-gray-600">
+                    <span className="font-medium text-gray-700">
                         {stats ? Math.round(stats.min).toLocaleString() : "-"}
                     </span>{" "}
                     -{" "}
-                    <span className="font-medium text-gray-600">
+                    <span className="font-medium text-gray-700">
                         {stats ? Math.round(stats.max).toLocaleString() : "-"}
                     </span>{" "}
                     ms

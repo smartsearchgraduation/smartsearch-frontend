@@ -158,9 +158,25 @@ const generateMockAnalyticsData = () => {
 
 export const handlers = [
     // 1. Search Request
-    http.post("/api/search", async () => {
+    http.post("/api/search", async ({ request }) => {
         // Simulate network delay
         await new Promise((resolve) => setTimeout(resolve, 800));
+
+        const contentType = request.headers.get("content-type") || "";
+
+        if (contentType.includes("multipart/form-data")) {
+            const formData = await request.formData();
+            const rawText = formData.get("raw_text");
+            const image = formData.get("image");
+
+            console.log("Mock Search Request Received:", {
+                raw_text: rawText,
+                image: image instanceof File ? `File: ${image.name} (${image.size} bytes)` : image,
+            });
+        } else if (contentType.includes("application/json")) {
+            const json = await request.json();
+            console.log("Mock Raw Text Request Received:", json);
+        }
 
         // Return a fake search ID
         return HttpResponse.json({

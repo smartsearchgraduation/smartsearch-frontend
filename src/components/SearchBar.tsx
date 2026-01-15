@@ -42,10 +42,65 @@ function SearchBar(props: {
         },
     });
 
-    const processFile = (file: File | null | undefined) => {
+    const convertImageToWebP = (file: File): Promise<File> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            const objectUrl = URL.createObjectURL(file);
+            img.src = objectUrl;
+            img.onload = () => {
+                const MAX_SIZE = 1080;
+                let { width, height } = img;
+
+                if (width > height) {
+                    if (width > MAX_SIZE) {
+                        height = Math.round((height * MAX_SIZE) / width);
+                        width = MAX_SIZE;
+                    }
+                } else if (height > MAX_SIZE) {
+                    width = Math.round((width * MAX_SIZE) / height);
+                    height = MAX_SIZE;
+                }
+
+                const canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    URL.revokeObjectURL(objectUrl);
+                    return reject(new Error("Failed to get canvas context"));
+                }
+                ctx.drawImage(img, 0, 0, width, height);
+                canvas.toBlob(
+                    (blob) => {
+                        URL.revokeObjectURL(objectUrl);
+                        if (!blob) return reject(new Error("Canvas to Blob conversion failed"));
+                        const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".webp"), {
+                            type: "image/webp",
+                        });
+                        resolve(webpFile);
+                    },
+                    "image/webp",
+                    0.96,
+                );
+            };
+            img.onerror = (err) => {
+                URL.revokeObjectURL(objectUrl);
+                reject(err);
+            };
+        });
+    };
+
+    const processFile = async (file: File | null | undefined) => {
         if (file && file.type.startsWith("image/")) {
-            setImageFile(file);
-            mutation.reset(); // Clear any previous errors
+            try {
+                const convertedFile = await convertImageToWebP(file);
+                setImageFile(convertedFile);
+                mutation.reset(); // Clear any previous errors
+            } catch (error) {
+                console.error("Image conversion failed:", error);
+                // Fallback to original if conversion fails, or handle error appropriate
+                // For now, let's just not set it if it fails to ensure we don't send bad data
+            }
         }
     };
 

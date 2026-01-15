@@ -42,17 +42,17 @@ if (import.meta.env.DEV) {
  * Returns a searchId to poll or fetch results for.
  */
 export async function searchRequest(input: SearchRequestInput): Promise<string> {
-    const { query } = input;
-    /* const formData = new FormData();
-    formData.append("raw_text", query);
-    if (image) {
-        formData.append("image", image);
-    } */
+    const formData = new FormData();
+    formData.append("raw_text", input.query);
+    if (input.image) {
+        formData.append("image", input.image);
+    } else {
+        formData.append("image", "");
+    }
 
     const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
-        body: JSON.stringify({ raw_text: query }),
-        headers: { "Content-Type": "application/json" },
+        body: formData,
     });
 
     if (!response.ok) {
