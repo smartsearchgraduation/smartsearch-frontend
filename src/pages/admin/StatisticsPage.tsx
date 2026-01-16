@@ -110,7 +110,9 @@ export default function StatisticsPage() {
 
     // Filter Data
     const filteredData = useMemo(() => {
-        return allData.filter((item) => item.search_id.toString().includes(searchTerm));
+        return allData
+            .filter((item) => item.search_id.toString().includes(searchTerm))
+            .sort((a, b) => b.search_id - a.search_id);
     }, [searchTerm, allData]);
 
     // Paginate Data

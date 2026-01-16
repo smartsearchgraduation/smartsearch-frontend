@@ -80,10 +80,13 @@ export const fetchSearchResults = async (searchId: string): Promise<SearchRespon
  * Fetches raw text results (for the 'Search instead for...' feature).
  */
 export const getRawTextResults = async (searchId: string): Promise<string> => {
+    const formData = new FormData();
+    formData.append("raw_text_flag", "true");
+    formData.append("search_id", searchId);
+
     const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
-        body: JSON.stringify({ raw_text_flag: true, search_id: searchId }),
-        headers: { "Content-Type": "application/json" },
+        body: formData,
     });
     if (!response.ok) {
         throw new Error("Failed to get raw text results");
