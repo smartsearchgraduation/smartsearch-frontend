@@ -66,7 +66,8 @@ function ProductPage() {
                     </div>
 
                     <h1 className="text-3xl text-gray-900 sm:text-4xl">
-                        <span className="font-bold">{product.brand.name}</span> <span>{product.name}</span>
+                        <span className="font-bold">{product.brand.name}</span>{" "}
+                        <span>{product.name.split(" ").slice(1).join(" ")}</span> {/* Temp fix: will fix later */}
                     </h1>
 
                     <div className="text-3xl font-medium text-gray-700">

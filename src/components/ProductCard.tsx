@@ -50,7 +50,8 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                         to={`/product/${product.product_id}`}
                         className="text-gray-900 after:absolute after:inset-0 after:z-10 after:content-['']"
                     >
-                        <span className="font-bold">{product.brand.name}</span> <span>{product.name}</span>
+                        <span className="font-bold">{product.brand.name}</span>{" "}
+                        <span>{product.name.split(" ").slice(1).join(" ")}</span> {/* Temp fix: will fix later */}
                     </Link>
                 </h3>
 
