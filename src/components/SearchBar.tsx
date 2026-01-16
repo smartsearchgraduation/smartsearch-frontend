@@ -15,15 +15,31 @@ function SearchBar(props: {
     className: string;
     onSearchSuccess: (searchId: string, searchDuration?: number) => void;
     autofocus?: boolean;
+    initialValue?: string;
 }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
-    const [query, setQuery] = useState<string>("");
+    const [query, setQuery] = useState<string>(props.initialValue || "");
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const startTimeRef = useRef<number | null>(null);
     const charLimit = 300;
+
+    // Sync query with initialValue prop
+    useEffect(() => {
+        if (props.initialValue !== undefined) {
+            setQuery(props.initialValue);
+        }
+    }, [props.initialValue]);
+
+    // Auto-resize textarea when query changes
+    useEffect(() => {
+        if (textAreaRef.current) {
+            textAreaRef.current.style.height = "auto";
+            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+        }
+    }, [query]);
 
     // Mutation for search request
     const mutation = useMutation({
@@ -34,11 +50,7 @@ function SearchBar(props: {
             props.onSearchSuccess(searchId, duration);
             setQuery("");
             removeImage();
-
-            // Reset textarea height
-            if (textAreaRef.current) {
-                textAreaRef.current.style.height = "auto";
-            }
+            // Height reset is handled by the query useEffect
         },
     });
 
@@ -119,10 +131,6 @@ function SearchBar(props: {
     const handleQueryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setQuery(event.target.value);
         mutation.reset(); // Clear errors on new input
-
-        // Auto-grow logic
-        event.target.style.height = "auto";
-        event.target.style.height = `${event.target.scrollHeight}px`;
     };
 
     // --- Paste Image Handler ---

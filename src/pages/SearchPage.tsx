@@ -102,7 +102,11 @@ function SearchPage() {
                     <span className="text-emerald-600">Smart </span>
                     <span className="text-gray-800">Search</span>
                 </Link>
-                <SearchBar onSearchSuccess={handleSearchSuccess} className="w-full max-w-[37.5rem]" />
+                <SearchBar
+                    onSearchSuccess={handleSearchSuccess}
+                    className="w-full max-w-[37.5rem]"
+                    initialValue={results?.corrected_text}
+                />
             </header>
 
             {!isRedirecting && results && results.corrected_text != results.raw_text && (
