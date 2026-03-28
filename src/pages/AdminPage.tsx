@@ -32,6 +32,14 @@ function AdminPage() {
                         >
                             Statistics
                         </NavLink>
+                        <NavLink
+                            to="/admin/settings"
+                            className={({ isActive }) =>
+                                `text-lg font-medium ${isActive ? "text-emerald-600 underline" : "text-gray-500 hover:text-gray-800"}`
+                            }
+                        >
+                            Settings
+                        </NavLink>
                     </nav>
                 </div>
             </header>

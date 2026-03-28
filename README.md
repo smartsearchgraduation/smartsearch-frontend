@@ -1,24 +1,38 @@
 
 # 🚀 smartsearch-frontend
 
-This is the React frontend for the SmartSearch project.
-
+A modern React frontend for the SmartSearch e-commerce search platform with admin capabilities.
 
 ## 🌐 Live Demo
 
-You can view the latest deployed version here:
-**[https://smartsearchgraduation.github.io/smartsearch-frontend/](https://smartsearchgraduation.github.io/smartsearch-frontend/)**
+View the deployed version: **[https://smartsearchgraduation.github.io/smartsearch-frontend/](https://smartsearchgraduation.github.io/smartsearch-frontend/)**
 
+## ✨ Features
+
+- **Advanced Search** - Text-based product search with spelling correction and relevance scoring
+- **Admin Panel** - Product management, statistics, and analytics dashboard
+- **Image Search UI** - Interface prepared for image uploads (backend integration pending)
+- **Performance Analytics** - Search timing and performance metrics
+- **Responsive Design** - Mobile-first design with Tailwind CSS
+- **Development Mocking** - MSW for API mocking during development
 
 ## 🛠️ Built With
 
-This project is built with modern web technologies, including:
+- **[React](https://reactjs.org/)** - UI framework
+- **[Vite](https://vitejs.dev/)** - Build tool and dev server
+- **[Tailwind CSS](https://tailwindcss.com/)** - Styling framework
+- **[TanStack Query](https://tanstack.com/query/latest)** - Data fetching and caching
+- **[React Router](https://reactrouter.com/)** - Client-side routing
+- **[MSW](https://mswjs.io/)** - API mocking for development
 
-* **[React](https://reactjs.org/):** A JavaScript library for building user interfaces.
-* **[Vite](https://vitejs.dev/):** A next-generation frontend build tool for extremely fast development.
-* **[Tailwind CSS](https://tailwindcss.com/):** A utility-first CSS framework for rapid UI development.
-* **[TanStack Query](https://tanstack.com/query/latest):** A powerful library for data fetching, caching, and state management.
 
+
+## 🔧 Admin Access
+
+For development, you can access the admin panel by running this in your browser console:
+```javascript
+localStorage.setItem("smartsearch_admin_access", true);
+```
 
 
 ## 🏁 Getting Started
@@ -56,8 +70,6 @@ This will run the app in development mode. Open [http://localhost:5173](https://
 
 ## 📁 Project Structure
 
-The project follows a standard Vite + React structure, organizing files by feature and type.
-
 ```
 smartsearch-frontend/
 ├── public/
@@ -66,24 +78,32 @@ smartsearch-frontend/
 │   ├── components/
 │   │   ├── SearchBar.tsx
 │   │   ├── ProductCard.tsx
-│   │   └── ... (reusable UI components)
+│   │   ├── ProtectedRoute.tsx
+│   │   ├── ui/ (custom UI components)
+│   │   └── ... (reusable components)
 │   ├── pages/
 │   │   ├── HomePage.tsx
 │   │   ├── SearchPage.tsx
-│   │   └── ... (main page views)
+│   │   ├── ProductPage.tsx
+│   │   ├── AdminPage.tsx
+│   │   └── admin/ (admin sub-pages)
+│   ├── lib/
+│   │   ├── api.ts (API layer)
+│   │   └── utils.ts
+│   ├── mocks/ (MSW handlers)
 │   ├── App.tsx
-│   ├── index.css
-│   └── main.tsx
+│   ├── main.tsx
+│   └── index.css
 ├── .gitignore
-├── index.html
 ├── package.json
 └── README.md
 ```
 
 ## 🏗️ Architecture
 
--   **Components:** All reusable UI elements (like `SearchBar`, `ProductCard`) are located in `src/components`. These are designed to be simple and reusable across different pages.
-    
--   **Pages:** Major application views (like `HomePage`, `SearchPage`) are in `src/pages`. These components are responsible for assembling various smaller components to create a full page.
-    
--   **Data Fetching:** All communication with the backend API is handled by **TanStack Query**. This manages caching, refetching, and loading/error states, keeping the UI components clean.
+- **Components:** Reusable UI elements in `src/components`, including custom UI components in `ui/` subdirectory
+- **Pages:** Major application views in `src/pages`, with admin sub-pages in `admin/` subdirectory  
+- **API Layer:** All backend communication handled through `src/lib/api.ts` with TanStack Query for caching
+- **Routing:** React Router with HashRouter, including protected admin routes
+- **Mocking:** MSW provides API mocking during development for faster iteration
+- **State Management:** TanStack Query handles server state, React state for UI state
