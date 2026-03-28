@@ -6,6 +6,7 @@ import ProductPage from "./pages/ProductPage";
 import AdminPage from "./pages/AdminPage";
 import ProductListPage from "./pages/admin/ProductListPage";
 import StatisticsPage from "./pages/admin/StatisticsPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
                 <Route index element={<Navigate to="products" replace />} />
                 <Route path="products" element={<ProductListPage />} />
                 <Route path="statistics" element={<StatisticsPage />} />
+                <Route path="settings" element={<SettingsPage />} />
             </Route>
         </Routes>
     );

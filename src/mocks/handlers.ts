@@ -102,6 +102,58 @@ const mockBrands = [
     { brand_id: 105, name: "Sporty" },
 ];
 
+const retrievalModelCatalog = {
+    textual_models: [
+        { name: "ViT-B/32", dimension: 512 },
+        { name: "BAAI/bge-large-en-v1.5", dimension: 1024 },
+        { name: "Qwen/Qwen3-Embedding-8B", dimension: 4096 },
+    ],
+    visual_models: [{ name: "ViT-B/32", dimension: 512 }],
+    defaults: {
+        textual: "BAAI/bge-large-en-v1.5",
+        visual: "ViT-B/32",
+    },
+};
+
+const correctionModelCatalog = {
+    engines: [
+        { name: "symspell_keyboard", description: "Keyboard typo correction" },
+        { name: "byt5", description: "Neural correction engine" },
+        { name: "rawtext", description: "No correction applied" },
+    ],
+    defaults: {
+        engine: "symspell_keyboard",
+    },
+};
+
+let selectedRetrievalModels = {
+    textual_model: retrievalModelCatalog.defaults.textual,
+    visual_model: retrievalModelCatalog.defaults.visual,
+    last_updated: new Date().toISOString(),
+};
+
+let selectedCorrectionEngine = correctionModelCatalog.defaults.engine;
+
+let mockIndexStats: Record<
+    string,
+    {
+        textual: number;
+        visual: number;
+        fused: number;
+    }
+> = {
+    "bge-large-en-v1.5_1024_embeddings": {
+        textual: 100,
+        visual: 0,
+        fused: 0,
+    },
+    "ViT-B-32_512_embeddings": {
+        textual: 0,
+        visual: 250,
+        fused: 0,
+    },
+};
+
 const generateMockAnalyticsData = () => {
     const data = [
         {
@@ -157,6 +209,121 @@ const generateMockAnalyticsData = () => {
 };
 
 export const handlers = [
+    // Retrieval Models
+    http.get("/api/retrieval/models", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return HttpResponse.json({
+            status: "success",
+            data: retrievalModelCatalog,
+        });
+    }),
+
+    // Retrieval Index Stats
+    http.get("/api/retrieval/index-stats", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return HttpResponse.json({
+            status: "success",
+            indices: mockIndexStats,
+        });
+    }),
+
+    // Retrieval Overall Stats
+    http.get("/api/retrieval/stats", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        return HttpResponse.json({
+            status: "success",
+            data: {
+                index_stats: mockIndexStats,
+                available_models: retrievalModelCatalog,
+                selected_models: selectedRetrievalModels,
+                service_status: "healthy",
+            },
+        });
+    }),
+
+    // Save and Rebuild Retrieval Models
+    http.post("/api/retrieval/selected-models/save-and-rebuild", async ({ request }) => {
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        const body = (await request.json()) as {
+            textual_model: string;
+            visual_model: string;
+            wait_duration_seconds?: number;
+        };
+
+        const totalProducts = mockProducts.length;
+        const failedCount = Math.min(2, Math.floor(Math.random() * 3));
+        const successfulCount = totalProducts - failedCount;
+
+        selectedRetrievalModels = {
+            textual_model: body.textual_model,
+            visual_model: body.visual_model,
+            last_updated: new Date().toISOString(),
+        };
+
+        mockIndexStats = {
+            ...mockIndexStats,
+            [`${body.textual_model.replaceAll("/", "-")}_${retrievalModelCatalog.textual_models.find((m) => m.name === body.textual_model)?.dimension ?? 1024}_embeddings`]: {
+                textual: successfulCount,
+                visual: 0,
+                fused: 0,
+            },
+            [`${body.visual_model.replaceAll("/", "-")}_${retrievalModelCatalog.visual_models.find((m) => m.name === body.visual_model)?.dimension ?? 512}_embeddings`]: {
+                textual: 0,
+                visual: successfulCount,
+                fused: 0,
+            },
+        };
+
+        return HttpResponse.json({
+            status: "success",
+            message: "Models saved and FAISS index rebuilt successfully",
+            data: {
+                textual_model: selectedRetrievalModels.textual_model,
+                visual_model: selectedRetrievalModels.visual_model,
+                total_products: totalProducts,
+                successful_count: successfulCount,
+                failed_count: failedCount,
+                total_duration_ms: 125000,
+                wait_duration_seconds: body.wait_duration_seconds ?? 60,
+            },
+            errors: failedCount
+                ? [{ product_id: "mock-product-failed", reason: "Mock processing error" }]
+                : [],
+        });
+    }),
+
+    // Correction Models
+    http.get("/api/correction/models", async () => {
+        await new Promise((resolve) => setTimeout(resolve, 250));
+        return HttpResponse.json({
+            status: "success",
+            data: {
+                ...correctionModelCatalog,
+                defaults: {
+                    engine: selectedCorrectionEngine,
+                },
+            },
+        });
+    }),
+
+    // Save Correction Engine
+    http.post("/api/correction/selected-engine/save", async ({ request }) => {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        const body = (await request.json()) as {
+            engine: string;
+        };
+
+        selectedCorrectionEngine = body.engine;
+
+        return HttpResponse.json({
+            status: "success",
+            message: "Correction engine saved successfully",
+            data: {
+                engine: selectedCorrectionEngine,
+            },
+        });
+    }),
+
     // 1. Search Request
     http.post("/api/search", async ({ request }) => {
         // Simulate network delay

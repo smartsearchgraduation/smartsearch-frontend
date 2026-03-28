@@ -331,3 +331,152 @@ export const fetchDurationStatistics = async (): Promise<SearchData[]> => {
     }
     return response.json();
 };
+
+export interface ModelOption {
+    name: string;
+    dimension: number;
+}
+
+export interface RetrievalModelsResponse {
+    status: string;
+    data: {
+        textual_models: ModelOption[];
+        visual_models: ModelOption[];
+        defaults: {
+            textual: string;
+            visual: string;
+        };
+    };
+}
+
+export interface RetrievalIndexStatsResponse {
+    status: string;
+    indices: Record<
+        string,
+        {
+            textual: number;
+            visual: number;
+            fused: number;
+        }
+    >;
+}
+
+export interface RetrievalStatsResponse {
+    status: string;
+    data: {
+        index_stats: Record<string, unknown>;
+        available_models: Record<string, unknown>;
+        selected_models: {
+            textual_model: string;
+            visual_model: string;
+            last_updated: string;
+        };
+        service_status: string;
+    };
+}
+
+export interface SaveAndRebuildRequest {
+    textual_model: string;
+    visual_model: string;
+    wait_duration_seconds: number;
+}
+
+export interface SaveAndRebuildResponse {
+    status: string;
+    message: string;
+    data: {
+        textual_model: string;
+        visual_model: string;
+        total_products: number;
+        successful_count: number;
+        failed_count: number;
+        total_duration_ms: number;
+        wait_duration_seconds: number;
+    };
+    errors: Array<Record<string, unknown>>;
+}
+
+export interface CorrectionModelsResponse {
+    status: string;
+    data: {
+        engines: {
+            name: string;
+            description: string;
+        }[];
+        defaults: {
+            engine: string;
+        };
+    };
+}
+
+export interface SaveCorrectionEngineRequest {
+    engine: string;
+}
+
+export interface SaveCorrectionEngineResponse {
+    status: string;
+    message: string;
+    data: {
+        engine: string;
+    };
+}
+
+export const fetchRetrievalModels = async (): Promise<RetrievalModelsResponse> => {
+    const response = await fetch(BASE_URL + "/api/retrieval/models");
+    if (!response.ok) {
+        throw new Error("Failed to fetch retrieval models");
+    }
+    return response.json();
+};
+
+export const fetchRetrievalStats = async (): Promise<RetrievalStatsResponse> => {
+    const response = await fetch(BASE_URL + "/api/retrieval/stats");
+    if (!response.ok) {
+        throw new Error("Failed to fetch retrieval stats");
+    }
+    return response.json();
+};
+
+export const fetchRetrievalIndexStats = async (): Promise<RetrievalIndexStatsResponse> => {
+    const response = await fetch(BASE_URL + "/api/retrieval/index-stats");
+    if (!response.ok) {
+        throw new Error("Failed to fetch retrieval index stats");
+    }
+    return response.json();
+};
+
+export const saveAndRebuildSelectedRetrievalModels = async (
+    payload: SaveAndRebuildRequest,
+): Promise<SaveAndRebuildResponse> => {
+    const response = await fetch(BASE_URL + "/api/retrieval/selected-models/save-and-rebuild", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to save retrieval models and rebuild index");
+    }
+    return response.json();
+};
+
+export const fetchCorrectionModels = async (): Promise<CorrectionModelsResponse> => {
+    const response = await fetch(BASE_URL + "/api/correction/models");
+    if (!response.ok) {
+        throw new Error("Failed to fetch correction models");
+    }
+    return response.json();
+};
+
+export const saveSelectedCorrectionEngine = async (
+    payload: SaveCorrectionEngineRequest,
+): Promise<SaveCorrectionEngineResponse> => {
+    const response = await fetch(BASE_URL + "/api/correction/selected-engine/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to save correction engine");
+    }
+    return response.json();
+};

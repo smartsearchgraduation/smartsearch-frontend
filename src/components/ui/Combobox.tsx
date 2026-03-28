@@ -15,6 +15,7 @@ interface ComboboxProps {
     placeholder?: string;
     className?: string;
     id?: string;
+    disabled?: boolean;
 }
 
 export function Combobox({
@@ -25,6 +26,7 @@ export function Combobox({
     placeholder = "Select or type...",
     className,
     id,
+    disabled = false,
 }: ComboboxProps) {
     const [isOpen, setIsOpen] = React.useState(false);
     const [highlightedIndex, setHighlightedIndex] = React.useState(0);
@@ -76,17 +78,21 @@ export function Combobox({
 
     // Handle Typing: Pass the text up
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (disabled) return;
         onChange(e.target.value);
         setIsOpen(true);
     };
 
     // Handle Selection
     const handleSelect = (option: ComboboxOption) => {
+        if (disabled) return;
         onChange(option.label);
         setIsOpen(false);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (disabled) return;
+
         if (!isOpen) {
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
                 setIsOpen(true);
@@ -136,16 +142,24 @@ export function Combobox({
                     id={comboId}
                     value={value}
                     onChange={handleInputChange}
-                    onFocus={() => setIsOpen(true)}
+                    onFocus={() => {
+                        if (!disabled) setIsOpen(true);
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     className="pr-10"
+                    disabled={disabled}
                 />
 
                 {/* Chevron: Click to toggle open/close */}
                 <div
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="absolute top-0 right-0 flex h-full w-10 cursor-pointer items-center justify-center text-gray-400 hover:text-gray-600"
+                    onClick={() => {
+                        if (!disabled) setIsOpen(!isOpen);
+                    }}
+                    className={cn(
+                        "absolute top-0 right-0 flex h-full w-10 items-center justify-center",
+                        disabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-gray-400 hover:text-gray-600",
+                    )}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -169,7 +183,7 @@ export function Combobox({
                     >
                         {filteredOptions.length === 0 ? (
                             <li className="px-4 py-2 text-sm text-gray-500">
-                                No matching brands found. You can add "{value}".
+                                No matching options found.
                             </li>
                         ) : (
                             filteredOptions.map((option, index) => {
