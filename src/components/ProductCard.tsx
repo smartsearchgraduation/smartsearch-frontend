@@ -6,6 +6,7 @@ import { Card } from "./ui/Card";
 import { Button } from "./ui/Button";
 import { cn } from "../lib/utils";
 import { ImageCarousel } from "./ImageCarousel";
+import { Tooltip } from "./ui/Tooltip";
 
 function ProductCard({ searchId, product }: { searchId: string; product: Product }) {
     // We keep local state for immediate UI feedback (optimistic UI)
@@ -36,12 +37,25 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
     return (
         <Card variant="interactive" className="group relative flex h-full flex-col bg-gray-200">
             {/* Image Section */}
-            <ImageCarousel
-                images={product.images}
-                alt={product.name}
-                className="relative z-20 aspect-square w-full"
-                url={`/product/${product.product_id}`}
-            />
+            <div className="relative">
+                <ImageCarousel
+                    images={product.images}
+                    alt={product.name}
+                    className="relative z-20 aspect-square w-full"
+                    url={`/product/${product.product_id}`}
+                />
+
+                {/* Similarity Score Badge */}
+                {product.similarity_score !== undefined && (
+                    <div className="absolute top-2 right-2 z-30">
+                        <Tooltip content={`Similarity score, above threshold`}>
+                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-lg">
+                                {Math.round(product.similarity_score * 100)}%
+                            </div>
+                        </Tooltip>
+                    </div>
+                )}
+            </div>
 
             {/* Content Section */}
             <div className="flex flex-1 flex-col bg-gray-100 p-4">
