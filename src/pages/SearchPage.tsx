@@ -5,6 +5,7 @@ import { fetchSearchResults, getRawTextResults, recordSearchDuration, type Produ
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import LoadingWave from "../components/LoadingWave";
+import { Switch } from "../components/ui/Switch";
 
 function SearchPage() {
     const { searchId } = useParams() as { searchId: string };
@@ -14,6 +15,7 @@ function SearchPage() {
     const recordedRef = useRef<string | null>(null);
     const loadStartTimeRef = useRef<number>(performance.now());
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const [semanticSearchEnabled, setSemanticSearchEnabled] = useState(true);
 
     useEffect(() => {
         loadStartTimeRef.current = performance.now();
@@ -110,24 +112,36 @@ function SearchPage() {
             </header>
 
             {!isRedirecting && results && results.corrected_text != results.raw_text && (
-                <main className="mb-6">
-                    <h1 className="visually-hidden">Search Results</h1>
-                    <h2 className="mb-1 text-gray-700">
-                        Showing results for:{" "}
-                        <span className="font-bold text-emerald-600">{results.corrected_text}</span>
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                        Search instead for:{" "}
-                        <button
-                            // Need to carry the image with me will look into when adding the image search
-                            onClick={handleRawTextSearch}
-                            className="cursor-pointer font-medium text-emerald-600 hover:underline"
-                            disabled={isRedirecting}
-                        >
-                            {results.raw_text}
-                        </button>
-                    </p>
-                </main>
+                <div className="mx-2 mb-6 flex justify-between">
+                    <div>
+                        <h1 className="visually-hidden">Search Results</h1>
+                        <h2 className="mb-1 text-gray-700">
+                            Showing results for:{" "}
+                            <span className="font-bold text-emerald-600">{results.corrected_text}</span>
+                        </h2>
+                        <p className="text-sm text-gray-600">
+                            Search instead for:{" "}
+                            <button
+                                // Need to carry the image with me will look into when adding the image search
+                                onClick={handleRawTextSearch}
+                                className="cursor-pointer font-medium text-emerald-600 hover:underline"
+                                disabled={isRedirecting}
+                            >
+                                {results.raw_text}
+                            </button>
+                        </p>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                        <label htmlFor="semantic-search" className="text-sm text-gray-600">
+                            Semantic search
+                        </label>
+                        <Switch
+                            id="semantic-search"
+                            checked={semanticSearchEnabled}
+                            onChange={setSemanticSearchEnabled}
+                        />
+                    </div>
+                </div>
             )}
 
             {renderContent()}
