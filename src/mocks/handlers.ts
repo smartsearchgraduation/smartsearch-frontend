@@ -17,6 +17,7 @@ let mockProducts = [
             },
         ],
         subcategory: "Jackets",
+        similarity_score: 0.92,
     },
     {
         product_id: "2",
@@ -34,6 +35,7 @@ let mockProducts = [
             },
         ],
         subcategory: "Jeans",
+        similarity_score: 0.78,
     },
     {
         product_id: "3",
@@ -51,6 +53,7 @@ let mockProducts = [
             },
         ],
         subcategory: "Furniture",
+        similarity_score: 0.65,
     },
     {
         product_id: "4",
@@ -68,6 +71,7 @@ let mockProducts = [
             },
         ],
         subcategory: "Audio",
+        similarity_score: 0.88,
     },
 ];
 
@@ -262,16 +266,18 @@ export const handlers = [
 
         mockIndexStats = {
             ...mockIndexStats,
-            [`${body.textual_model.replaceAll("/", "-")}_${retrievalModelCatalog.textual_models.find((m) => m.name === body.textual_model)?.dimension ?? 1024}_embeddings`]: {
-                textual: successfulCount,
-                visual: 0,
-                fused: 0,
-            },
-            [`${body.visual_model.replaceAll("/", "-")}_${retrievalModelCatalog.visual_models.find((m) => m.name === body.visual_model)?.dimension ?? 512}_embeddings`]: {
-                textual: 0,
-                visual: successfulCount,
-                fused: 0,
-            },
+            [`${body.textual_model.replaceAll("/", "-")}_${retrievalModelCatalog.textual_models.find((m) => m.name === body.textual_model)?.dimension ?? 1024}_embeddings`]:
+                {
+                    textual: successfulCount,
+                    visual: 0,
+                    fused: 0,
+                },
+            [`${body.visual_model.replaceAll("/", "-")}_${retrievalModelCatalog.visual_models.find((m) => m.name === body.visual_model)?.dimension ?? 512}_embeddings`]:
+                {
+                    textual: 0,
+                    visual: successfulCount,
+                    fused: 0,
+                },
         };
 
         return HttpResponse.json({
@@ -286,9 +292,7 @@ export const handlers = [
                 total_duration_ms: 125000,
                 wait_duration_seconds: body.wait_duration_seconds ?? 60,
             },
-            errors: failedCount
-                ? [{ product_id: "mock-product-failed", reason: "Mock processing error" }]
-                : [],
+            errors: failedCount ? [{ product_id: "mock-product-failed", reason: "Mock processing error" }] : [],
         });
     }),
 

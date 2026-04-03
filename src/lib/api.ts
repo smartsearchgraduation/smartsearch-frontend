@@ -23,6 +23,7 @@ export type Product = {
         } | null;
     }[];
     subcategory: string;
+    similarity_score?: number;
 };
 
 export interface SearchResponse {
