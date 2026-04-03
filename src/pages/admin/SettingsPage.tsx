@@ -4,6 +4,7 @@ import { Card, CardContent } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { Icons } from "../../components/ui/Icons";
 import { Select } from "../../components/ui/Select";
+import { Tooltip } from "../../components/ui/Tooltip";
 import {
     fetchCorrectionModels,
     fetchRetrievalIndexStats,
@@ -26,6 +27,7 @@ export default function SettingsPage() {
     const [selectedTextualModel, setSelectedTextualModel] = useState("");
     const [selectedVisualModel, setSelectedVisualModel] = useState("");
     const [selectedCorrectionEngine, setSelectedCorrectionEngine] = useState("");
+    const [selectedFusion, setSelectedFusion] = useState<"early" | "late">("late");
 
     const [retrievalAlert, setRetrievalAlert] = useState<AlertState | null>(null);
     const [correctionAlert, setCorrectionAlert] = useState<AlertState | null>(null);
@@ -126,10 +128,7 @@ export default function SettingsPage() {
         },
     });
 
-    const indexRows = useMemo(
-        () => Object.entries(indexStatsData?.indices ?? {}),
-        [indexStatsData?.indices],
-    );
+    const indexRows = useMemo(() => Object.entries(indexStatsData?.indices ?? {}), [indexStatsData?.indices]);
 
     const textualModelOptions = useMemo(
         () =>
@@ -158,6 +157,16 @@ export default function SettingsPage() {
         [correctionModelsData?.data.engines],
     );
 
+    // Fusion validation logic
+    const canUseEarlyFusion = selectedTextualModel === selectedVisualModel;
+
+    // Auto-switch to late fusion if early fusion becomes invalid
+    useEffect(() => {
+        if (selectedFusion === "early" && !canUseEarlyFusion) {
+            setSelectedFusion("late");
+        }
+    }, [selectedFusion, canUseEarlyFusion]);
+
     const isRebuildRunning = saveRetrievalMutation.isPending;
 
     const isRetrievalSectionLoading = isRetrievalModelsLoading || isRetrievalStatsLoading;
@@ -185,7 +194,9 @@ export default function SettingsPage() {
         <div className="space-y-6">
             <div>
                 <h1 className="text-2xl font-bold text-gray-900">System Settings</h1>
-                <p className="text-sm text-gray-500">Select active retrieval and correction models for admin operations.</p>
+                <p className="text-sm text-gray-500">
+                    Select active retrieval and correction models for admin operations.
+                </p>
             </div>
 
             <Card className="relative overflow-hidden">
@@ -238,6 +249,65 @@ export default function SettingsPage() {
                                 </div>
                             </div>
 
+                            {/* Fusion Selection Cards */}
+                            <div className="space-y-3">
+                                <h3 className="text-sm font-medium text-gray-700">Fusion Strategy</h3>
+                                <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2">
+                                    {/* Early Fusion Card */}
+                                    <Tooltip
+                                        content={
+                                            !canUseEarlyFusion
+                                                ? "Early fusion requires identical textual and visual models"
+                                                : ""
+                                        }
+                                        className="h-full"
+                                    >
+                                        <Card
+                                            variant="flat"
+                                            className={`h-full cursor-pointer transition-all ${
+                                                selectedFusion === "early"
+                                                    ? "bg-emerald-50 ring-2 ring-emerald-500"
+                                                    : canUseEarlyFusion
+                                                      ? "hover:shadow-sm"
+                                                      : "cursor-not-allowed opacity-50"
+                                            }`}
+                                            onClick={() => canUseEarlyFusion && setSelectedFusion("early")}
+                                        >
+                                            <CardContent className="flex h-full flex-col justify-between p-4">
+                                                <div className="space-y-1">
+                                                    <h4 className="font-semibold text-gray-900">Early Fusion</h4>
+                                                    <p className="text-xs text-gray-600">
+                                                        Combines textual and visual features at the embedding level
+                                                        before indexing. Requires identical model architectures.
+                                                    </p>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </Tooltip>
+
+                                    {/* Late Fusion Card */}
+                                    <Card
+                                        variant="flat"
+                                        className={`h-full cursor-pointer transition-all ${
+                                            selectedFusion === "late"
+                                                ? "bg-emerald-50 ring-2 ring-emerald-500"
+                                                : "hover:shadow-sm"
+                                        }`}
+                                        onClick={() => setSelectedFusion("late")}
+                                    >
+                                        <CardContent className="flex h-full flex-col justify-between p-4">
+                                            <div className="space-y-1">
+                                                <h4 className="font-semibold text-gray-900">Late Fusion</h4>
+                                                <p className="text-xs text-gray-600">
+                                                    Combines textual and visual search results at the ranking level.
+                                                    Works with any model combination.
+                                                </p>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+
                             <div className="flex flex-wrap items-center gap-3">
                                 <Button
                                     onClick={handleSaveAndRebuild}
@@ -245,7 +315,9 @@ export default function SettingsPage() {
                                 >
                                     Save & Rebuild
                                 </Button>
-                                <span className="text-xs text-gray-500">The form is locked while rebuild is running.</span>
+                                <span className="text-xs text-gray-500">
+                                    The form is locked while rebuild is running.
+                                </span>
                             </div>
                         </>
                     )}
@@ -287,6 +359,7 @@ export default function SettingsPage() {
                             </div>
 
                             <Button
+                                className="mb-1"
                                 onClick={handleSaveCorrection}
                                 disabled={!selectedCorrectionEngine || saveCorrectionMutation.isPending}
                             >
