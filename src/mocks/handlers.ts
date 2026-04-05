@@ -7,7 +7,7 @@ let mockProducts = [
         brand: { brand_id: 101, name: "UrbanStyle" },
         price: 89.99,
         description: "A stylish vintage leather jacket.",
-        is_relevant: true,
+        is_relevant: null,
         images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
@@ -17,7 +17,11 @@ let mockProducts = [
             },
         ],
         subcategory: "Jackets",
-        similarity_score: 0.92,
+        rank: 1,
+        score: 0.92,
+        text_score: 0.9,
+        image_score: 0.94,
+        combined_score: 0.92,
     },
     {
         product_id: "2",
@@ -25,7 +29,7 @@ let mockProducts = [
         brand: { brand_id: 102, name: "DenimCo" },
         price: 45.5,
         description: "Comfortable classic fit denim jeans.",
-        is_relevant: true,
+        is_relevant: null,
         images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
@@ -35,7 +39,11 @@ let mockProducts = [
             },
         ],
         subcategory: "Jeans",
-        similarity_score: 0.78,
+        rank: 2,
+        score: 0.78,
+        text_score: 0.82,
+        image_score: 0.74,
+        combined_score: 0.78,
     },
     {
         product_id: "3",
@@ -43,7 +51,7 @@ let mockProducts = [
         brand: { brand_id: 103, name: "OfficePro" },
         price: 150.0,
         description: "An ergonomic chair for long hours at the desk.",
-        is_relevant: false,
+        is_relevant: null,
         images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
@@ -53,7 +61,11 @@ let mockProducts = [
             },
         ],
         subcategory: "Furniture",
-        similarity_score: 0.65,
+        rank: 3,
+        score: 0.65,
+        text_score: 0.7,
+        image_score: 0.6,
+        combined_score: 0.65,
     },
     {
         product_id: "4",
@@ -61,7 +73,7 @@ let mockProducts = [
         brand: { brand_id: 104, name: "TechLife" },
         price: 99.99,
         description: "Voice-activated smart speaker with great sound.",
-        is_relevant: true,
+        is_relevant: null,
         images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
         categories: [
             {
@@ -71,7 +83,11 @@ let mockProducts = [
             },
         ],
         subcategory: "Audio",
-        similarity_score: 0.88,
+        rank: 4,
+        score: 0.88,
+        text_score: 0.85,
+        image_score: 0.91,
+        combined_score: 0.88,
     },
 ];
 
@@ -251,6 +267,7 @@ export const handlers = [
         const body = (await request.json()) as {
             textual_model: string;
             visual_model: string;
+            fusion_endpoint: string;
             wait_duration_seconds?: number;
         };
 
@@ -282,7 +299,6 @@ export const handlers = [
 
         return HttpResponse.json({
             status: "success",
-            message: "Models saved and FAISS index rebuilt successfully",
             data: {
                 textual_model: selectedRetrievalModels.textual_model,
                 visual_model: selectedRetrievalModels.visual_model,
@@ -290,7 +306,6 @@ export const handlers = [
                 successful_count: successfulCount,
                 failed_count: failedCount,
                 total_duration_ms: 125000,
-                wait_duration_seconds: body.wait_duration_seconds ?? 60,
             },
             errors: failedCount ? [{ product_id: "mock-product-failed", reason: "Mock processing error" }] : [],
         });
@@ -347,11 +362,13 @@ export const handlers = [
                 });
             } else {
                 const rawText = formData.get("raw_text");
-                const image = formData.get("image");
+                const images = formData.get("images");
+                const correctionEnabled = formData.get("correction_enabled");
 
                 console.log("Mock Search Request Received:", {
                     raw_text: rawText,
-                    image: image instanceof File ? `File: ${image.name} (${image.size} bytes)` : image,
+                    images: images instanceof File ? `File: ${images.name} (${images.size} bytes)` : images,
+                    correction_enabled: correctionEnabled,
                 });
             }
         } else if (contentType.includes("application/json")) {
@@ -365,6 +382,44 @@ export const handlers = [
         });
     }),
 
+    // DB Fallback (traditional search comparison)
+    http.post("/api/search/db-fallback", async ({ request }) => {
+        await new Promise((resolve) => setTimeout(resolve, 600));
+        const body = (await request.json()) as { search_id: string };
+        console.log("Mock DB Fallback Request:", body);
+
+        return HttpResponse.json({
+            original_search_id: body.search_id,
+            search_text: "corrected text example",
+            products: [
+                {
+                    product_id: 3,
+                    name: "Ergonomic Office Chair",
+                    price: 150.0,
+                    score: 1.0,
+                    brand: { brand_id: 103, name: "OfficePro" },
+                    images: ["https://placehold.co/400"],
+                },
+                {
+                    product_id: 2,
+                    name: "Classic Denim Jeans",
+                    price: 45.5,
+                    score: 0.85,
+                    brand: { brand_id: 102, name: "DenimCo" },
+                    images: ["https://placehold.co/400"],
+                },
+                {
+                    product_id: 4,
+                    name: "Smart Home Speaker",
+                    price: 99.99,
+                    score: 0.6,
+                    brand: { brand_id: 104, name: "TechLife" },
+                    images: ["https://placehold.co/400"],
+                },
+            ],
+        });
+    }),
+
     // 2. Get Search Results
     http.get("/api/search/:searchId", async ({ params }) => {
         await new Promise((resolve) => setTimeout(resolve, 800));
@@ -375,6 +430,9 @@ export const handlers = [
             corrected_text: "corrected text example",
             raw_text: "raw query text",
             search_id: searchId,
+            fusion_type: "late_fusion",
+            textual_model_name: selectedRetrievalModels.textual_model,
+            visual_model_name: selectedRetrievalModels.visual_model,
         });
     }),
 

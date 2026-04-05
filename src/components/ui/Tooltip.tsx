@@ -3,9 +3,15 @@ import { cn } from "../../lib/utils";
 
 interface TooltipProps {
     children: React.ReactNode;
-    content: string;
+    content: React.ReactNode;
     className?: string;
 }
+
+const isContentEmpty = (content: React.ReactNode): boolean => {
+    if (content == null || content === false || content === "") return true;
+    if (typeof content === "string") return content.trim() === "";
+    return false;
+};
 
 export const Tooltip = ({ children, content, className }: TooltipProps) => {
     const [isVisible, setIsVisible] = React.useState(false);
@@ -14,7 +20,7 @@ export const Tooltip = ({ children, content, className }: TooltipProps) => {
     const tooltipRef = React.useRef<HTMLDivElement>(null);
 
     const updatePosition = React.useCallback(() => {
-        if (childRef.current && tooltipRef.current && content.trim()) {
+        if (childRef.current && tooltipRef.current && !isContentEmpty(content)) {
             const rect = childRef.current.getBoundingClientRect();
             const tooltipWidth = tooltipRef.current.offsetWidth;
             const screenWidth = window.innerWidth;
@@ -44,8 +50,9 @@ export const Tooltip = ({ children, content, className }: TooltipProps) => {
             // Ensure arrow position stays within bounds (0% to 100%)
             arrowPosition = Math.max(10, Math.min(90, arrowPosition));
 
+            const tooltipHeight = tooltipRef.current.offsetHeight;
             setPosition({
-                top: rect.top - 45, // Position above the element with more space
+                top: rect.top - tooltipHeight - 8,
                 left: left,
                 arrowPosition: arrowPosition,
             });
@@ -59,7 +66,7 @@ export const Tooltip = ({ children, content, className }: TooltipProps) => {
     }, [isVisible, updatePosition]);
 
     const handleMouseEnter = () => {
-        if (childRef.current && content.trim()) {
+        if (childRef.current && !isContentEmpty(content)) {
             // Set initial position
             const rect = childRef.current.getBoundingClientRect();
             setPosition({
@@ -85,10 +92,10 @@ export const Tooltip = ({ children, content, className }: TooltipProps) => {
             >
                 {children}
             </div>
-            {isVisible && content.trim() && (
+            {isVisible && !isContentEmpty(content) && (
                 <div
                     ref={tooltipRef}
-                    className="pointer-events-none fixed z-50 -translate-x-1/2 transform rounded-lg bg-gray-900 px-3 py-2 text-xs whitespace-nowrap text-white shadow-lg"
+                    className="pointer-events-none fixed z-50 -translate-x-1/2 transform rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-lg"
                     style={{
                         top: `${position.top}px`,
                         left: `${position.left}px`,

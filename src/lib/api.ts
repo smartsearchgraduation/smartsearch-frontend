@@ -1,6 +1,7 @@
 export interface SearchRequestInput {
     query: string;
     image: File | null;
+    correctionEnabled?: boolean;
 }
 
 export type Product = {
@@ -12,7 +13,7 @@ export type Product = {
     };
     price: number;
     description: string;
-    is_relevant: boolean;
+    is_relevant: boolean | null;
     images: string[];
     categories: {
         category_id: number;
@@ -23,14 +24,38 @@ export type Product = {
         } | null;
     }[];
     subcategory: string;
-    similarity_score?: number;
+    rank?: number;
+    score?: number;
+    text_score?: number | null;
+    image_score?: number | null;
+    combined_score?: number;
 };
+
+export type FusionType = "late_fusion" | "early_fusion" | "text_only" | "image_only" | "db_fallback";
 
 export interface SearchResponse {
     products: Product[];
     corrected_text: string;
     search_id: string;
     raw_text: string;
+    fusion_type: FusionType;
+    textual_model_name: string;
+    visual_model_name: string;
+}
+
+export interface DbFallbackProduct {
+    product_id: number;
+    name: string;
+    price: number;
+    score: number;
+    brand: { brand_id: number; name: string };
+    images: string[];
+}
+
+export interface DbFallbackResponse {
+    original_search_id: string;
+    search_text: string;
+    products: DbFallbackProduct[];
 }
 
 let BASE_URL = "https://api.init-ai.com";
@@ -46,10 +71,9 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
     const formData = new FormData();
     formData.append("raw_text", input.query);
     if (input.image) {
-        formData.append("image", input.image);
-    } else {
-        formData.append("image", "");
+        formData.append("images", input.image);
     }
+    formData.append("correction_enabled", input.correctionEnabled === false ? "false" : "true");
 
     const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
@@ -97,8 +121,20 @@ export const getRawTextResults = async (searchId: string): Promise<string> => {
 };
 
 /**
- * Fetches a single product by ID.
+ * Fetches traditional DB search results for comparison with semantic search.
  */
+export const fetchDbFallback = async (searchId: string): Promise<DbFallbackResponse> => {
+    const response = await fetch(BASE_URL + "/api/search/db-fallback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ search_id: searchId }),
+    });
+    if (!response.ok) {
+        throw new Error("Failed to fetch DB fallback results");
+    }
+    return response.json();
+};
+
 export const fetchProductById = async (productId: string): Promise<Product> => {
     const response = await fetch(BASE_URL + `/api/products/${productId}`);
     if (!response.ok) {
@@ -379,12 +415,12 @@ export interface RetrievalStatsResponse {
 export interface SaveAndRebuildRequest {
     textual_model: string;
     visual_model: string;
+    fusion_endpoint: string;
     wait_duration_seconds: number;
 }
 
 export interface SaveAndRebuildResponse {
     status: string;
-    message: string;
     data: {
         textual_model: string;
         visual_model: string;
@@ -392,7 +428,6 @@ export interface SaveAndRebuildResponse {
         successful_count: number;
         failed_count: number;
         total_duration_ms: number;
-        wait_duration_seconds: number;
     };
     errors: Array<Record<string, unknown>>;
 }

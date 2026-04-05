@@ -45,12 +45,31 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                     url={`/product/${product.product_id}`}
                 />
 
-                {/* Similarity Score Badge */}
-                {product.similarity_score !== undefined && (
+                {/* Score Badge */}
+                {product.score !== undefined && (
                     <div className="absolute top-2 right-2 z-30">
-                        <Tooltip content={`Similarity score, above threshold`}>
+                        <Tooltip
+                            content={
+                                <div className="flex flex-col gap-0.5">
+                                    <span className="font-semibold">Score: {(product.score * 100).toFixed(1)}%</span>
+                                    {product.text_score != null && (
+                                        <span className="text-gray-300">
+                                            Text: {(product.text_score * 100).toFixed(1)}%
+                                        </span>
+                                    )}
+                                    {product.image_score != null && (
+                                        <span className="text-gray-300">
+                                            Image: {(product.image_score * 100).toFixed(1)}%
+                                        </span>
+                                    )}
+                                    {product.rank != null && (
+                                        <span className="text-gray-300">Rank: #{product.rank}</span>
+                                    )}
+                                </div>
+                            }
+                        >
                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-lg">
-                                {Math.round(product.similarity_score * 100)}%
+                                {Math.round(product.score * 100)}%
                             </div>
                         </Tooltip>
                     </div>

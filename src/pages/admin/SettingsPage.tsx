@@ -99,7 +99,7 @@ export default function SettingsPage() {
         onSuccess: (response) => {
             setRetrievalAlert({
                 type: "success",
-                message: `${response.message} (${response.data.successful_count}/${response.data.total_products} successful, ${response.data.failed_count} failed, ${Math.round(response.data.total_duration_ms / 1000)}s)`,
+                message: `Models saved and index rebuilt successfully (${response.data.successful_count}/${response.data.total_products} successful, ${response.data.failed_count} failed, ${Math.round(response.data.total_duration_ms / 1000)}s)`,
             });
             queryClient.invalidateQueries({ queryKey: ["retrieval-stats"] });
             queryClient.invalidateQueries({ queryKey: ["retrieval-index-stats"] });
@@ -178,6 +178,7 @@ export default function SettingsPage() {
         saveRetrievalMutation.mutate({
             textual_model: selectedTextualModel,
             visual_model: selectedVisualModel,
+            fusion_endpoint: selectedFusion,
             wait_duration_seconds: REBUILD_WAIT_SECONDS,
         });
     };

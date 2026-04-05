@@ -1,7 +1,14 @@
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchSearchResults, getRawTextResults, recordSearchDuration, type Product } from "../lib/api";
+import {
+    fetchSearchResults,
+    fetchDbFallback,
+    getRawTextResults,
+    recordSearchDuration,
+    type Product,
+    type DbFallbackProduct,
+} from "../lib/api";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import LoadingWave from "../components/LoadingWave";
@@ -31,6 +38,30 @@ function SearchPage() {
         queryKey: ["searchResults", searchId],
         queryFn: () => fetchSearchResults(searchId!),
         enabled: !!searchId,
+    });
+
+    const {
+        data: dbFallbackResults,
+        isLoading: isDbFallbackLoading,
+        isError: isDbFallbackError,
+        error: dbFallbackError,
+    } = useQuery({
+        queryKey: ["dbFallback", searchId],
+        queryFn: () => fetchDbFallback(searchId!),
+        enabled: !!searchId && !semanticSearchEnabled,
+    });
+
+    const mapDbFallbackProduct = (p: DbFallbackProduct): Product => ({
+        product_id: String(p.product_id),
+        name: p.name,
+        brand: p.brand,
+        price: p.price,
+        description: "",
+        is_relevant: false,
+        images: p.images,
+        categories: [],
+        subcategory: "",
+        score: p.score,
     });
 
     useEffect(() => {
@@ -65,19 +96,27 @@ function SearchPage() {
     };
 
     const renderContent = () => {
-        if (isLoading || isRedirecting) {
+        const loading = semanticSearchEnabled ? isLoading : isLoading || isDbFallbackLoading;
+        const hasError = semanticSearchEnabled ? isError : isDbFallbackError;
+        const errorMsg = semanticSearchEnabled ? error?.message : dbFallbackError?.message;
+
+        const products: Product[] = semanticSearchEnabled
+            ? (results?.products ?? [])
+            : (dbFallbackResults?.products.map(mapDbFallbackProduct) ?? []);
+
+        if (loading || isRedirecting) {
             return <LoadingWave message={isRedirecting ? "Redirecting to raw search" : "Loading results"} />;
         }
 
-        if (isError) {
+        if (hasError) {
             return (
                 <div role="alert" className="py-10 text-center text-red-500">
-                    {error?.message || "Failed to fetch search results."}
+                    {errorMsg || "Failed to fetch search results."}
                 </div>
             );
         }
 
-        if (!results || results.products.length === 0) {
+        if (products.length === 0) {
             return (
                 <div role="status" className="py-10 text-center text-gray-500">
                     No products found.
@@ -87,7 +126,7 @@ function SearchPage() {
 
         return (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] sm:gap-4">
-                {results.products.map((product: Product) => (
+                {products.map((product: Product) => (
                     <ProductCard searchId={searchId} key={product.product_id} product={product} />
                 ))}
             </div>
