@@ -50,6 +50,7 @@ export interface DbFallbackProduct {
     score: number;
     brand: { brand_id: number; name: string };
     images: string[];
+    is_relevant: boolean | null;
 }
 
 export interface DbFallbackResponse {

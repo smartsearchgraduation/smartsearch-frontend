@@ -57,7 +57,7 @@ function SearchPage() {
         brand: p.brand,
         price: p.price,
         description: "",
-        is_relevant: false,
+        is_relevant: p.is_relevant,
         images: p.images,
         categories: [],
         subcategory: "",
