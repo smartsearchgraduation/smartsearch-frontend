@@ -202,7 +202,8 @@ function SearchBar(props: {
             return;
         }
 
-        if (query.trim() === "") {
+        // Allow search if there's text, an image, or both
+        if (query.trim() === "" && !imageFile) {
             return;
         }
 
@@ -349,7 +350,7 @@ function SearchBar(props: {
                         id="submit"
                         name="submit"
                         type="submit"
-                        disabled={mutation.isPending || query.trim() === "" || query.length > charLimit}
+                        disabled={mutation.isPending || (query.trim() === "" && !imageFile) || query.length > charLimit}
                         className="h-10 w-10 cursor-pointer rounded-full bg-emerald-600 p-2 text-white shadow-md duration-200 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-700"
                         aria-label="Submit search"
                     >
