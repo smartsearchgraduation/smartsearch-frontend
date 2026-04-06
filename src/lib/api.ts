@@ -59,7 +59,7 @@ export interface DbFallbackResponse {
 }
 
 let BASE_URL = "https://api.init-ai.com";
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && !import.meta.env.VITE_USE_LIVE_API) {
     BASE_URL = "";
 }
 

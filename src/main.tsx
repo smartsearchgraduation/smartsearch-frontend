@@ -15,7 +15,7 @@ const queryClient = new QueryClient({
 });
 
 async function enableMocking() {
-    if (!import.meta.env.DEV) {
+    if (!import.meta.env.DEV || import.meta.env.VITE_USE_LIVE_API) {
         return;
     }
 
