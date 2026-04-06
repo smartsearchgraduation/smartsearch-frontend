@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
     fetchSearchResults,
     fetchDbFallback,
-    getRawTextResults,
+    searchRequest,
     recordSearchDuration,
     type Product,
     type DbFallbackProduct,
@@ -83,10 +83,15 @@ function SearchPage() {
     };
 
     const handleRawTextSearch = async () => {
+        if (!results?.raw_text) return;
         setIsRedirecting(true);
         const startTime = performance.now();
         try {
-            const newSearchId = await getRawTextResults(searchId || "");
+            const newSearchId = await searchRequest({
+                query: results.raw_text,
+                image: null,
+                correctionEnabled: false,
+            });
             const duration = performance.now() - startTime;
             handleSearchSuccess(newSearchId, duration);
         } catch (error) {

@@ -352,28 +352,15 @@ export const handlers = [
 
         if (contentType.includes("multipart/form-data")) {
             const formData = await request.formData();
-            const rawTextFlag = formData.get("raw_text_flag");
+            const rawText = formData.get("raw_text");
+            const images = formData.get("images");
+            const correctionEnabled = formData.get("correction_enabled");
 
-            if (rawTextFlag === "true") {
-                const searchId = formData.get("search_id");
-                console.log("Mock Raw Text Request Received:", {
-                    search_id: searchId,
-                    raw_text_flag: rawTextFlag,
-                });
-            } else {
-                const rawText = formData.get("raw_text");
-                const images = formData.get("images");
-                const correctionEnabled = formData.get("correction_enabled");
-
-                console.log("Mock Search Request Received:", {
-                    raw_text: rawText,
-                    images: images instanceof File ? `File: ${images.name} (${images.size} bytes)` : images,
-                    correction_enabled: correctionEnabled,
-                });
-            }
-        } else if (contentType.includes("application/json")) {
-            const json = await request.json();
-            console.log("Mock JSON Request Received:", json);
+            console.log("Mock Search Request Received:", {
+                raw_text: rawText,
+                images: images instanceof File ? `File: ${images.name} (${images.size} bytes)` : images,
+                correction_enabled: correctionEnabled,
+            });
         }
 
         // Return a fake search ID

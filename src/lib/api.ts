@@ -53,7 +53,7 @@ export interface DbFallbackProduct {
 }
 
 export interface DbFallbackResponse {
-    original_search_id: string;
+    original_search_id: number;
     search_text: string;
     products: DbFallbackProduct[];
 }
@@ -99,25 +99,6 @@ export const fetchSearchResults = async (searchId: string): Promise<SearchRespon
 
     const data = await response.json();
     return data;
-};
-
-/**
- * Fetches raw text results (for the 'Search instead for...' feature).
- */
-export const getRawTextResults = async (searchId: string): Promise<string> => {
-    const formData = new FormData();
-    formData.append("raw_text_flag", "true");
-    formData.append("search_id", searchId);
-
-    const response = await fetch(BASE_URL + "/api/search", {
-        method: "POST",
-        body: formData,
-    });
-    if (!response.ok) {
-        throw new Error("Failed to get raw text results");
-    }
-    const data = await response.json();
-    return data.search_id;
 };
 
 /**
