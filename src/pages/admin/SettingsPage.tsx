@@ -69,27 +69,33 @@ export default function SettingsPage() {
     });
 
     useEffect(() => {
-        if (!selectedTextualModel && retrievalStatsData?.data.selected_models.textual_model) {
+        // Set active models if available (highest priority)
+        if (retrievalStatsData?.data.selected_models.textual_model) {
             setSelectedTextualModel(retrievalStatsData.data.selected_models.textual_model);
-        }
-
-        if (!selectedVisualModel && retrievalStatsData?.data.selected_models.visual_model) {
-            setSelectedVisualModel(retrievalStatsData.data.selected_models.visual_model);
-        }
-    }, [retrievalStatsData, selectedTextualModel, selectedVisualModel]);
-
-    useEffect(() => {
-        if (!selectedTextualModel && retrievalModelsData?.data.defaults.textual) {
+        } else if (!selectedTextualModel && retrievalModelsData?.data.defaults.textual) {
+            // Fall back to defaults only if no active model and no selection
             setSelectedTextualModel(retrievalModelsData.data.defaults.textual);
         }
 
-        if (!selectedVisualModel && retrievalModelsData?.data.defaults.visual) {
+        if (retrievalStatsData?.data.selected_models.visual_model) {
+            setSelectedVisualModel(retrievalStatsData.data.selected_models.visual_model);
+        } else if (!selectedVisualModel && retrievalModelsData?.data.defaults.visual) {
+            // Fall back to defaults only if no active model and no selection
             setSelectedVisualModel(retrievalModelsData.data.defaults.visual);
         }
-    }, [retrievalModelsData, selectedTextualModel, selectedVisualModel]);
+
+        // Load fusion setting from API if available
+        if (retrievalStatsData?.data.selected_models.fusion_endpoint) {
+            setSelectedFusion(retrievalStatsData.data.selected_models.fusion_endpoint as "early" | "late");
+        }
+    }, [retrievalStatsData, retrievalModelsData, selectedTextualModel, selectedVisualModel]);
 
     useEffect(() => {
-        if (!selectedCorrectionEngine && correctionModelsData?.data.defaults.engine) {
+        // Set active correction engine if available (highest priority)
+        if (correctionModelsData?.data.selected_engine) {
+            setSelectedCorrectionEngine(correctionModelsData.data.selected_engine);
+        } else if (!selectedCorrectionEngine && correctionModelsData?.data.defaults.engine) {
+            // Fall back to defaults only if no active engine and no selection
             setSelectedCorrectionEngine(correctionModelsData.data.defaults.engine);
         }
     }, [correctionModelsData, selectedCorrectionEngine]);

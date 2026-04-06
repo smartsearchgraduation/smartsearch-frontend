@@ -387,6 +387,7 @@ export interface RetrievalStatsResponse {
         selected_models: {
             textual_model: string;
             visual_model: string;
+            fusion_endpoint?: string;
             last_updated: string;
         };
         service_status: string;
@@ -423,6 +424,7 @@ export interface CorrectionModelsResponse {
         defaults: {
             engine: string;
         };
+        selected_engine?: string;
     };
 }
 
