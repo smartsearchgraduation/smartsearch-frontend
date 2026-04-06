@@ -24,10 +24,10 @@ type AlertState = {
 export default function SettingsPage() {
     const queryClient = useQueryClient();
 
-    const [selectedTextualModel, setSelectedTextualModel] = useState("");
-    const [selectedVisualModel, setSelectedVisualModel] = useState("");
-    const [selectedCorrectionEngine, setSelectedCorrectionEngine] = useState("");
-    const [selectedFusion, setSelectedFusion] = useState<"early" | "late">("late");
+    const [userTextualModel, setUserTextualModel] = useState<string | null>(null);
+    const [userVisualModel, setUserVisualModel] = useState<string | null>(null);
+    const [userCorrectionEngine, setUserCorrectionEngine] = useState<string | null>(null);
+    const [userFusion, setUserFusion] = useState<"early" | "late" | null>(null);
 
     const [retrievalAlert, setRetrievalAlert] = useState<AlertState | null>(null);
     const [correctionAlert, setCorrectionAlert] = useState<AlertState | null>(null);
@@ -68,37 +68,29 @@ export default function SettingsPage() {
         queryFn: fetchCorrectionModels,
     });
 
-    useEffect(() => {
-        // Set active models if available (highest priority)
-        if (retrievalStatsData?.data.selected_models.textual_model) {
-            setSelectedTextualModel(retrievalStatsData.data.selected_models.textual_model);
-        } else if (!selectedTextualModel && retrievalModelsData?.data.defaults.textual) {
-            // Fall back to defaults only if no active model and no selection
-            setSelectedTextualModel(retrievalModelsData.data.defaults.textual);
-        }
+    // Derive displayed values: user override → server active → server default → ""
+    const selectedTextualModel =
+        userTextualModel ??
+        retrievalStatsData?.data.selected_models.textual_model ??
+        retrievalModelsData?.data.defaults.textual ??
+        "";
 
-        if (retrievalStatsData?.data.selected_models.visual_model) {
-            setSelectedVisualModel(retrievalStatsData.data.selected_models.visual_model);
-        } else if (!selectedVisualModel && retrievalModelsData?.data.defaults.visual) {
-            // Fall back to defaults only if no active model and no selection
-            setSelectedVisualModel(retrievalModelsData.data.defaults.visual);
-        }
+    const selectedVisualModel =
+        userVisualModel ??
+        retrievalStatsData?.data.selected_models.visual_model ??
+        retrievalModelsData?.data.defaults.visual ??
+        "";
 
-        // Load fusion setting from API if available
-        if (retrievalStatsData?.data.selected_models.fusion_endpoint) {
-            setSelectedFusion(retrievalStatsData.data.selected_models.fusion_endpoint as "early" | "late");
-        }
-    }, [retrievalStatsData, retrievalModelsData, selectedTextualModel, selectedVisualModel]);
+    const selectedFusion =
+        userFusion ??
+        (retrievalStatsData?.data.selected_models.fusion_endpoint as "early" | "late" | undefined) ??
+        "late";
 
-    useEffect(() => {
-        // Set active correction engine if available (highest priority)
-        if (correctionModelsData?.data.selected_engine) {
-            setSelectedCorrectionEngine(correctionModelsData.data.selected_engine);
-        } else if (!selectedCorrectionEngine && correctionModelsData?.data.defaults.engine) {
-            // Fall back to defaults only if no active engine and no selection
-            setSelectedCorrectionEngine(correctionModelsData.data.defaults.engine);
-        }
-    }, [correctionModelsData, selectedCorrectionEngine]);
+    const selectedCorrectionEngine =
+        userCorrectionEngine ??
+        correctionModelsData?.data.selected_engine ??
+        correctionModelsData?.data.defaults.engine ??
+        "";
 
     const saveRetrievalMutation = useMutation({
         mutationFn: saveAndRebuildSelectedRetrievalModels,
@@ -169,7 +161,7 @@ export default function SettingsPage() {
     // Auto-switch to late fusion if early fusion becomes invalid
     useEffect(() => {
         if (selectedFusion === "early" && !canUseEarlyFusion) {
-            setSelectedFusion("late");
+            setUserFusion("late");
         }
     }, [selectedFusion, canUseEarlyFusion]);
 
@@ -239,7 +231,7 @@ export default function SettingsPage() {
                                         label="Textual model"
                                         options={textualModelOptions}
                                         value={selectedTextualModel}
-                                        onChange={setSelectedTextualModel}
+                                        onChange={setUserTextualModel}
                                         disabled={isRebuildRunning}
                                     />
                                 </div>
@@ -250,7 +242,7 @@ export default function SettingsPage() {
                                         label="Visual model"
                                         options={visualModelOptions}
                                         value={selectedVisualModel}
-                                        onChange={setSelectedVisualModel}
+                                        onChange={setUserVisualModel}
                                         disabled={isRebuildRunning}
                                     />
                                 </div>
@@ -278,7 +270,7 @@ export default function SettingsPage() {
                                                       ? "hover:shadow-sm"
                                                       : "cursor-not-allowed opacity-50"
                                             }`}
-                                            onClick={() => canUseEarlyFusion && setSelectedFusion("early")}
+                                            onClick={() => canUseEarlyFusion && setUserFusion("early")}
                                         >
                                             <CardContent className="flex h-full flex-col justify-between p-4">
                                                 <div className="space-y-1">
@@ -300,7 +292,7 @@ export default function SettingsPage() {
                                                 ? "bg-emerald-50 ring-2 ring-emerald-500"
                                                 : "hover:shadow-sm"
                                         }`}
-                                        onClick={() => setSelectedFusion("late")}
+                                        onClick={() => setUserFusion("late")}
                                     >
                                         <CardContent className="flex h-full flex-col justify-between p-4">
                                             <div className="space-y-1">
@@ -360,7 +352,7 @@ export default function SettingsPage() {
                                     label="Correction engine"
                                     options={correctionEngineOptions}
                                     value={selectedCorrectionEngine}
-                                    onChange={setSelectedCorrectionEngine}
+                                    onChange={setUserCorrectionEngine}
                                     disabled={saveCorrectionMutation.isPending}
                                 />
                             </div>
