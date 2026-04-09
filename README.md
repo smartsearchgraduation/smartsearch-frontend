@@ -1,4 +1,3 @@
-
 # 🚀 smartsearch-frontend
 
 A modern React frontend for the SmartSearch e-commerce search platform with admin capabilities.
@@ -10,9 +9,15 @@ View the deployed version: **[https://smartsearchgraduation.github.io/smartsearc
 ## ✨ Features
 
 - **Advanced Search** - Text-based product search with spelling correction and relevance scoring
-- **Admin Panel** - Product management, statistics, and analytics dashboard
-- **Image Search UI** - Interface prepared for image uploads (backend integration pending)
+- **Image Search** - Upload images for product search with automatic WebP conversion (max 1080px)
+- **Image-Only Search** - Search using images without requiring text queries
+- **Query Retention** - Search bar retains corrected text for easy refinement
+- **"Search Instead For"** - Option to search with original uncorrected text
+- **Similarity Scores** - Product cards display similarity scores for better observability
+- **Admin Panel** - Product management, statistics dashboard, and configuration options for retrieval models and fusion strategies
 - **Performance Analytics** - Search timing and performance metrics
+- **Animated Loading** - Smooth loading indicators for better UX
+- **Accessibility** - ARIA labels and keyboard navigation support
 - **Responsive Design** - Mobile-first design with Tailwind CSS
 - **Development Mocking** - MSW for API mocking during development
 
@@ -24,16 +29,16 @@ View the deployed version: **[https://smartsearchgraduation.github.io/smartsearc
 - **[TanStack Query](https://tanstack.com/query/latest)** - Data fetching and caching
 - **[React Router](https://reactrouter.com/)** - Client-side routing
 - **[MSW](https://mswjs.io/)** - API mocking for development
-
-
+- **[Vitest](https://vitest.dev/)** - Testing framework with jsdom environment
+- **[Testing Library](https://testing-library.com/)** - React component testing utilities
 
 ## 🔧 Admin Access
 
 For development, you can access the admin panel by running this in your browser console:
+
 ```javascript
 localStorage.setItem("smartsearch_admin_access", true);
 ```
-
 
 ## 🏁 Getting Started
 
@@ -65,45 +70,60 @@ Once the dependencies are installed, you can start the local development server:
 ```sh
 npm run dev
 ```
-This will run the app in development mode. Open [http://localhost:5173](https://www.google.com/search?q=http://localhost:5173) (or the port specified in your terminal) to view it in your browser. The page will reload automatically as you make edits.
 
+This will run the app in development mode with MSW API mocking. Open [http://localhost:5173](http://localhost:5173) (or the port specified in your terminal) to view it in your browser.
 
-## 📁 Project Structure
+**Connect to Live Server:**
 
+To connect to the live backend API instead of using mocked data:
+
+```sh
+npm run dev:live
 ```
+
+This sets `VITE_USE_LIVE_API=true` and bypasses MSW mocking to connect directly to the backend.
+
+### Running Tests
+
+The project uses Vitest for unit and integration testing with jsdom environment and Testing Library for React components.
+
+```sh
+# Run tests once
+npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with UI
+npm run test:ui
+```
+
+Test files should be placed alongside components or in the `src/test` directory with the `.test.ts` or `.test.tsx` extension.
+
+## 📁 Project Structure & Architecture
+
+```bash
 smartsearch-frontend/
-├── public/
-│   └── ... (static assets)
+├── public/           # Static assets
+├── docs/             # Build output for GitHub Pages deployment (replaces dist/)
 ├── src/
-│   ├── components/
-│   │   ├── SearchBar.tsx
-│   │   ├── ProductCard.tsx
-│   │   ├── ProtectedRoute.tsx
-│   │   ├── ui/ (custom UI components)
-│   │   └── ... (reusable components)
-│   ├── pages/
-│   │   ├── HomePage.tsx
-│   │   ├── SearchPage.tsx
-│   │   ├── ProductPage.tsx
-│   │   ├── AdminPage.tsx
-│   │   └── admin/ (admin sub-pages)
-│   ├── lib/
-│   │   ├── api.ts (API layer)
-│   │   └── utils.ts
-│   ├── mocks/ (MSW handlers)
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── .gitignore
+│   ├── components/   # Reusable UI elements (SearchBar.tsx, ProductCard.tsx, ui/, ...)
+│   ├── pages/        # Major application views (HomePage.tsx, AdminPage.tsx, admin/, ...)
+│   ├── lib/          # API layer and utilities (api.ts, utils.ts, ...)
+│   ├── mocks/        # MSW handlers for API mocking
+│   ├── test/         # Test setup and configuration files
+│   ├── App.tsx       # Root component
+│   └── main.tsx      # Entry point
 ├── package.json
 └── README.md
 ```
 
-## 🏗️ Architecture
+**Architecture:**
 
-- **Components:** Reusable UI elements in `src/components`, including custom UI components in `ui/` subdirectory
-- **Pages:** Major application views in `src/pages`, with admin sub-pages in `admin/` subdirectory  
-- **API Layer:** All backend communication handled through `src/lib/api.ts` with TanStack Query for caching
-- **Routing:** React Router with HashRouter, including protected admin routes
-- **Mocking:** MSW provides API mocking during development for faster iteration
-- **State Management:** TanStack Query handles server state, React state for UI state
+- **Components** - Reusable UI elements in `src/components`, with custom UI components in `ui/` subdirectory
+- **Pages** - Major application views in `src/pages`, with admin sub-pages in `admin/` subdirectory
+- **API Layer** - All backend communication handled through `src/lib/api.ts` with TanStack Query for caching
+- **Routing** - React Router with HashRouter, including protected admin routes
+- **Mocking** - MSW provides API mocking during development for faster iteration
+- **Testing** - Vitest with jsdom environment and Testing Library for component testing
+- **State Management** - TanStack Query handles server state, React state for UI state
