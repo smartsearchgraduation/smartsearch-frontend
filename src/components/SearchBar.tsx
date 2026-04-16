@@ -10,6 +10,10 @@ import {
 } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { searchRequest } from "../lib/api";
+import { Tooltip } from "./ui/Tooltip";
+import { Icons } from "./ui/Icons";
+import { Card, CardContent } from "./ui/Card";
+import { Button } from "./ui/Button";
 
 function SearchBar(props: {
     className: string;
@@ -21,9 +25,15 @@ function SearchBar(props: {
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>(props.initialValue || "");
     const [isDragging, setIsDragging] = useState(false);
+    type SearchMode = "std" | "iwt" | "twi";
+    const [searchMode, setSearchMode] = useState<SearchMode>("std");
+    const [correctionEnabled, setCorrectionEnabled] = useState(true);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const startTimeRef = useRef<number | null>(null);
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const modeButtonRef = useRef<HTMLButtonElement>(null);
     const charLimit = 300;
 
     // Sync query with initialValue prop
@@ -40,6 +50,26 @@ function SearchBar(props: {
             textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
         }
     }, [query]);
+
+    // Close popover when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                isSettingsOpen &&
+                popoverRef.current &&
+                modeButtonRef.current &&
+                !popoverRef.current.contains(event.target as Node) &&
+                !modeButtonRef.current.contains(event.target as Node)
+            ) {
+                setIsSettingsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isSettingsOpen]);
 
     // Mutation for search request
     const mutation = useMutation({
@@ -202,13 +232,21 @@ function SearchBar(props: {
             return;
         }
 
-        // Allow search if there's text, an image, or both
-        if (query.trim() === "" && !imageFile) {
-            return;
+        // Validation based on mode
+        if (searchMode === "iwt" && query.trim() === "") {
+            return; // iwt requires text
+        }
+
+        if (searchMode === "twi" && !imageFile) {
+            return; // twi requires image
+        }
+
+        if (searchMode === "std" && query.trim() === "" && !imageFile) {
+            return; // std needs text or image
         }
 
         startTimeRef.current = performance.now();
-        mutation.mutate({ query, image: imageFile });
+        mutation.mutate({ query, image: imageFile, correctionEnabled, searchMode });
     };
 
     // --- Submit on Enter (but not Shift+Enter) ---
@@ -258,9 +296,15 @@ function SearchBar(props: {
                     aria-invalid={!!mutation.error}
                     aria-describedby={mutation.error ? "search-error" : undefined}
                     rows={1}
-                    disabled={mutation.isPending}
-                    className="max-h-28 flex-grow resize-none overflow-y-auto border-none bg-transparent text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none"
-                    placeholder="Search using natural language"
+                    disabled={mutation.isPending || searchMode === "twi"}
+                    className="max-h-28 flex-grow resize-none overflow-y-auto border-none bg-transparent text-lg text-gray-900 placeholder:text-gray-500 focus:ring-0 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder={
+                        searchMode === "iwt"
+                            ? "Describe the image you're looking for"
+                            : searchMode === "twi"
+                              ? "Upload an image to find matching text descriptions"
+                              : "Search using natural language"
+                    }
                     autoFocus={props.autofocus || false}
                     value={query}
                     onChange={handleQueryChange}
@@ -305,84 +349,154 @@ function SearchBar(props: {
                                 className="absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-900/60 p-1.5 text-white duration-200 hover:bg-gray-900/80 disabled:cursor-not-allowed"
                                 aria-label="Remove image"
                             >
-                                <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        stroke="currentColor"
-                                        strokeWidth="80"
-                                        strokeLinecap="round"
-                                        d="M 100 100 500 500 M 100 500 500 100"
-                                    />
-                                </svg>
+                                <Icons.X />
                             </button>
                         </div>
                     </div>
                 ) : (
-                    <button
-                        id="addImage"
-                        name="addImage"
-                        onClick={handleAddImageClick}
-                        type="button"
-                        disabled={mutation.isPending}
-                        className="h-10 w-10 flex-shrink-0 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-600 duration-200 hover:bg-gray-300 hover:text-gray-800 disabled:cursor-not-allowed"
-                        aria-label="Add image"
-                    >
-                        <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                stroke="currentColor"
-                                strokeWidth="60"
-                                strokeLinecap="round"
-                                d="M 300 80 300 520 M 80 300 520 300"
-                            />
-                        </svg>
-                    </button>
+                    <Tooltip content="Add image">
+                        <Button
+                            id="addImage"
+                            name="addImage"
+                            onClick={handleAddImageClick}
+                            type="button"
+                            disabled={mutation.isPending || searchMode === "iwt"}
+                            variant="gray"
+                            size="icon"
+                            className="flex-shrink-0"
+                            aria-label="Add image"
+                        >
+                            <Icons.Plus className="h-5 w-5" />
+                        </Button>
+                    </Tooltip>
                 )}
-                <div className="mt-auto">
+                {/* --- Controls Row --- */}
+                <div className="mt-auto flex items-center gap-2">
                     {/* --- Character Count/Limit --- */}
                     <span
                         aria-live="polite"
                         aria-atomic="true"
-                        className={"mr-2 text-sm text-gray-500 " + (query.length > charLimit ? "text-red-500" : "")}
+                        className={"text-sm text-gray-500 " + (query.length > charLimit ? "text-red-500" : "")}
                     >
                         {textAreaRef.current?.value.length || 0}/{charLimit}
                     </span>
+                    {/* Correction Toggle */}
+                    <Tooltip content={correctionEnabled ? "Spell correction: ON" : "Spell correction: OFF"}>
+                        <Button
+                            type="button"
+                            onClick={() => setCorrectionEnabled(!correctionEnabled)}
+                            variant="gray"
+                            size="icon"
+                            className="flex-shrink-0"
+                            aria-label={`Spell correction, ${correctionEnabled ? "on" : "off"}`}
+                            aria-pressed={correctionEnabled}
+                        >
+                            {correctionEnabled ? <Icons.SpellCheck /> : <Icons.SpellCheck2 />}
+                        </Button>
+                    </Tooltip>
+                    {/* Mode Button with Dropdown */}
+                    <div className="relative">
+                        <button
+                            ref={modeButtonRef}
+                            type="button"
+                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                            className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 duration-200 hover:bg-gray-300 hover:text-gray-800"
+                            aria-label={`Current mode: ${searchMode}, click to change`}
+                            aria-expanded={isSettingsOpen}
+                            aria-haspopup="true"
+                        >
+                            <span>Mode</span>
+                            <Icons.ChevronDown className="h-4 w-4" />
+                        </button>
+                        {isSettingsOpen && (
+                            <div ref={popoverRef} className="absolute top-full right-0 mt-4">
+                                <Card className="rounded-[1.5rem]">
+                                    <CardContent className="p-4">
+                                        <p className="mb-2 ml-2 text-sm font-medium text-gray-700">Search Mode</p>
+                                        <div className="relative flex overflow-hidden rounded-full border border-gray-200 bg-white">
+                                            {/* Moving highlight background */}
+                                            <div
+                                                className={`absolute h-full w-[calc(33.33%)] bg-emerald-200 transition-all duration-200 ${
+                                                    searchMode === "std"
+                                                        ? "left-0"
+                                                        : searchMode === "iwt"
+                                                          ? "left-[33.33%]"
+                                                          : "left-[66.66%]"
+                                                }`}
+                                            />
+                                            <div className="relative flex w-full p-1">
+                                                <Tooltip content="Standard mode: text↔text, image↔image, hybrid↔hybrid matching">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSearchMode("std")}
+                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
+                                                        aria-pressed={searchMode === "std"}
+                                                    >
+                                                        std
+                                                    </button>
+                                                </Tooltip>
+                                                <Tooltip content="Image-by-text: cross-modal search using text query to find images">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSearchMode("iwt")}
+                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
+                                                        aria-pressed={searchMode === "iwt"}
+                                                    >
+                                                        iwt
+                                                    </button>
+                                                </Tooltip>
+                                                <Tooltip content="Text-by-image: cross-modal search using image query to find text descriptions">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSearchMode("twi")}
+                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
+                                                        aria-pressed={searchMode === "twi"}
+                                                    >
+                                                        twi
+                                                    </button>
+                                                </Tooltip>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+                    </div>
                     {/* --- Submit Button --- */}
-                    <button
+                    <Button
                         id="submit"
                         name="submit"
                         type="submit"
                         disabled={mutation.isPending || (query.trim() === "" && !imageFile) || query.length > charLimit}
-                        className="h-10 w-10 cursor-pointer rounded-full bg-emerald-600 p-2 text-white shadow-md duration-200 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-700 disabled:opacity-50 disabled:hover:bg-emerald-700"
+                        variant="primary"
+                        size="icon"
                         aria-label="Submit search"
                     >
                         {mutation.isPending ? (
-                            <svg className="animate-spin" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M 300 80 A 220 220 0 1 1 80 300"
-                                    fill="transparent"
+                            <svg
+                                className="h-5 w-5 animate-spin"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
                                     stroke="currentColor"
-                                    strokeWidth="60"
-                                    strokeLinecap="round"
-                                />
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
                             </svg>
                         ) : (
-                            <svg viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    stroke="currentColor"
-                                    strokeWidth="60"
-                                    strokeLinecap="round"
-                                    d="M 400 400 520 520"
-                                />
-                                <circle
-                                    cx="240"
-                                    cy="240"
-                                    r="180"
-                                    fill="transparent"
-                                    stroke="currentColor"
-                                    strokeWidth="60"
-                                />
-                            </svg>
+                            <Icons.Search />
                         )}
-                    </button>
+                    </Button>
                 </div>
             </div>
             {/* --- Drag and Drop Overlay --- */}

@@ -8,6 +8,7 @@ View the deployed version: **[https://smartsearchgraduation.github.io/smartsearc
 
 ## ✨ Features
 
+- **Multi-Mode Search** - Three search modes: Standard (text/image fusion), Image-by-Text (text query → image results), Text-by-Image (image query → text results)
 - **Advanced Search** - Text-based product search with spelling correction and relevance scoring
 - **Image Search** - Upload images for product search with automatic WebP conversion (max 1080px)
 - **Image-Only Search** - Search using images without requiring text queries

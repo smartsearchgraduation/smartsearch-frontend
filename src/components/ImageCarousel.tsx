@@ -92,6 +92,7 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
             src={images[currentIndex]}
             alt={`${alt} - Image ${currentIndex + 1}`}
             className="h-full w-full object-contain transition-opacity duration-300"
+            tabIndex={-1}
         />
     );
 
@@ -103,7 +104,7 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
             onTouchEnd={isMultiImage ? onTouchEnd : undefined}
         >
             {url ? (
-                <Link to={url} className="block h-full w-full">
+                <Link to={url} className="block h-full w-full" tabIndex={-1}>
                     {ImageContent}
                 </Link>
             ) : (
@@ -113,11 +114,11 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
             {isMultiImage && (
                 <>
                     {/* Navigation Buttons */}
-                    <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-between p-2 opacity-0 transition-opacity group-hover:opacity-100 sm:flex">
+                    <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-between p-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100 sm:flex">
                         <Button
                             variant="secondary"
                             size="icon"
-                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md ring-gray-700 hover:bg-gray-600"
+                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md hover:bg-gray-600"
                             onClick={handlePrev}
                             aria-label="Previous image"
                         >
@@ -133,7 +134,7 @@ export function ImageCarousel({ images = [], alt, className, url }: ImageCarouse
                         <Button
                             variant="secondary"
                             size="icon"
-                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md ring-gray-700 hover:bg-gray-600"
+                            className="pointer-events-auto h-8 w-8 rounded-full bg-gray-600/75 text-white shadow-md hover:bg-gray-600"
                             onClick={handleNext}
                             aria-label="Next image"
                         >

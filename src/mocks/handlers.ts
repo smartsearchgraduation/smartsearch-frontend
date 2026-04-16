@@ -355,11 +355,13 @@ export const handlers = [
             const rawText = formData.get("raw_text");
             const images = formData.get("images");
             const correctionEnabled = formData.get("correction_enabled");
+            const searchMode = formData.get("search_mode");
 
             console.log("Mock Search Request Received:", {
                 raw_text: rawText,
                 images: images instanceof File ? `File: ${images.name} (${images.size} bytes)` : images,
                 correction_enabled: correctionEnabled,
+                search_mode: searchMode,
             });
         }
 

@@ -2,6 +2,7 @@ export interface SearchRequestInput {
     query: string;
     image: File | null;
     correctionEnabled?: boolean;
+    searchMode?: "std" | "iwt" | "twi";
 }
 
 export type Product = {
@@ -75,6 +76,9 @@ export async function searchRequest(input: SearchRequestInput): Promise<string> 
         formData.append("images", input.image);
     }
     formData.append("correction_enabled", input.correctionEnabled === false ? "false" : "true");
+    if (input.searchMode) {
+        formData.append("search_mode", input.searchMode);
+    }
 
     const response = await fetch(BASE_URL + "/api/search", {
         method: "POST",
