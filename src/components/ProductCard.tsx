@@ -47,7 +47,7 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
 
                 {/* Score Badge */}
                 {product.score !== undefined && (
-                    <div className="absolute top-2 right-2 z-30">
+                    <div className="absolute top-0 right-0 z-30">
                         <Tooltip
                             content={
                                 <div className="flex flex-col gap-0.5">
@@ -68,8 +68,8 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                                 </div>
                             }
                         >
-                            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-lg">
-                                {Math.round(product.score * 100)}%
+                            <div className="flex items-center justify-center rounded-bl-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                                Score: {Math.round(product.score * 100)}%
                             </div>
                         </Tooltip>
                     </div>

@@ -396,20 +396,30 @@ function SearchBar(props: {
                     </Tooltip>
                     {/* Mode Button with Dropdown */}
                     <div className="relative">
-                        <button
-                            ref={modeButtonRef}
-                            type="button"
-                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                            className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 duration-200 hover:bg-gray-300 hover:text-gray-800"
-                            aria-label={`Current mode: ${searchMode}, click to change`}
-                            aria-expanded={isSettingsOpen}
-                            aria-haspopup="true"
+                        <Tooltip
+                            content={
+                                searchMode === "std"
+                                    ? "Standard mode: text↔text, image↔image, hybrid↔hybrid matching"
+                                    : searchMode === "iwt"
+                                      ? "Image with text: cross-modal search using text query to find images"
+                                      : "Text with image: cross-modal search using image query to find text descriptions"
+                            }
                         >
-                            <span>Mode</span>
-                            <Icons.ChevronDown className="h-4 w-4" />
-                        </button>
+                            <button
+                                ref={modeButtonRef}
+                                type="button"
+                                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 duration-200 hover:bg-gray-300 hover:text-gray-800"
+                                aria-label={`Current mode: ${searchMode}, click to change`}
+                                aria-expanded={isSettingsOpen}
+                                aria-haspopup="true"
+                            >
+                                <span>{searchMode}</span>
+                                <Icons.ChevronDown className="h-4 w-4" />
+                            </button>
+                        </Tooltip>
                         {isSettingsOpen && (
-                            <div ref={popoverRef} className="absolute top-full right-0 mt-4">
+                            <div ref={popoverRef} className="absolute top-full right-0 z-50 mt-4">
                                 <Card className="rounded-[1.5rem]">
                                     <CardContent className="p-4">
                                         <p className="mb-2 ml-2 text-sm font-medium text-gray-700">Search Mode</p>
@@ -435,7 +445,7 @@ function SearchBar(props: {
                                                         std
                                                     </button>
                                                 </Tooltip>
-                                                <Tooltip content="Image-by-text: cross-modal search using text query to find images">
+                                                <Tooltip content="Image with text: cross-modal search using text query to find images">
                                                     <button
                                                         type="button"
                                                         onClick={() => setSearchMode("iwt")}
@@ -445,7 +455,7 @@ function SearchBar(props: {
                                                         iwt
                                                     </button>
                                                 </Tooltip>
-                                                <Tooltip content="Text-by-image: cross-modal search using image query to find text descriptions">
+                                                <Tooltip content="Text with image: cross-modal search using image query to find text descriptions">
                                                     <button
                                                         type="button"
                                                         onClick={() => setSearchMode("twi")}

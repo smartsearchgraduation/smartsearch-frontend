@@ -158,7 +158,9 @@ export function Combobox({
                     }}
                     className={cn(
                         "absolute top-0 right-0 flex h-full w-10 items-center justify-center",
-                        disabled ? "cursor-not-allowed text-gray-300" : "cursor-pointer text-gray-400 hover:text-gray-600",
+                        disabled
+                            ? "cursor-not-allowed text-gray-300"
+                            : "cursor-pointer text-gray-400 hover:text-gray-600",
                     )}
                 >
                     <svg
@@ -182,9 +184,7 @@ export function Combobox({
                         className="absolute z-50 mt-2 max-h-60 w-full overflow-auto rounded-lg border border-gray-100 bg-white py-2 shadow-xl ring-1 ring-black/5"
                     >
                         {filteredOptions.length === 0 ? (
-                            <li className="px-4 py-2 text-sm text-gray-500">
-                                No matching options found.
-                            </li>
+                            <li className="px-4 py-2 text-sm text-gray-500">No matching options found.</li>
                         ) : (
                             filteredOptions.map((option, index) => {
                                 const isHighlighted = index === highlightedIndex;
