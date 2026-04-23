@@ -246,7 +246,7 @@ function SearchBar(props: {
         }
 
         startTimeRef.current = performance.now();
-        mutation.mutate({ query, image: imageFile, correctionEnabled, searchMode });
+        mutation.mutate({ query: query.trim(), image: imageFile, correctionEnabled, searchMode });
     };
 
     // --- Submit on Enter (but not Shift+Enter) ---
