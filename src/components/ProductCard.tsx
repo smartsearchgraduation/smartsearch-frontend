@@ -68,7 +68,7 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                                 </div>
                             }
                         >
-                            <div className="flex items-center justify-center rounded-bl-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-lg">
+                            <div className="flex items-center justify-center rounded-bl-lg bg-gray-400 px-3 py-1.5 text-xs text-white shadow-lg">
                                 Score: {Math.round(product.score * 100)}%
                             </div>
                         </Tooltip>
