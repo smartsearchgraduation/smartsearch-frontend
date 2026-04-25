@@ -91,7 +91,19 @@ function SearchBar(props: {
             img.src = objectUrl;
             img.onload = () => {
                 const MAX_SIZE = 1080;
+                const MAX_FILE_SIZE = 1_000_000; // 1MB
                 let { width, height } = img;
+
+                // Skip compression if already WebP, within size limits, and under file size threshold
+                if (
+                    file.type === "image/webp" &&
+                    width <= MAX_SIZE &&
+                    height <= MAX_SIZE &&
+                    file.size <= MAX_FILE_SIZE
+                ) {
+                    URL.revokeObjectURL(objectUrl);
+                    return resolve(file);
+                }
 
                 if (width > height) {
                     if (width > MAX_SIZE) {
