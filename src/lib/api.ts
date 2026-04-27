@@ -34,14 +34,23 @@ export type Product = {
 
 export type FusionType = "late_fusion" | "early_fusion" | "text_only" | "image_only" | "db_fallback";
 
+export interface QueryImage {
+    filename: string;
+    url: string;
+    data_url: string;
+}
+
 export interface SearchResponse {
     products: Product[];
     corrected_text: string;
-    search_id: string;
+    search_id: number | string;
     raw_text: string;
     fusion_type: FusionType;
     textual_model_name: string;
     visual_model_name: string;
+    query_image?: QueryImage;
+    search_mode: "std" | "iwt" | "twi";
+    correction_enabled: boolean;
 }
 
 export interface DbFallbackProduct {

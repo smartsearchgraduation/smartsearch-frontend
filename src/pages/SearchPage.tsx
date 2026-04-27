@@ -151,7 +151,10 @@ function SearchPage() {
                 <SearchBar
                     onSearchSuccess={handleSearchSuccess}
                     className="w-full max-w-[37.5rem]"
-                    initialValue={results?.corrected_text}
+                    queryText={results?.corrected_text}
+                    queryImage={results?.query_image}
+                    searchMode={results?.search_mode}
+                    correctionEnabled={results?.correction_enabled}
                 />
             </header>
 

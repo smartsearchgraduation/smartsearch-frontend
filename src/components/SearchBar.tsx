@@ -9,7 +9,7 @@ import {
     type ClipboardEvent,
 } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { searchRequest } from "../lib/api";
+import { searchRequest, type QueryImage } from "../lib/api";
 import { Tooltip } from "./ui/Tooltip";
 import { Icons } from "./ui/Icons";
 import { Card, CardContent } from "./ui/Card";
@@ -19,15 +19,18 @@ function SearchBar(props: {
     className: string;
     onSearchSuccess: (searchId: string, searchDuration?: number) => void;
     autofocus?: boolean;
-    initialValue?: string;
+    queryText?: string;
+    queryImage?: QueryImage;
+    searchMode?: "std" | "iwt" | "twi";
+    correctionEnabled?: boolean;
 }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
-    const [query, setQuery] = useState<string>(props.initialValue || "");
+    const [query, setQuery] = useState<string>(props.queryText || "");
     const [isDragging, setIsDragging] = useState(false);
     type SearchMode = "std" | "iwt" | "twi";
-    const [searchMode, setSearchMode] = useState<SearchMode>("std");
-    const [correctionEnabled, setCorrectionEnabled] = useState(true);
+    const [searchMode, setSearchMode] = useState<SearchMode>(props.searchMode || "std");
+    const [correctionEnabled, setCorrectionEnabled] = useState(props.correctionEnabled ?? true);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,12 +39,19 @@ function SearchBar(props: {
     const modeButtonRef = useRef<HTMLButtonElement>(null);
     const charLimit = 300;
 
-    // Sync query with initialValue prop
+    // Sync query with queryText prop
     useEffect(() => {
-        if (props.initialValue !== undefined) {
-            setQuery(props.initialValue);
+        if (props.queryText !== undefined) {
+            setQuery(props.queryText);
         }
-    }, [props.initialValue]);
+    }, [props.queryText]);
+
+    // Restore query image from props (for search results page)
+    useEffect(() => {
+        if (props.queryImage?.data_url) {
+            setPreviewUrl(props.queryImage.data_url);
+        }
+    }, [props.queryImage]);
 
     // Auto-resize textarea when query changes
     useEffect(() => {

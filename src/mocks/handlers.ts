@@ -422,6 +422,14 @@ export const handlers = [
             fusion_type: "late_fusion",
             textual_model_name: selectedRetrievalModels.textual_model,
             visual_model_name: selectedRetrievalModels.visual_model,
+            query_image: {
+                filename: "search_mock.jpg",
+                url: "/uploads/products/search_mock.jpg",
+                data_url:
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAP//////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=",
+            },
+            search_mode: "std",
+            correction_enabled: true,
         });
     }),
 
