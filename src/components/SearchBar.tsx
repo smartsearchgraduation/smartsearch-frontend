@@ -169,22 +169,22 @@ function SearchBar(props: {
                 </p>
             )}
             {/* --- Bottom Row --- */}
-            <div className="flex items-center justify-between px-2 pt-1 pb-2">
+            <div className="flex items-center gap-6 px-2 pt-1 pb-2">
                 {/* --- Image Preview --- */}
-                {previewUrl && searchMode !== "iwt" ? (
-                    <div className="flex p-1">
-                        <div className="relative">
+                {previewUrl ? (
+                    <div className="flex flex-1 p-1">
+                        <div className="relative w-full">
                             <img
                                 src={previewUrl}
                                 alt={imageFile ? `Preview of ${imageFile.name}` : ""}
-                                className="pointer-events-none max-h-24 max-w-xs rounded-[1rem] shadow-md"
+                                className={`pointer-events-none h-24 w-full rounded-[1rem] object-cover shadow-md ${searchMode === "iwt" ? "opacity-50 blur-[1px] grayscale" : ""}`}
                                 onError={() => removeImage()}
                             />
                             <button
                                 onClick={removeImage}
                                 type="button"
                                 disabled={mutation.isPending}
-                                className="absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-900/60 p-1.5 text-white duration-200 hover:bg-gray-900/80 disabled:cursor-not-allowed"
+                                className="absolute top-2 right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-900/60 p-1.5 text-white duration-200 hover:bg-gray-900/80 disabled:cursor-not-allowed disabled:opacity-50"
                                 aria-label="Remove image"
                             >
                                 <Icons.X />
@@ -209,7 +209,7 @@ function SearchBar(props: {
                     </Tooltip>
                 )}
                 {/* --- Controls Row --- */}
-                <div className="mt-auto flex items-center gap-2">
+                <div className="mt-auto ml-auto flex flex-shrink-0 items-center gap-2">
                     {/* --- Character Count/Limit --- */}
                     <span
                         aria-live="polite"

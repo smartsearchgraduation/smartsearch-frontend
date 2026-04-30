@@ -1,5 +1,8 @@
 import { http, HttpResponse } from "msw";
 
+const placeholderImage =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect width='100%25' height='100%25' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' fill='%236b7280' text-anchor='middle' dominant-baseline='middle'%3EPlaceholder%3C/text%3E%3C/svg%3E";
+
 let mockProducts = [
     {
         product_id: "1",
@@ -8,7 +11,7 @@ let mockProducts = [
         price: 89.99,
         description: "A stylish vintage leather jacket.",
         is_relevant: null,
-        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        images: [placeholderImage, placeholderImage, placeholderImage],
         categories: [
             {
                 category_id: 18,
@@ -30,7 +33,7 @@ let mockProducts = [
         price: 45.5,
         description: "Comfortable classic fit denim jeans.",
         is_relevant: null,
-        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        images: [placeholderImage, placeholderImage, placeholderImage],
         categories: [
             {
                 category_id: 19,
@@ -52,7 +55,7 @@ let mockProducts = [
         price: 150.0,
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: null,
-        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        images: [placeholderImage, placeholderImage, placeholderImage],
         categories: [
             {
                 category_id: 11,
@@ -74,7 +77,7 @@ let mockProducts = [
         price: 99.99,
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: null,
-        images: ["https://placehold.co/400", "https://placehold.co/500", "https://placehold.co/600"],
+        images: [placeholderImage, placeholderImage, placeholderImage],
         categories: [
             {
                 category_id: 20,
@@ -387,7 +390,7 @@ export const handlers = [
                     price: 150.0,
                     score: 1.0,
                     brand: { brand_id: 103, name: "OfficePro" },
-                    images: ["https://placehold.co/400"],
+                    images: [placeholderImage],
                 },
                 {
                     product_id: 2,
@@ -395,7 +398,7 @@ export const handlers = [
                     price: 45.5,
                     score: 0.85,
                     brand: { brand_id: 102, name: "DenimCo" },
-                    images: ["https://placehold.co/400"],
+                    images: [placeholderImage],
                 },
                 {
                     product_id: 4,
@@ -403,7 +406,7 @@ export const handlers = [
                     price: 99.99,
                     score: 0.6,
                     brand: { brand_id: 104, name: "TechLife" },
-                    images: ["https://placehold.co/400"],
+                    images: [placeholderImage],
                 },
             ],
         });
