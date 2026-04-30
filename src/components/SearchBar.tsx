@@ -1,19 +1,11 @@
-import {
-    useState,
-    useEffect,
-    useRef,
-    type ChangeEvent,
-    type DragEvent,
-    type FormEvent,
-    type KeyboardEvent,
-    type ClipboardEvent,
-} from "react";
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent, type KeyboardEvent } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { searchRequest, type QueryImage } from "../lib/api";
 import { Tooltip } from "./ui/Tooltip";
 import { Icons } from "./ui/Icons";
-import { Card, CardContent } from "./ui/Card";
 import { Button } from "./ui/Button";
+import SearchModeMenu, { type SearchMode } from "./SearchModeMenu";
+import useSearchImage from "./useSearchImage";
 
 function SearchBar(props: {
     className: string;
@@ -24,19 +16,11 @@ function SearchBar(props: {
     searchMode?: "std" | "iwt" | "twi";
     correctionEnabled?: boolean;
 }) {
-    const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
-    const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
     const [query, setQuery] = useState<string>(props.queryText || "");
-    const [isDragging, setIsDragging] = useState(false);
-    type SearchMode = "std" | "iwt" | "twi";
     const [searchMode, setSearchMode] = useState<SearchMode>(props.searchMode || "std");
     const [correctionEnabled, setCorrectionEnabled] = useState(props.correctionEnabled ?? true);
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     const startTimeRef = useRef<number | null>(null);
-    const popoverRef = useRef<HTMLDivElement>(null);
-    const modeButtonRef = useRef<HTMLButtonElement>(null);
     const charLimit = 300;
 
     // Sync query with queryText prop
@@ -46,13 +30,6 @@ function SearchBar(props: {
         }
     }, [props.queryText]);
 
-    // Restore query image from props (for search results page)
-    useEffect(() => {
-        if (props.queryImage?.data_url) {
-            setPreviewUrl(props.queryImage.data_url);
-        }
-    }, [props.queryImage]);
-
     // Auto-resize textarea when query changes
     useEffect(() => {
         if (textAreaRef.current) {
@@ -61,189 +38,42 @@ function SearchBar(props: {
         }
     }, [query]);
 
-    // Close popover when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                isSettingsOpen &&
-                popoverRef.current &&
-                modeButtonRef.current &&
-                !popoverRef.current.contains(event.target as Node) &&
-                !modeButtonRef.current.contains(event.target as Node)
-            ) {
-                setIsSettingsOpen(false);
-            }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isSettingsOpen]);
-
     // Mutation for search request
     const mutation = useMutation({
         mutationFn: searchRequest,
-        onSuccess: (searchId) => {
-            const endTime = performance.now();
-            const duration = startTimeRef.current ? endTime - startTimeRef.current : 0;
-            props.onSearchSuccess(searchId, duration);
-            setQuery("");
-            removeImage();
-            // Height reset is handled by the query useEffect
-        },
     });
 
-    const convertImageToWebP = (file: File): Promise<File> => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            const objectUrl = URL.createObjectURL(file);
-            img.src = objectUrl;
-            img.onload = () => {
-                const MAX_SIZE = 1080;
-                const MAX_FILE_SIZE = 1_000_000; // 1MB
-                let { width, height } = img;
+    const {
+        imageFile,
+        previewUrl,
+        isDragging,
+        fileInputRef,
+        handleFileChange,
+        handleAddImageClick,
+        handlePaste,
+        removeImage,
+        handleDragOver,
+        handleDragLeave,
+        handleDrop,
+    } = useSearchImage({
+        queryImage: props.queryImage,
+        onImageChange: mutation.reset,
+    });
 
-                // Skip compression if already WebP, within size limits, and under file size threshold
-                if (
-                    file.type === "image/webp" &&
-                    width <= MAX_SIZE &&
-                    height <= MAX_SIZE &&
-                    file.size <= MAX_FILE_SIZE
-                ) {
-                    URL.revokeObjectURL(objectUrl);
-                    return resolve(file);
-                }
-
-                if (width > height) {
-                    if (width > MAX_SIZE) {
-                        height = Math.round((height * MAX_SIZE) / width);
-                        width = MAX_SIZE;
-                    }
-                } else if (height > MAX_SIZE) {
-                    width = Math.round((width * MAX_SIZE) / height);
-                    height = MAX_SIZE;
-                }
-
-                const canvas = document.createElement("canvas");
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext("2d");
-                if (!ctx) {
-                    URL.revokeObjectURL(objectUrl);
-                    return reject(new Error("Failed to get canvas context"));
-                }
-                ctx.drawImage(img, 0, 0, width, height);
-                canvas.toBlob(
-                    (blob) => {
-                        URL.revokeObjectURL(objectUrl);
-                        if (!blob) return reject(new Error("Canvas to Blob conversion failed"));
-                        const webpFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".webp"), {
-                            type: "image/webp",
-                        });
-                        resolve(webpFile);
-                    },
-                    "image/webp",
-                    0.96,
-                );
-            };
-            img.onerror = (err) => {
-                URL.revokeObjectURL(objectUrl);
-                reject(err);
-            };
-        });
-    };
-
-    const processFile = async (file: File | null | undefined) => {
-        if (file && file.type.startsWith("image/")) {
-            try {
-                const convertedFile = await convertImageToWebP(file);
-                setImageFile(convertedFile);
-                mutation.reset(); // Clear any previous errors
-            } catch (error) {
-                console.error("Image conversion failed:", error);
-                // Fallback to original if conversion fails, or handle error appropriate
-                // For now, let's just not set it if it fails to ensure we don't send bad data
-            }
-        }
+    const handleSearchSuccess = (searchId: string) => {
+        const endTime = performance.now();
+        const duration = startTimeRef.current ? endTime - startTimeRef.current : 0;
+        props.onSearchSuccess(searchId, duration);
+        setQuery("");
+        removeImage();
+        // Height reset is handled by the query useEffect
     };
 
     // --- Input Handlers ---
-    // Runs when the user selects a file from the dialog
-    const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        processFile(event.target.files?.[0]);
-    };
-
-    // Runs when the user clicks the "+" button
-    const handleAddImageClick = () => {
-        fileInputRef.current?.click();
-    };
-
     // Handles text changes and auto-grows the textarea
     const handleQueryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setQuery(event.target.value);
         mutation.reset(); // Clear errors on new input
-    };
-
-    // --- Paste Image Handler ---
-    const handlePaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
-        const items = event.clipboardData?.items;
-        if (!items) return;
-
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            if (item.kind === "file" && item.type.startsWith("image/")) {
-                const file = item.getAsFile();
-                if (file) {
-                    processFile(file);
-                    event.preventDefault();
-                    break;
-                }
-            }
-        }
-    };
-
-    // --- Remove Image Handler ---
-    const removeImage = () => {
-        setImageFile(null);
-        mutation.reset();
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    // --- Drag-and-Drop Handlers ---
-    const handleDragOver = (event: DragEvent<HTMLElement>) => {
-        let isImageFile = false;
-        if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
-            for (let i = 0; i < event.dataTransfer.items.length; i++) {
-                const item = event.dataTransfer.items[i];
-                if (item.kind === "file" && item.type.startsWith("image/")) {
-                    isImageFile = true;
-                    break;
-                }
-            }
-        } else {
-            isImageFile = event.dataTransfer.types.includes("Files");
-        }
-
-        if (isImageFile) {
-            event.preventDefault();
-            setIsDragging(true);
-        }
-    };
-
-    const handleDragLeave = (event: DragEvent<HTMLElement>) => {
-        event.preventDefault();
-        setIsDragging(false);
-    };
-
-    const handleDrop = (event: DragEvent<HTMLElement>) => {
-        if (isDragging) {
-            event.preventDefault(); // Prevent the file from opening in the browser
-            processFile(event.dataTransfer.files?.[0]);
-        }
-        setIsDragging(false);
     };
 
     // --- Form Submit Logic ---
@@ -268,7 +98,10 @@ function SearchBar(props: {
         }
 
         startTimeRef.current = performance.now();
-        mutation.mutate({ query: query.trim(), image: imageFile, correctionEnabled, searchMode });
+        mutation.mutate(
+            { query: query.trim(), image: imageFile, correctionEnabled, searchMode },
+            { onSuccess: handleSearchSuccess },
+        );
     };
 
     // --- Submit on Enter (but not Shift+Enter) ---
@@ -278,24 +111,6 @@ function SearchBar(props: {
             handleFormSubmit();
         }
     };
-
-    // --- Memory Cleanup & Preview URL Effect ---
-    useEffect(() => {
-        let objectUrl: string | null = null;
-
-        if (imageFile) {
-            objectUrl = URL.createObjectURL(imageFile);
-            setPreviewUrl(objectUrl);
-        } else {
-            setPreviewUrl("");
-        }
-
-        return () => {
-            if (objectUrl) {
-                URL.revokeObjectURL(objectUrl);
-            }
-        };
-    }, [imageFile]);
 
     return (
         <form
@@ -356,13 +171,14 @@ function SearchBar(props: {
             {/* --- Bottom Row --- */}
             <div className="flex items-center justify-between px-2 pt-1 pb-2">
                 {/* --- Image Preview --- */}
-                {previewUrl ? (
+                {previewUrl && searchMode !== "iwt" ? (
                     <div className="flex p-1">
                         <div className="relative">
                             <img
                                 src={previewUrl}
                                 alt={imageFile ? `Preview of ${imageFile.name}` : ""}
                                 className="pointer-events-none max-h-24 max-w-xs rounded-[1rem] shadow-md"
+                                onError={() => removeImage()}
                             />
                             <button
                                 onClick={removeImage}
@@ -417,83 +233,7 @@ function SearchBar(props: {
                         </Button>
                     </Tooltip>
                     {/* Mode Button with Dropdown */}
-                    <div className="relative">
-                        <Tooltip
-                            content={
-                                searchMode === "std"
-                                    ? "Standard mode: text↔text, image↔image, hybrid↔hybrid matching"
-                                    : searchMode === "iwt"
-                                      ? "Image with text: cross-modal search using text query to find images"
-                                      : "Text with image: cross-modal search using image query to find text descriptions"
-                            }
-                        >
-                            <button
-                                ref={modeButtonRef}
-                                type="button"
-                                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                                className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 duration-200 hover:bg-gray-300 hover:text-gray-800"
-                                aria-label={`Current mode: ${searchMode}, click to change`}
-                                aria-expanded={isSettingsOpen}
-                                aria-haspopup="true"
-                            >
-                                <span>{searchMode}</span>
-                                <Icons.ChevronDown className="h-4 w-4" />
-                            </button>
-                        </Tooltip>
-                        {isSettingsOpen && (
-                            <div ref={popoverRef} className="absolute top-full right-0 z-50 mt-4">
-                                <Card className="rounded-[1.5rem]">
-                                    <CardContent className="p-4">
-                                        <p className="mb-2 ml-2 text-sm font-medium text-gray-700">Search Mode</p>
-                                        <div className="relative flex overflow-hidden rounded-full border border-gray-200 bg-white">
-                                            {/* Moving highlight background */}
-                                            <div
-                                                className={`absolute h-full w-[calc(33.33%)] bg-emerald-200 transition-all duration-200 ${
-                                                    searchMode === "std"
-                                                        ? "left-0"
-                                                        : searchMode === "iwt"
-                                                          ? "left-[33.33%]"
-                                                          : "left-[66.66%]"
-                                                }`}
-                                            />
-                                            <div className="relative flex w-full p-1">
-                                                <Tooltip content="Standard mode: text↔text, image↔image, hybrid↔hybrid matching">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSearchMode("std")}
-                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
-                                                        aria-pressed={searchMode === "std"}
-                                                    >
-                                                        std
-                                                    </button>
-                                                </Tooltip>
-                                                <Tooltip content="Image with text: cross-modal search using text query to find images">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSearchMode("iwt")}
-                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
-                                                        aria-pressed={searchMode === "iwt"}
-                                                    >
-                                                        iwt
-                                                    </button>
-                                                </Tooltip>
-                                                <Tooltip content="Text with image: cross-modal search using image query to find text descriptions">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setSearchMode("twi")}
-                                                        className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
-                                                        aria-pressed={searchMode === "twi"}
-                                                    >
-                                                        twi
-                                                    </button>
-                                                </Tooltip>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        )}
-                    </div>
+                    <SearchModeMenu searchMode={searchMode} onSearchModeChange={setSearchMode} />
                     {/* --- Submit Button --- */}
                     <Button
                         id="submit"
