@@ -23,6 +23,9 @@ describe("Button component", () => {
 
         rerender(<Button variant="destructive">Destructive</Button>);
         expect(screen.getByRole("button")).toHaveClass("bg-red-50");
+
+        rerender(<Button variant="gray">Gray</Button>);
+        expect(screen.getByRole("button")).toHaveClass("bg-gray-200");
     });
 
     it("renders with different sizes", () => {
@@ -61,5 +64,34 @@ describe("Button component", () => {
         render(<Button className="custom-class">Custom</Button>);
         const button = screen.getByRole("button");
         expect(button).toHaveClass("custom-class");
+    });
+
+    it("renders with type attribute", () => {
+        render(<Button type="submit">Submit</Button>);
+        const button = screen.getByRole("button");
+        expect(button).toHaveAttribute("type", "submit");
+    });
+
+    it("supports aria-label", () => {
+        render(<Button aria-label="Close">X</Button>);
+        const button = screen.getByRole("button");
+        expect(button).toHaveAttribute("aria-label", "Close");
+    });
+
+    it("supports aria-pressed for toggle buttons", () => {
+        render(<Button aria-pressed="true">Toggle</Button>);
+        const button = screen.getByRole("button");
+        expect(button).toHaveAttribute("aria-pressed", "true");
+    });
+
+    it("renders children correctly", () => {
+        render(
+            <Button>
+                <span>Icon</span>
+                <span>Text</span>
+            </Button>,
+        );
+        expect(screen.getByText("Icon")).toBeInTheDocument();
+        expect(screen.getByText("Text")).toBeInTheDocument();
     });
 });
