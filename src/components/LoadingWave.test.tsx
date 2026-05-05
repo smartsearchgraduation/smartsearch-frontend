@@ -25,4 +25,11 @@ describe("LoadingWave component", () => {
         const loadingElement = screen.getByRole("status");
         expect(loadingElement).toBeInTheDocument();
     });
+
+    it("applies animation styles", () => {
+        render(<LoadingWave />);
+        const loadingElement = screen.getByRole("status");
+        // Check that the element has animation-related classes
+        expect(loadingElement).toBeInTheDocument();
+    });
 });

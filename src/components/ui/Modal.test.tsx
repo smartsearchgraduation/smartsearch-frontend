@@ -116,4 +116,3 @@ describe("Modal", () => {
         expect(modal).toBeInTheDocument();
     });
 });
-

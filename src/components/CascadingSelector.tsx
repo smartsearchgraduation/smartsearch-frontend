@@ -27,7 +27,7 @@ export function CascadingSelector({
     const activeSubCategoryRef = useRef<HTMLLabelElement>(null);
 
     useEffect(() => {
-        if (activeCategoryRef.current) {
+        if (activeCategoryRef.current && typeof activeCategoryRef.current.scrollIntoView === "function") {
             activeCategoryRef.current.scrollIntoView({
                 block: "nearest",
                 behavior: "smooth",
@@ -36,9 +36,9 @@ export function CascadingSelector({
     }, [selectedCategoryId]);
 
     useEffect(() => {
-        if (activeSubCategoryRef.current) {
+        if (activeSubCategoryRef.current && typeof activeSubCategoryRef.current.scrollIntoView === "function") {
             activeSubCategoryRef.current.scrollIntoView({
-                block: "nearest",
+                block: "center",
                 behavior: "smooth",
             });
         }

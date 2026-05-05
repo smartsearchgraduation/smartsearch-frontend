@@ -41,4 +41,3 @@ describe("Icons", () => {
         expect(svg).toHaveAttribute("height", "32");
     });
 });
-

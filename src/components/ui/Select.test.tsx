@@ -85,4 +85,3 @@ describe("Select", () => {
         expect(icon).toBeInTheDocument();
     });
 });
-

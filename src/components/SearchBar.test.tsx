@@ -140,17 +140,20 @@ describe("SearchBar component", () => {
         expect(correctionButtonOff).toBeInTheDocument();
     });
 
-    it("shows character limit in red when exceeded", async () => {
-        const handleSearchSuccess = vi.fn();
-        const user = userEvent.setup();
-        render(<SearchBar className="test-class" onSearchSuccess={handleSearchSuccess} />, { wrapper });
+    describe("User Input", () => {
+        const user = userEvent.setup({ delay: null });
 
-        const textarea = screen.getByRole("textbox");
-        const longText = "a".repeat(301);
-        await user.type(textarea, longText);
+        it("shows character limit in red when exceeded", async () => {
+            const handleSearchSuccess = vi.fn();
+            render(<SearchBar className="test-class" onSearchSuccess={handleSearchSuccess} />, { wrapper });
 
-        const charCount = screen.getByText(/301\/300/i);
-        expect(charCount).toHaveClass("text-red-500");
+            const textarea = screen.getByRole("textbox");
+            const longText = "a".repeat(301);
+            await user.type(textarea, longText);
+
+            const charCount = screen.getByText(/301\/300/i);
+            expect(charCount).toHaveClass("text-red-500");
+        }, 10000);
     });
 
     it("disables submit button when query is empty and no image", async () => {

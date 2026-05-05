@@ -73,7 +73,9 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                     <Tooltip content="Standard mode: text↔text, image↔image, hybrid↔hybrid matching">
                                         <button
                                             type="button"
-                                            onClick={() => props.onSearchModeChange("std")}
+                                            onClick={() => {
+                                                props.onSearchModeChange("std");
+                                            }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "std"}
                                         >
@@ -83,7 +85,9 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                     <Tooltip content="Image with text: cross-modal search using text query to find images">
                                         <button
                                             type="button"
-                                            onClick={() => props.onSearchModeChange("iwt")}
+                                            onClick={() => {
+                                                props.onSearchModeChange("iwt");
+                                            }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "iwt"}
                                         >
@@ -93,7 +97,9 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                     <Tooltip content="Text with image: cross-modal search using image query to find text descriptions">
                                         <button
                                             type="button"
-                                            onClick={() => props.onSearchModeChange("twi")}
+                                            onClick={() => {
+                                                props.onSearchModeChange("twi");
+                                            }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "twi"}
                                         >
