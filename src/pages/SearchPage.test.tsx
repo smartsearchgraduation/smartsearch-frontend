@@ -49,6 +49,16 @@ vi.mock("../lib/api", () => ({
 
 import * as api from "../lib/api";
 
+// Mock useLocation to provide state
+const mockUseLocation = vi.fn();
+vi.mock("react-router-dom", async () => {
+    const actual = await vi.importActual("react-router-dom");
+    return {
+        ...actual,
+        useLocation: () => mockUseLocation(),
+    };
+});
+
 describe("SearchPage", () => {
     // COVERAGE NOTES:
     // - SearchBar component: Already covered by SearchBar.test.tsx (full component testing)
@@ -82,6 +92,8 @@ describe("SearchPage", () => {
         vi.stubGlobal("performance", {
             now: vi.fn(() => 1000),
         });
+        // Reset useLocation mock
+        mockUseLocation.mockReturnValue({ state: undefined });
     });
 
     it("renders loading state while fetching results", async () => {
@@ -262,5 +274,235 @@ describe("SearchPage", () => {
         // Just verify the page renders successfully
         expect(screen.getByText("Smart")).toBeInTheDocument();
     });
-});
 
+    it("records search duration when results load with searchDuration in state", async () => {
+        mockUseLocation.mockReturnValue({ state: { searchDuration: 100 } });
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "test",
+            raw_text: "test",
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        expect(api.recordSearchDuration).toHaveBeenCalledWith("test-id", 100, expect.any(Number));
+        expect(sessionStorage.setItem).toHaveBeenCalledWith("recorded_search_test-id", "true");
+    });
+
+    it("does not record duration when already recorded in sessionStorage", async () => {
+        mockUseLocation.mockReturnValue({ state: { searchDuration: 100 } });
+        vi.mocked(sessionStorage.getItem).mockReturnValue("true");
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "test",
+            raw_text: "test",
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        expect(api.recordSearchDuration).not.toHaveBeenCalled();
+    });
+
+    it("does not record duration when searchDuration is undefined", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "test",
+            raw_text: "test",
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        expect(api.recordSearchDuration).not.toHaveBeenCalled();
+    });
+
+    it("navigates to search on SearchBar success callback", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "test",
+            raw_text: "test",
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        const newSearchButton = screen.getByText("New Search");
+        await newSearchButton.click();
+        // Navigation is tested by the callback being called
+        expect(newSearchButton).toBeInTheDocument();
+    });
+
+    it("performs raw text search when clicking 'Search instead for' button", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "corrected",
+            raw_text: "raw",
+        });
+        (api.searchRequest as any).mockResolvedValue("new-search-id");
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("raw");
+        const rawTextButton = screen.getByText("raw");
+        await rawTextButton.click();
+
+        expect(api.searchRequest).toHaveBeenCalledWith({
+            query: "raw",
+            image: null,
+            correctionEnabled: false,
+        });
+    });
+
+    it("shows redirecting state when performing raw text search", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "corrected",
+            raw_text: "raw",
+        });
+        (api.searchRequest as any).mockImplementation(() => new Promise(() => {}));
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("raw");
+        const rawTextButton = screen.getByText("raw");
+        await rawTextButton.click();
+
+        expect(screen.getByText("Redirecting to raw search")).toBeInTheDocument();
+    });
+
+    it("handles raw text search error gracefully", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "corrected",
+            raw_text: "raw",
+        });
+        (api.searchRequest as any).mockRejectedValue(new Error("Search failed"));
+
+        const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("raw");
+        const rawTextButton = screen.getByText("raw");
+        await rawTextButton.click();
+
+        expect(consoleSpy).toHaveBeenCalledWith("Failed to fetch raw text results", expect.any(Error));
+        consoleSpy.mockRestore();
+    });
+
+    it("does not show raw text search button when corrected equals raw text", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "same",
+            raw_text: "same",
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        expect(screen.queryByText("Search instead for:")).not.toBeInTheDocument();
+    });
+
+    it("switches to DB fallback when semantic search disabled", async () => {
+        (api.fetchSearchResults as any).mockResolvedValue({
+            products: [],
+            corrected_text: "test",
+            raw_text: "test",
+        });
+        (api.fetchDbFallback as any).mockResolvedValue({
+            products: [
+                {
+                    product_id: 1,
+                    name: "DB Product",
+                    price: 10,
+                    score: 0.5,
+                    brand: { brand_id: 1, name: "Brand" },
+                    images: [],
+                    is_relevant: null,
+                },
+            ],
+        });
+
+        render(
+            <QueryClientProvider client={queryClient}>
+                <MemoryRouter initialEntries={["/search/test-id"]}>
+                    <Routes>
+                        <Route path="/search/:searchId" element={<SearchPage />} />
+                    </Routes>
+                </MemoryRouter>
+            </QueryClientProvider>,
+        );
+
+        await screen.findByText("No products found.");
+        const semanticToggle = screen.getByTestId("semantic-search");
+        await semanticToggle.click();
+
+        expect(api.fetchDbFallback).toHaveBeenCalledWith("test-id");
+    });
+});

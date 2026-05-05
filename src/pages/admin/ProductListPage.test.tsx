@@ -375,4 +375,3 @@ describe("ProductListPage", () => {
         await screen.findByText(/Page 1 of 3/);
     });
 });
-

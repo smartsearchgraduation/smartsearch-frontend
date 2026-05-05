@@ -113,4 +113,3 @@ describe("Tooltip", () => {
         // but it's accessible via hover which is standard for tooltips
     });
 });
-

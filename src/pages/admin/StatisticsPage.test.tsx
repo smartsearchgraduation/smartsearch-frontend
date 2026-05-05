@@ -384,4 +384,3 @@ describe("StatisticsPage", () => {
         expect(rows[2]).toHaveAttribute("data-id", "1");
     });
 });
-

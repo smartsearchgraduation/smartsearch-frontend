@@ -597,4 +597,3 @@ describe("SettingsPage", () => {
         }
     });
 });
-

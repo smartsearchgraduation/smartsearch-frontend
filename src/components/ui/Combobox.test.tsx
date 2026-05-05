@@ -177,4 +177,3 @@ describe("Combobox", () => {
         expect(label.getAttribute("for")).toBe(input.getAttribute("id"));
     });
 });
-

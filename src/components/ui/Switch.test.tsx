@@ -67,4 +67,3 @@ describe("Switch", () => {
         expect(label).toHaveClass("custom-class");
     });
 });
-

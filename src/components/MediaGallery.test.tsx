@@ -390,4 +390,3 @@ describe("MediaGallery", () => {
         });
     });
 });
-

@@ -84,5 +84,83 @@ describe("Pagination", () => {
         await user.tab();
         expect(prevButton).toHaveFocus();
     });
-});
 
+    describe("getPageNumbers function coverage", () => {
+        it("shows all pages when total pages <= 7", () => {
+            render(<Pagination currentPage={3} totalPages={5} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "3" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "5" })).toBeInTheDocument();
+        });
+
+        it("shows ellipsis at end when current page is early (<= 4)", () => {
+            render(<Pagination currentPage={3} totalPages={10} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "3" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "5" })).toBeInTheDocument();
+            expect(screen.getByText("...")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "10" })).toBeInTheDocument();
+        });
+
+        it("shows ellipsis at start when current page is late (>= totalPages - 3)", () => {
+            render(<Pagination currentPage={8} totalPages={10} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByText("...")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "6" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "7" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "8" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "9" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "10" })).toBeInTheDocument();
+        });
+
+        it("shows ellipsis on both sides when current page is in middle", () => {
+            render(<Pagination currentPage={5} totalPages={10} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            const ellipsisElements = screen.getAllByText("...");
+            expect(ellipsisElements).toHaveLength(2);
+            expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "5" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "6" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "10" })).toBeInTheDocument();
+        });
+
+        it("handles edge case with exactly 7 pages", () => {
+            render(<Pagination currentPage={4} totalPages={7} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "3" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "5" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "6" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "7" })).toBeInTheDocument();
+            // No ellipsis when exactly 7 pages
+            expect(screen.queryByText("...")).not.toBeInTheDocument();
+        });
+
+        it("handles large page numbers at start", () => {
+            render(<Pagination currentPage={1} totalPages={20} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "2" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "3" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "4" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "5" })).toBeInTheDocument();
+            expect(screen.getByText("...")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "20" })).toBeInTheDocument();
+        });
+
+        it("handles large page numbers at end", () => {
+            render(<Pagination currentPage={20} totalPages={20} onPageChange={vi.fn()} />);
+            expect(screen.getByRole("button", { name: "1" })).toBeInTheDocument();
+            expect(screen.getByText("...")).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "16" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "17" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "18" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "19" })).toBeInTheDocument();
+            expect(screen.getByRole("button", { name: "20" })).toBeInTheDocument();
+        });
+    });
+});

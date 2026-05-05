@@ -193,4 +193,3 @@ describe("SearchModeMenu", () => {
         });
     });
 });
-

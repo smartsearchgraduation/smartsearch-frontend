@@ -135,4 +135,3 @@ describe("AdminPage", () => {
         expect(statisticsLink).toBeInTheDocument();
     });
 });
-

@@ -235,6 +235,35 @@ describe("ProductFormModal", () => {
 
             expect(priceInput).toHaveValue(99);
         });
+
+        it("handles category select when same category selected (early return)", async () => {
+            renderModal(true, mockProduct);
+
+            await waitFor(() => {
+                expect(screen.getByLabelText("Product Title")).toHaveValue("Test Product");
+            });
+
+            // Select the same category that's already selected
+            const electronicsRadio = screen.getByLabelText("Electronics");
+            fireEvent.click(electronicsRadio);
+
+            // Should not clear subcategory since it's the same category
+            await waitFor(() => {
+                expect(screen.getByLabelText("Phones")).toBeInTheDocument();
+            });
+        });
+
+        it("handles image loading error gracefully", async () => {
+            vi.mocked(api.fetchProductImages).mockRejectedValue(new Error("Failed to fetch images"));
+            const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+            renderModal(true, mockProduct);
+
+            await waitFor(() => {
+                expect(consoleSpy).toHaveBeenCalledWith("Failed to load existing images", expect.any(Error));
+            });
+
+            consoleSpy.mockRestore();
+        });
     });
 });
-

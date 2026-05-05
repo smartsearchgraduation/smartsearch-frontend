@@ -261,4 +261,3 @@ describe("ProductPage", () => {
         expect(screen.getByText("Smart")).toBeInTheDocument();
     });
 });
-

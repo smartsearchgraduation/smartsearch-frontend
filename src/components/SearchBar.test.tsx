@@ -218,4 +218,3 @@ describe("SearchBar component", () => {
         expect(textarea).toBeInTheDocument();
     });
 });
-
