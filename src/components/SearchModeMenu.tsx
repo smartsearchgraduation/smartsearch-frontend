@@ -75,7 +75,6 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                             type="button"
                                             onClick={() => {
                                                 props.onSearchModeChange("std");
-                                                setIsSettingsOpen(false);
                                             }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "std"}
@@ -88,7 +87,6 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                             type="button"
                                             onClick={() => {
                                                 props.onSearchModeChange("iwt");
-                                                setIsSettingsOpen(false);
                                             }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "iwt"}
@@ -101,7 +99,6 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
                                             type="button"
                                             onClick={() => {
                                                 props.onSearchModeChange("twi");
-                                                setIsSettingsOpen(false);
                                             }}
                                             className="flex-1 cursor-pointer px-3 py-1 text-sm font-medium text-gray-700 transition-colors hover:text-gray-900"
                                             aria-pressed={props.searchMode === "twi"}
@@ -120,5 +117,3 @@ function SearchModeMenu(props: { searchMode: SearchMode; onSearchModeChange: (se
 }
 
 export default SearchModeMenu;
-
-
