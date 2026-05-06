@@ -20,7 +20,6 @@ import ProductPage from "../../pages/ProductPage";
 // ---------- jsdom polyfills ----------
 // canvas.toBlob is needed by useSearchImage's WebP conversion path.
 if (typeof HTMLCanvasElement !== "undefined") {
-    // @ts-expect-error - jsdom canvas does not implement toBlob by default
     HTMLCanvasElement.prototype.toBlob = function (cb: BlobCallback, type = "image/webp") {
         const blob = new Blob(["mock-image-bytes"], { type });
         cb(blob);
@@ -33,7 +32,7 @@ if (typeof HTMLCanvasElement !== "undefined") {
 
 // Image.onload firing reliably in jsdom: emulate a successful load synchronously.
 if (typeof Image !== "undefined") {
-    const OriginalImage = global.Image;
+    type OriginalImage = typeof globalThis.Image;
     class MockImage {
         public src = "";
         public onload: (() => void) | null = null;
@@ -48,15 +47,12 @@ if (typeof Image !== "undefined") {
     }
     // Only override if the default jsdom Image does not auto-fire onload.
     // We always replace because jsdom does not really decode images.
-    // @ts-expect-error - replace global Image for tests
-    global.Image = MockImage as unknown as typeof OriginalImage;
+    globalThis.Image = MockImage as unknown as OriginalImage;
 }
 
 // URL.createObjectURL polyfill (used by useSearchImage for previews).
 if (typeof URL !== "undefined" && typeof URL.createObjectURL !== "function") {
-    // @ts-expect-error - extend URL with createObjectURL
     URL.createObjectURL = vi.fn(() => "blob:mock-preview");
-    // @ts-expect-error - extend URL with revokeObjectURL
     URL.revokeObjectURL = vi.fn();
 }
 
@@ -97,6 +93,7 @@ function renderHomeWithRoutes(extra?: React.ReactNode) {
     return renderWithProviders(<></>, { initialEntries: ["/"], routes });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let lastDestinationState: { searchId?: string; state?: unknown } = {};
 function DestinationProbe() {
     const params = useParams();
@@ -237,7 +234,7 @@ describe("FB-INT-004", () => {
         await user.click(screen.getByRole("button", { name: /submit search/i }));
 
         await waitFor(() => expect(captured).not.toBeNull());
-        expect((captured as FormData).get("correction_enabled")).toBe("false");
+        expect(captured!.get("correction_enabled")).toBe("false");
     });
 });
 
@@ -267,8 +264,8 @@ describe("FB-INT-005", () => {
         await user.click(screen.getByRole("button", { name: /submit search/i }));
 
         await waitFor(() => expect(captured).not.toBeNull());
-        expect((captured as FormData).get("search_mode")).toBe("iwt");
-        expect((captured as FormData).get("raw_text")).toBe("red sneakers");
+        expect(captured!.get("search_mode")).toBe("iwt");
+        expect(captured!.get("raw_text")).toBe("red sneakers");
     });
 });
 
@@ -478,8 +475,8 @@ describe("FB-INT-010", () => {
         await user.click(rawButton);
 
         await waitFor(() => expect(capturedSearch).not.toBeNull());
-        expect((capturedSearch as FormData).get("raw_text")).toBe("lether jakcet");
-        expect((capturedSearch as FormData).get("correction_enabled")).toBe("false");
+        expect(capturedSearch!.get("raw_text")).toBe("lether jakcet");
+        expect(capturedSearch!.get("correction_enabled")).toBe("false");
     });
 });
 
@@ -557,9 +554,7 @@ describe("FB-INT-011", () => {
 describe("FB-INT-012", () => {
     it("FB-INT-012 — 500 from GET /api/search/:id renders error region", async () => {
         // FB-INT-012: Verify HTTP 500 surfaces as role=alert with thrown message.
-        server.use(
-            http.get("/api/search/:searchId", async () => new HttpResponse(null, { status: 500 })),
-        );
+        server.use(http.get("/api/search/:searchId", async () => new HttpResponse(null, { status: 500 })));
 
         renderWithProviders(<></>, {
             initialEntries: ["/search/err-1"],
@@ -700,9 +695,7 @@ describe("FB-INT-015", () => {
 describe("FB-INT-016", () => {
     it("FB-INT-016 — ProductPage renders error alert on 404", async () => {
         // FB-INT-016: Verify 404 renders role=alert with "Product not found" message.
-        server.use(
-            http.get("/api/products/:productId", async () => new HttpResponse(null, { status: 404 })),
-        );
+        server.use(http.get("/api/products/:productId", async () => new HttpResponse(null, { status: 404 })));
 
         renderWithProviders(<></>, {
             initialEntries: ["/product/9999"],
@@ -736,7 +729,8 @@ describe("FB-INT-017", () => {
         await screen.findByText(/UrbanStyle/);
 
         // Find the like button on the second card (product id 2 = DenimCo)
-        const denimCard = screen.getByText(/DenimCo/).closest("div.group, .group, [class*='group']") ??
+        const denimCard =
+            screen.getByText(/DenimCo/).closest("div.group, .group, [class*='group']") ??
             screen.getByText(/DenimCo/).closest("div") ??
             document.body;
         // Fallback: get all like buttons and pick the second one (cards rendered in product order 1..4)
@@ -793,9 +787,7 @@ describe("FB-INT-018", () => {
 describe("FB-INT-019", () => {
     it("FB-INT-019 — failed feedback (500) reverts the optimistic vote", async () => {
         // FB-INT-019: Verify HTTP 500 reverts optimistic state and alerts the user.
-        server.use(
-            http.post("/api/feedback", async () => new HttpResponse(null, { status: 500 })),
-        );
+        server.use(http.post("/api/feedback", async () => new HttpResponse(null, { status: 500 })));
         const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
 
         renderWithProviders(<></>, {
@@ -852,9 +844,7 @@ describe("FB-INT-020", () => {
 describe("FB-INT-021", () => {
     it("FB-INT-021 — score badge text rounds product.score to a percentage", async () => {
         // FB-INT-021: Verify score=0.926 renders as "Score: 93%".
-        const customProducts = mockProducts.map((p, i) =>
-            i === 0 ? { ...p, score: 0.926 } : p,
-        );
+        const customProducts = mockProducts.map((p, i) => (i === 0 ? { ...p, score: 0.926 } : p));
         server.use(
             http.get("/api/search/:searchId", async ({ params }) =>
                 HttpResponse.json({
@@ -931,9 +921,7 @@ describe("FB-INT-023", () => {
         let captured: { search_id?: unknown; search_duration?: unknown; product_load_duration?: unknown } | null = null;
         let analyticsCount = 0;
         server.use(
-            http.post("/api/search", async () =>
-                HttpResponse.json({ search_id: "search-abc" }),
-            ),
+            http.post("/api/search", async () => HttpResponse.json({ search_id: "search-abc" })),
             http.get("/api/search/:searchId", async ({ params }) =>
                 HttpResponse.json({
                     products: mockProducts,
@@ -1024,9 +1012,7 @@ describe("FB-INT-024", () => {
 describe("FB-INT-025", () => {
     it("FB-INT-025 — POST /api/search 500 surfaces inline error and does not navigate", async () => {
         // FB-INT-025: Verify HTTP 500 from search shows error in SearchBar without navigation.
-        server.use(
-            http.post("/api/search", async () => new HttpResponse(null, { status: 500 })),
-        );
+        server.use(http.post("/api/search", async () => new HttpResponse(null, { status: 500 })));
 
         renderHomeWithRoutes();
         const user = userEvent.setup();
@@ -1178,12 +1164,6 @@ describe("FB-INT-028", () => {
             expect(screen.getByText(/BrandA/)).toBeInTheDocument();
             expect(screen.getByText(/BrandB/)).toBeInTheDocument();
             expect(screen.getByText(/BrandC/)).toBeInTheDocument();
-        });
-        expect(contentType).toMatch(/application\/json/);
-        expect(body).toEqual({ search_id: "search-2" });
-    });
-});
-creen.getByText(/BrandC/)).toBeInTheDocument();
         });
         expect(contentType).toMatch(/application\/json/);
         expect(body).toEqual({ search_id: "search-2" });
