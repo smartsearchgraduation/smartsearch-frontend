@@ -30,6 +30,20 @@ function SearchBar(props: {
         }
     }, [props.queryText]);
 
+    // Sync searchMode with searchMode prop
+    useEffect(() => {
+        if (props.searchMode !== undefined) {
+            setSearchMode(props.searchMode);
+        }
+    }, [props.searchMode]);
+
+    // Sync correctionEnabled with correctionEnabled prop
+    useEffect(() => {
+        if (props.correctionEnabled !== undefined) {
+            setCorrectionEnabled(props.correctionEnabled);
+        }
+    }, [props.correctionEnabled]);
+
     // Auto-resize textarea when query changes
     useEffect(() => {
         if (textAreaRef.current) {
