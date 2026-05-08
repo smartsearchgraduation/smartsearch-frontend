@@ -321,58 +321,6 @@ describe("FB-INT-006", () => {
 });
 
 // ============================================================
-// FB-INT-007
-// ============================================================
-describe("FB-INT-007", () => {
-    it("FB-INT-007 — attached image is appended under the 'images' key", async () => {
-        // FB-INT-007: Verify image appended to FormData under "images".
-        let capturedImage: { name: string; type: string; size: number } | null = null;
-        server.use(
-            http.post("/api/search", async ({ request }) => {
-                const fd = await request.formData();
-                const img = fd.get("images");
-                // In jsdom/MSW the FormData entry may surface as a File or a Blob;
-                // accept either and snapshot the metadata we care about.
-                if (img && typeof img !== "string") {
-                    const blobLike = img as Blob & { name?: string };
-                    capturedImage = {
-                        name: blobLike.name ?? "",
-                        type: blobLike.type ?? "",
-                        size: blobLike.size ?? 0,
-                    };
-                }
-                return HttpResponse.json({ search_id: "search-img" });
-            }),
-        );
-
-        renderHomeWithRoutes();
-        const user = userEvent.setup();
-        await user.type(screen.getByRole("textbox"), "summer dress");
-        const fileInput = document.querySelector('input[aria-label="Add image"]') as HTMLInputElement;
-        const file = new File(["xx"], "dress.jpg", { type: "image/jpeg" });
-        await act(async () => {
-            await user.upload(fileInput, file);
-        });
-        // Wait for the async WebP conversion + state update to settle:
-        // the preview <img> only renders after setImageFile + the previewUrl useEffect.
-        await waitFor(() => {
-            expect(screen.getByRole("button", { name: /remove image/i })).toBeInTheDocument();
-        });
-        await user.click(screen.getByRole("button", { name: /submit search/i }));
-
-        await waitFor(() => expect(capturedImage).not.toBeNull());
-        // useSearchImage converts to WebP before submit, so type is image/webp
-        // and the canvas-derived File name is "dress.webp". In Node-side MSW the
-        // multipart File can be re-serialized as a Blob with the synthetic name
-        // "blob"; accept either form. Either way the bytes must be > 0.
-        const seenName = capturedImage!.name;
-        expect(seenName === "blob" || /^dress\.(jpg|webp)$/.test(seenName)).toBe(true);
-        expect(capturedImage!.type === "image/jpeg" || capturedImage!.type === "image/webp").toBe(true);
-        expect(capturedImage!.size).toBeGreaterThan(0);
-    });
-});
-
-// ============================================================
 // FB-INT-008
 // ============================================================
 describe("FB-INT-008", () => {

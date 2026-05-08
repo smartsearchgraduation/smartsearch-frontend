@@ -22,9 +22,7 @@ export const mockProducts = [
         description: "A stylish vintage leather jacket.",
         is_relevant: null,
         images: [placeholderImage],
-        categories: [
-            { category_id: 18, name: "Jackets", parent: { category_id: 2, name: "Clothing" } },
-        ],
+        categories: [{ category_id: 18, name: "Jackets", parent: { category_id: 2, name: "Clothing" } }],
         subcategory: "Jackets",
         rank: 1,
         score: 0.92,
@@ -40,9 +38,7 @@ export const mockProducts = [
         description: "Comfortable classic fit denim jeans.",
         is_relevant: null,
         images: [placeholderImage],
-        categories: [
-            { category_id: 19, name: "Jeans", parent: { category_id: 2, name: "Clothing" } },
-        ],
+        categories: [{ category_id: 19, name: "Jeans", parent: { category_id: 2, name: "Clothing" } }],
         subcategory: "Jeans",
         rank: 2,
         score: 0.78,
@@ -58,9 +54,7 @@ export const mockProducts = [
         description: "An ergonomic chair for long hours at the desk.",
         is_relevant: null,
         images: [placeholderImage],
-        categories: [
-            { category_id: 11, name: "Furniture", parent: { category_id: 3, name: "Home" } },
-        ],
+        categories: [{ category_id: 11, name: "Furniture", parent: { category_id: 3, name: "Home" } }],
         subcategory: "Furniture",
         rank: 3,
         score: 0.65,
@@ -76,9 +70,7 @@ export const mockProducts = [
         description: "Voice-activated smart speaker with great sound.",
         is_relevant: null,
         images: [placeholderImage],
-        categories: [
-            { category_id: 20, name: "Audio", parent: { category_id: 1, name: "Electronics" } },
-        ],
+        categories: [{ category_id: 20, name: "Audio", parent: { category_id: 1, name: "Electronics" } }],
         subcategory: "Audio",
         rank: 4,
         score: 0.88,
@@ -119,9 +111,7 @@ export const defaultDbFallbackProducts = [
 ];
 
 const defaultHandlers = [
-    http.post("/api/search", async () =>
-        HttpResponse.json({ search_id: "search-default" }),
-    ),
+    http.post("/api/search", async () => HttpResponse.json({ search_id: "search-default" })),
     http.get("/api/search/:searchId", async ({ params }) =>
         HttpResponse.json({
             products: mockProducts,
@@ -149,9 +139,7 @@ const defaultHandlers = [
         return HttpResponse.json(product);
     }),
     http.post("/api/feedback", async () => HttpResponse.json({})),
-    http.post("/api/analytics/search-duration", async () =>
-        HttpResponse.json({ success: true }),
-    ),
+    http.post("/api/analytics/search-duration", async () => HttpResponse.json({ success: true })),
 ];
 
 export const server = setupServer(...defaultHandlers);

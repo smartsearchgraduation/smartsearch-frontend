@@ -11,7 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:ui": "vitest run --ui",
+    "test:ui": "vitest --ui",
     "test:watch": "vitest"
   },
   "dependencies": {
