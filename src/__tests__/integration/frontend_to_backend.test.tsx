@@ -93,12 +93,9 @@ function renderHomeWithRoutes(extra?: React.ReactNode) {
     return renderWithProviders(<></>, { initialEntries: ["/"], routes });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let lastDestinationState: { searchId?: string; state?: unknown } = {};
 function DestinationProbe() {
     const params = useParams();
     const location = useLocation();
-    lastDestinationState = { searchId: params.searchId, state: location.state };
     return (
         <div data-testid="destination">
             <span data-testid="dest-searchId">{params.searchId}</span>
@@ -108,7 +105,6 @@ function DestinationProbe() {
 }
 
 beforeEach(() => {
-    lastDestinationState = {};
     sessionStorage.clear();
 });
 

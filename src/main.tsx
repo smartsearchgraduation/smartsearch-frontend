@@ -15,7 +15,15 @@ const queryClient = new QueryClient({
 });
 
 async function enableMocking() {
-    if (!import.meta.env.DEV || import.meta.env.VITE_USE_LIVE_API) {
+    if (import.meta.env.VITE_USE_LIVE_API) {
+        return;
+    }
+
+    // Enable mocking in dev mode, or in preview when ?mock=true is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const enableMockPreview = urlParams.has("mock") || localStorage.getItem("enableMock") === "true";
+
+    if (!import.meta.env.DEV && !enableMockPreview) {
         return;
     }
 

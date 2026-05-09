@@ -70,7 +70,14 @@ export interface DbFallbackResponse {
 }
 
 let BASE_URL = "https://api.init-ai.com";
-if (import.meta.env.DEV && !import.meta.env.VITE_USE_LIVE_API) {
+// Check for mock preview via URL param or localStorage
+const urlParams = new URLSearchParams(window.location.search);
+const enableMockPreview =
+    (import.meta.env.DEV && !import.meta.env.VITE_USE_LIVE_API) ||
+    urlParams.has("mock") ||
+    localStorage.getItem("enableMock") === "true";
+
+if (enableMockPreview) {
     BASE_URL = "";
 }
 
