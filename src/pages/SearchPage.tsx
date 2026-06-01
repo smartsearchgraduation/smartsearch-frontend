@@ -132,7 +132,12 @@ function SearchPage() {
         return (
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] sm:gap-4">
                 {products.map((product: Product) => (
-                    <ProductCard searchId={searchId} key={product.product_id} product={product} />
+                    <ProductCard
+                        searchId={searchId}
+                        key={product.product_id}
+                        product={product}
+                        semanticSearchEnabled={semanticSearchEnabled}
+                    />
                 ))}
             </div>
         );

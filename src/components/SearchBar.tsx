@@ -143,7 +143,7 @@ function SearchBar(props: {
                     ref={textAreaRef}
                     id="searchbar"
                     name="searchbar"
-                    aria-label="Search using natural language"
+                    aria-label="Search input"
                     aria-invalid={!!mutation.error}
                     aria-describedby={mutation.error ? "search-error" : undefined}
                     rows={1}
@@ -154,7 +154,7 @@ function SearchBar(props: {
                             ? "Describe the image you're looking for"
                             : searchMode === "twi"
                               ? "Upload an image to find matching text descriptions"
-                              : "Search using natural language"
+                              : "Search with natural language, an image, or both..."
                     }
                     autoFocus={props.autofocus || false}
                     value={query}
@@ -218,7 +218,7 @@ function SearchBar(props: {
                             className="flex-shrink-0"
                             aria-label="Add image"
                         >
-                            <Icons.Plus className="h-5 w-5" />
+                            <Icons.ImagePlus className="h-5 w-5" />
                         </Button>
                     </Tooltip>
                 )}

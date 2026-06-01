@@ -8,7 +8,15 @@ import { cn } from "../lib/utils";
 import { ImageCarousel } from "./ImageCarousel";
 import { Tooltip } from "./ui/Tooltip";
 
-function ProductCard({ searchId, product }: { searchId: string; product: Product }) {
+function ProductCard({
+    searchId,
+    product,
+    semanticSearchEnabled,
+}: {
+    searchId: string;
+    product: Product;
+    semanticSearchEnabled?: boolean;
+}) {
     // We keep local state for immediate UI feedback (optimistic UI)
     const [vote, setVote] = useState<"like" | "dislike" | null>(
         product.is_relevant == null ? null : product.is_relevant ? "like" : "dislike",
@@ -46,12 +54,12 @@ function ProductCard({ searchId, product }: { searchId: string; product: Product
                 />
 
                 {/* Score Badge */}
-                {product.score !== undefined && (
+                {semanticSearchEnabled && product.score !== undefined && (
                     <div className="absolute top-0 right-0 z-30">
                         <Tooltip
                             content={
                                 <div className="flex flex-col gap-0.5">
-                                    <span className="font-semibold">Score: {(product.score * 100).toFixed(1)}%</span>
+                                    <span className="font-semibold">Relevance Score</span>
                                     {product.text_score != null && (
                                         <span className="text-gray-300">
                                             Text: {(product.text_score * 100).toFixed(1)}%
