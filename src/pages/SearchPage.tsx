@@ -164,9 +164,9 @@ function SearchPage() {
             </header>
 
             {!isRedirecting && results && (
-                <div className="mx-2 mb-6 flex">
+                <div className="mx-2 mb-6 flex flex-col sm:flex-row">
                     {results.corrected_text !== results.raw_text && (
-                        <div>
+                        <div className="order-2 sm:order-1">
                             <h1 className="visually-hidden">Search Results</h1>
                             <h2 className="mb-1 text-gray-700">
                                 Showing results for:{" "}
@@ -185,8 +185,8 @@ function SearchPage() {
                             </p>
                         </div>
                     )}
-                    <div className="mt-2 ml-auto flex items-center gap-2">
-                        <label htmlFor="semantic-search" className="text-sm text-gray-600">
+                    <div className="order-1 mb-2 ml-auto flex items-center gap-2 sm:order-2 sm:mb-0 sm:mt-2">
+                        <label htmlFor="semantic-search" className="text-sm text-gray-600 whitespace-nowrap">
                             Semantic search
                         </label>
                         <Switch

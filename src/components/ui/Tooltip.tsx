@@ -19,6 +19,25 @@ export const Tooltip = ({ children, content, className }: TooltipProps) => {
     const childRef = React.useRef<HTMLDivElement>(null);
     const tooltipRef = React.useRef<HTMLDivElement>(null);
 
+    // Handle click outside to dismiss tooltip (for mobile)
+    React.useEffect(() => {
+        if (!isVisible) return;
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                childRef.current &&
+                tooltipRef.current &&
+                !childRef.current.contains(event.target as Node) &&
+                !tooltipRef.current.contains(event.target as Node)
+            ) {
+                setIsVisible(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isVisible]);
+
     const updatePosition = React.useCallback(() => {
         if (childRef.current && tooltipRef.current && !isContentEmpty(content)) {
             const rect = childRef.current.getBoundingClientRect();
