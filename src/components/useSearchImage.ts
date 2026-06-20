@@ -1,6 +1,21 @@
 import { useEffect, useRef, useState, type ChangeEvent, type ClipboardEvent, type DragEvent } from "react";
 import type { QueryImage } from "../lib/api";
 
+// Cheap HEIC detection (no library) so we only load the heavy decoder on demand.
+// Checks the ISO-BMFF "ftyp" box brand in the first bytes, with a MIME/extension fallback.
+async function isLikelyHeic(file: File): Promise<boolean> {
+    if (file.type === "image/heic" || file.type === "image/heif") return true;
+    if (/\.(heic|heif)$/i.test(file.name)) return true;
+    try {
+        const header = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+        if (String.fromCharCode(...header.subarray(4, 8)) !== "ftyp") return false;
+        const brand = String.fromCharCode(...header.subarray(8, 12)).toLowerCase();
+        return ["heic", "heix", "heim", "heis", "hevc", "hevx", "mif1", "msf1", "heif"].includes(brand);
+    } catch {
+        return false;
+    }
+}
+
 function useSearchImage(props: { queryImage?: QueryImage; onImageChange: () => void }) {
     const [imageFile, setImageFile] = useState<File | null>(null); // The actual file
     const [previewUrl, setPreviewUrl] = useState<string>(""); // The blob: URL for <img src>
@@ -75,16 +90,29 @@ function useSearchImage(props: { queryImage?: QueryImage; onImageChange: () => v
     };
 
     const processFile = async (file: File | null | undefined) => {
-        if (file && file.type.startsWith("image/")) {
-            try {
-                const convertedFile = await convertImageToWebP(file);
-                setImageFile(convertedFile);
-                props.onImageChange(); // Clear any previous errors
-            } catch (error) {
-                console.error("Image conversion failed:", error);
-                // Fallback to original if conversion fails, or handle error appropriate
-                // For now, let's just not set it if it fails to ensure we don't send bad data
+        if (!file) return;
+        try {
+            // HEIC/HEIF (e.g. Samsung/iPhone photos) can't be decoded by <canvas>,
+            // so decode them to a JPEG first. Low quality is fine since we downscale next.
+            let workingFile = file;
+            if (await isLikelyHeic(file)) {
+                // Lazy-load the heavy HEIC decoder only when it's actually needed.
+                const { heicTo } = await import("heic-to");
+                const jpegBlob = await heicTo({ blob: file, type: "image/jpeg", quality: 0.5 });
+                workingFile = new File([jpegBlob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                    type: "image/jpeg",
+                });
             }
+
+            if (!workingFile.type.startsWith("image/")) return;
+
+            const convertedFile = await convertImageToWebP(workingFile);
+            setImageFile(convertedFile);
+            props.onImageChange(); // Clear any previous errors
+        } catch (error) {
+            console.error("Image conversion failed:", error);
+            // Fallback to original if conversion fails, or handle error appropriate
+            // For now, let's just not set it if it fails to ensure we don't send bad data
         }
     };
 
